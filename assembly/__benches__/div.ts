@@ -1,4 +1,4 @@
-import { MpZ } from '../mp';
+import { MpZ } from '..';
 import { BigInt } from 'as-bigint/assembly/BigInt';
 
 const a = '0xFEEBDAEDFEEBDAEDFEEBDAEDFEEBDAEDFEEBDAEDFEEBDAEDFEEBDAEDFEEBDAED';

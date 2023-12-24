@@ -1,4 +1,4 @@
-import { MpZ } from '../mp';
+import { MpZ } from '..';
 import { assertSame } from './assertions';
 
 function fact(n: u32): MpZ {

@@ -1,1 +1,1 @@
-export * from './assembly/mp';
+export * from './assembly/index';

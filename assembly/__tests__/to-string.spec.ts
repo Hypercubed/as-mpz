@@ -1,4 +1,4 @@
-import { MpZ } from '../mp';
+import { MpZ } from '..';
 
 function fact(n: u32): MpZ {
   let a = MpZ.from(1);
