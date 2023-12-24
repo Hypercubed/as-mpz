@@ -1,11 +1,11 @@
 {
   "name": "@hypercubed/as-mpz",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "AssemblyScript package for math with arbitrarily large integers",
   "ascMain": "assembly/mp.ts",
   "types": "assembly/mp.ts",
   "source": "assembly/mp.ts",
-  "main": "assembly/mp.ts",
+  "main": "build/release.ts",
   "files": [
     "assembly",
     "README.md",
