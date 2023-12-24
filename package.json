@@ -1,9 +1,18 @@
 {
-  "name": "as-mpz",
+  "name": "@hypercubed/as-mpz",
   "version": "0.0.0",
   "description": "AssemblyScript package for math with arbitrarily large integers",
-  "asMain": "assembly/index.ts",
-  "main": "build/release.js",
+  "ascMain": "assembly/mp.ts",
+  "types": "assembly/mp.ts",
+  "source": "assembly/mp.ts",
+  "main": "assembly/mp.ts",
+  "files": [
+    "assembly",
+    "README.md",
+    "package.json",
+    "tsconfig.json",
+    "asconfig.json"
+  ],
   "scripts": {
     "test": "npm-run-all --serial prettier tap asp",
     "asp": "asp --verbose",
