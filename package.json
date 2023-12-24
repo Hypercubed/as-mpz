@@ -1,0 +1,38 @@
+{
+  "name": "as-mpz",
+  "version": "0.0.0",
+  "description": "AssemblyScript package for math with arbitrarily large integers",
+  "asMain": "assembly/index.ts",
+  "main": "build/release.js",
+  "scripts": {
+    "test": "npm-run-all --serial prettier tap asp",
+    "asp": "asp --verbose",
+    "pretap": "npm run asbuild:debug",
+    "prettier": "prettier . --check",
+    "tap": "tap --node-arg=\"--no-warnings\" --allow-empty-coverage --disable-coverage run ./tests/*.js",
+    "asbuild:debug": "asc assembly/index.ts --target debug",
+    "asbuild:release": "asc assembly/index.ts --target release",
+    "asbuild": "npm run asbuild:debug && npm run asbuild:release",
+    "bench": "astral",
+    "fix": "prettier . --write"
+  },
+  "author": "J. Harshbarger",
+  "license": "MIT",
+  "devDependencies": {
+    "@as-pect/cli": "^8.1.0",
+    "@as-tral/cli": "^2.0.1",
+    "as-bigint": "^0.5.3",
+    "assemblyscript": "^0.27.22",
+    "assemblyscript-prettier": "^3.0.1",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^3.1.1",
+    "tap": "^18.6.1"
+  },
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./build/release.js",
+      "types": "./build/release.d.ts"
+    }
+  }
+}

@@ -1,0 +1,4 @@
+build/
+as-tral/
+node_modules/
+.tap/
