@@ -1,5 +1,5 @@
 import { MpZ } from '..';
-import { BigInt } from '../../node_modules/as-bigint/assembly/BigInt';
+import { BigInt } from 'as-bigint/assembly/BigInt';
 
 const s = '0xDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEF';
 const mpz = blackbox(MpZ.from(s));

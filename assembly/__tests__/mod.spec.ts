@@ -2,7 +2,7 @@ import { MpZ } from '..';
 import { assertSame } from './assertions';
 
 describe('mod', () => {
-  it('retrun correct results', () => {
+  it('return correct results', () => {
     assertSame(MpZ.from(0x0) % MpZ.from(0x1), 0);
     assertSame(MpZ.from(0x1) % MpZ.from(0x1), 0);
     assertSame(MpZ.from(0xdeadbeef) % MpZ.from(0x1), 0);

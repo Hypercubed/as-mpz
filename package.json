@@ -18,7 +18,7 @@
   ],
   "scripts": {
     "test": "npm-run-all --serial prettier tap asp",
-    "asp": "asp --verbose",
+    "asp": "asp",
     "pretap": "npm run asbuild:debug",
     "prettier": "prettier . --check",
     "tap": "tap --node-arg=\"--no-warnings\" --allow-empty-coverage --disable-coverage run ./tests/*.js",

@@ -9,14 +9,18 @@ const mpzB = blackbox(MpZ.from(b));
 const bigIntA = blackbox(BigInt.from(a));
 const bigIntB = blackbox(BigInt.from(b));
 
-bench('MpZ#mul', () => {
-  blackbox(mpzA.mul(mpzB));
+bench('MpZ#div', () => {
+  blackbox(mpzA.div(mpzB));
 });
 
-bench('MpZ#_umulKaratsuba', () => {
-  blackbox(mpzA.mul(mpzB));
+bench('MpZ#_udiv', () => {
+  blackbox(mpzA._udiv(mpzB));
 });
 
-bench('BigInt#mul', () => {
-  blackbox(bigIntA.mul(bigIntB));
+bench('MpZ#_udivNewtonInv', () => {
+  blackbox(mpzA._udivNewtonInv(mpzB));
+});
+
+bench('BigInt#div', () => {
+  blackbox(bigIntA.div(bigIntB));
 });

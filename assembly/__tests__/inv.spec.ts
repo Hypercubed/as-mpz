@@ -2,7 +2,7 @@ import { MpZ } from '..';
 import { assertSame } from './assertions';
 
 describe('inv', () => {
-  it('retrun correct results', () => {
+  it('return correct results', () => {
     assertSame(MpZ.from(0x1).inv(0), 0x1);
     assertSame(MpZ.from(0x1).inv(1), 0x2);
     assertSame(MpZ.from(0x1).inv(4), 0x10);

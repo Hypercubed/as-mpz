@@ -10,7 +10,7 @@ function fact(n: u32): MpZ {
 }
 
 describe('fact', () => {
-  it('retrun correct results', () => {
+  it('return correct results', () => {
     assertSame(fact(0), MpZ.from(1));
     assertSame(fact(1), MpZ.from(1));
     assertSame(fact(2), MpZ.from(2));
