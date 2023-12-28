@@ -15,12 +15,13 @@ bench('MpZ#mod', () => {
 });
 
 bench('MpZ#_umod', () => {
+  // @ts-ignore
   blackbox(mpzA._umod(mpzM));
 });
 
-bench('MpZ#_umodNewtonInv', () => {
-  blackbox(mpzA._umodNewtonInv(mpzM));
-});
+// bench('MpZ#_umodNewtonInv', () => {
+//   blackbox(mpzA._umodNewtonInv(mpzM));
+// });
 
 bench('BigInt#mod', () => {
   blackbox(bigIntA.mod(bigIntM));

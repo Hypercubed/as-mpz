@@ -13,9 +13,10 @@ bench('MpZ#mul', () => {
   blackbox(mpzA.mul(mpzB));
 });
 
-bench('MpZ#_umulKaratsuba', () => {
-  blackbox(mpzA.mul(mpzB));
-});
+// bench('MpZ#_umulKaratsuba', () => {
+//   // @ts-ignore
+//   blackbox(mpzA._umulKaratsuba(mpzB));
+// });
 
 bench('BigInt#mul', () => {
   blackbox(bigIntA.mul(bigIntB));

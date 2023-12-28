@@ -14,12 +14,13 @@ bench('MpZ#div', () => {
 });
 
 bench('MpZ#_udiv', () => {
+  // @ts-ignore
   blackbox(mpzA._udiv(mpzB));
 });
 
-bench('MpZ#_udivNewtonInv', () => {
-  blackbox(mpzA._udivNewtonInv(mpzB));
-});
+// bench('MpZ#_udivNewtonInv', () => {
+//   blackbox(mpzA._udivNewtonInv(mpzB));
+// });
 
 bench('BigInt#div', () => {
   blackbox(bigIntA.div(bigIntB));
