@@ -19,7 +19,8 @@ describe('mul', () => {
       '294743557975626283697822613802522659139',
     );
     assertSame(
-      MpZ.from('0xDEADBEEFDEADBEEFFEEBDAEDFEEBDAED') * MpZ.from('0xFEEBDAEDFEEBDAEDDEADBEEFDEADBEEF'),
+      MpZ.from('0xDEADBEEFDEADBEEFFEEBDAEDFEEBDAED') *
+        MpZ.from('0xFEEBDAEDFEEBDAEDDEADBEEFDEADBEEF'),
       '100296035542644961557257340252644763255005271048861661491165839172406949071171',
     );
   });
@@ -74,7 +75,10 @@ describe('div2', () => {
     // @ts-ignore
     assertSame(MpZ.from(2222)._div2(), 1111);
     // @ts-ignore
-    assertSame(MpZ.from('222222222222222222222222')._div2(), '111111111111111111111111');
+    assertSame(
+      MpZ.from('222222222222222222222222')._div2(),
+      '111111111111111111111111',
+    );
 
     // @ts-ignore
     assertSame(MpZ.from(12)._div2(), 6);

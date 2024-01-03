@@ -1,7 +1,7 @@
 import { MpZ } from '..';
 import { BigInt } from 'as-bigint/assembly/BigInt';
 
-const a = '542101086242752217003726400434970855712890625';  // 5^4^3
+const a = '542101086242752217003726400434970855712890625'; // 5^4^3
 const m = '100';
 
 const mpzA = blackbox(MpZ.from(a));

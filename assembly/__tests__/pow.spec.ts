@@ -11,10 +11,7 @@ describe('pow', () => {
 
     assertSame(MpZ.from(0) ** MpZ.TWO, 0);
     assertSame(MpZ.from(1) ** MpZ.TWO, 1);
-    assertSame(
-      MpZ.from(0xdeadbeef) ** MpZ.TWO,
-      '13957162197951816481',
-    );
+    assertSame(MpZ.from(0xdeadbeef) ** MpZ.TWO, '13957162197951816481');
     assertSame(
       MpZ.from(0xdeadbeef) ** MpZ.from(3),
       '52142960857923402497294780879',
@@ -53,11 +50,12 @@ describe('pow', () => {
     const x = MpZ.from('2') ** MpZ.from('0xFFFF');
     expect(x.toString().length).toBe(19729);
 
-    const p = MpZ.from(5) ** MpZ.from(4) ** MpZ.from(3);
+    const p = MpZ.from(5) ** (MpZ.from(4) ** MpZ.from(3));
     assertSame(p, '542101086242752217003726400434970855712890625');
 
     const s = (
-      MpZ.from(5) ** MpZ.from(4) ** MpZ.from(3) ** MpZ.from(2) ** MpZ.from(1)
+      MpZ.from(5) **
+      (MpZ.from(4) ** (MpZ.from(3) ** (MpZ.from(2) ** MpZ.from(1))))
     ).toString();
 
     expect(s.length).toBe(183231);
@@ -68,7 +66,7 @@ describe('pow', () => {
 
 describe('powMod', () => {
   it('return correct results', () => {
-    assertSame(MpZ.from('2').powMod('0xFF', 100000),'19968');
-    assertSame(MpZ.from(5).powMod(4**3, 100000), '90625');
+    assertSame(MpZ.from('2').powMod('0xFF', 100000), '19968');
+    assertSame(MpZ.from(5).powMod(4 ** 3, 100000), '90625');
   });
 });
