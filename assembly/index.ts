@@ -44,14 +44,17 @@ function toStaticArray<T>(data: T): StaticArray<u32> {
 }
 
 function fromI32(value: i32): MpZ {
+  const neg = value < 0;
   if (value < 0) {
-    return new MpZ([u32(-value)] as StaticArray<u32>, true);
+    value = -value;
   }
-  return new MpZ([u32(value)] as StaticArray<u32>);
+  return fromU32(<u32>value, neg);
 }
 
-function fromU32(value: u32): MpZ {
-  return new MpZ([value] as StaticArray<u32>);
+
+@inline
+function fromU32(value: u32, neg: boolean = false): MpZ {
+  return new MpZ([u32(value)], neg);
 }
 
 function fromI64(value: i64): MpZ {
@@ -59,21 +62,16 @@ function fromI64(value: i64): MpZ {
   if (value < 0) {
     value = -value;
   }
-  const hi = high32(value);
-  const lo = low32(value);
-  if (hi === 0) {
-    return new MpZ([lo] as StaticArray<u32>, neg);
-  }
-  return new MpZ([low32(value), high32(value)] as StaticArray<u32>, neg);
+  return fromU64(<u64>value, neg);
 }
 
-function fromU64(value: u64): MpZ {
+function fromU64(value: u64, neg: boolean = false): MpZ {
   const hi = high32(value);
   const lo = low32(value);
   if (hi === 0) {
-    return new MpZ([lo] as StaticArray<u32>, false);
+    return fromU32(lo, neg);
   }
-  return new MpZ([low32(value), high32(value)] as StaticArray<u32>, false);
+  return new MpZ([lo, hi], neg);
 }
 
 function codeToU32(code: u32): u32 {
@@ -192,7 +190,7 @@ export class MpZ {
   }
 
   // unsigned add
-  // lhs > rhs
+  // Size(lhs) > Size(rhs)
   protected __uadd(rhs: MpZ): MpZ {
     const q = this._data.length;
     const result = new StaticArray<u32>(q + 1);
@@ -481,7 +479,7 @@ export class MpZ {
     let rem: u32 = 0;
     for (let i: i32 = this._data.length - 1; i >= 0; --i) {
       const d = unchecked(this._data[i]);
-      unchecked(result[i] = (d >> 1) + (rem << 31));
+      unchecked((result[i] = (d >> 1) + (rem << 31)));
       rem = d % 2;
     }
 
@@ -657,7 +655,7 @@ export class MpZ {
     let rem: u64 = 0;
     for (let i: i32 = this._data.length - 1; i >= 0; --i) {
       rem = u64(unchecked(this._data[i])) + u64(rem << 32);
-      unchecked(result[i] = low32(rem / rhs));
+      unchecked((result[i] = low32(rem / rhs)));
       rem %= rhs;
     }
 
@@ -671,7 +669,7 @@ export class MpZ {
     let rem: u64 = 0;
     for (let i: i32 = this._data.length - 1; i >= 0; --i) {
       rem = u64(unchecked(this._data[i])) + (rem << 32);
-      unchecked(result[i] = low32(rem / rhs));
+      unchecked((result[i] = low32(rem / rhs)));
       rem %= rhs;
     }
 
@@ -851,12 +849,12 @@ export class MpZ {
 
     while (true) {
       if (rhs & 1) {
-        result = result.mul(lhs);
+        result = result._umul(lhs);
       }
 
       rhs >>= 1;
       if (rhs === 0) break;
-      lhs = lhs.mul(lhs);
+      lhs = lhs._umul(lhs);
     }
 
     return result;

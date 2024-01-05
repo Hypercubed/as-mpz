@@ -14,10 +14,10 @@ bench('MpZ#pow', () => {
   blackbox(mpzA.pow(b));
 });
 
-bench('MpZ#_upow', () => {
-  // @ts-ignore
-  blackbox(mpzA._upow(mpzB));
-});
+// bench('MpZ#_upow', () => {
+//   // @ts-ignore
+//   blackbox(mpzA._upow(mpzB));
+// });
 
 bench('MpZ#_upowU32', () => {
   // @ts-ignore
