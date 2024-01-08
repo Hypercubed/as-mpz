@@ -4,7 +4,9 @@
       "outFile": "build/debug.wasm",
       "textFile": "build/debug.wat",
       "sourceMap": true,
-      "debug": true
+      "debug": true,
+      "uncheckedBehavior": "never",
+      "noAssert": false
     },
     "release": {
       "outFile": "build/release.wasm",
@@ -13,7 +15,8 @@
       "optimizeLevel": 3,
       "shrinkLevel": 0,
       "converge": false,
-      "noAssert": false
+      "noAssert": true,
+      "uncheckedBehavior": "always"
     }
   },
   "options": {

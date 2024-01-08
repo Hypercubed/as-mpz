@@ -18,6 +18,11 @@ bench('MpZ#mul', () => {
 //   blackbox(mpzA._usqrKaratsuba());
 // });
 
+bench('MpZ#_usqr', () => {
+  // @ts-ignore
+  blackbox(mpzA._usqr());
+});
+
 bench('MpZ#pow2', () => {
   blackbox(mpzA.pow(2));
 });

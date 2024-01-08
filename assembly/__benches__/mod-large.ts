@@ -2,7 +2,7 @@ import { MpZ } from '..';
 import { BigInt } from 'as-bigint/assembly/BigInt';
 
 const a = '542101086242752217003726400434970855712890625'; // 5^4^3
-const m = '100000000000000000000000000000000000000000';
+const m = '100000000000000000000';
 
 const mpzA = blackbox(MpZ.from(a));
 const mpzM = blackbox(MpZ.from(m));
@@ -20,6 +20,7 @@ bench('MpZ#_umod', () => {
 });
 
 // bench('MpZ#_umodNewtonInv', () => {
+//   // @ts-ignore
 //   blackbox(mpzA._umodNewtonInv(mpzM));
 // });
 

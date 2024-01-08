@@ -2,7 +2,7 @@ import { MpZ } from '..';
 import { BigInt } from 'as-bigint/assembly/BigInt';
 
 const a = '0xFEEBDAEDFEEBDAEDFEEBDAEDFEEBDAEDFEEBDAEDFEEBDAEDFEEBDAEDFEEBDAED';
-const b = '0xDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEF';
+const b = '0x0000DEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEAD';
 const mpzA = blackbox(MpZ.from(a));
 const mpzB = blackbox(MpZ.from(b));
 
@@ -19,6 +19,7 @@ bench('MpZ#_udiv', () => {
 });
 
 // bench('MpZ#_udivNewtonInv', () => {
+//   // @ts-ignore
 //   blackbox(mpzA._udivNewtonInv(mpzB));
 // });
 

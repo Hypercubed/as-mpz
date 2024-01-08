@@ -26,8 +26,9 @@ describe('subtraction', () => {
   assertSame(MpZ.from(0xffff) - MpZ.from(0x00ff), 0xff00);
   assertSame(MpZ.from(0xffffffff) - MpZ.from(0x0000ffff), 0xffff0000);
   assertSame(MpZ.from(0xffffff) - MpZ.from(0x00ffff), 0xff0000);
+  assertSame(MpZ.from(<u64>0xffff_ffff_ffff) - MpZ.from(0xff), 0xffffffffff00);
   assertSame(
-    MpZ.from(<u64>0xffff_ffff_ffff) - MpZ.from(0xffff as u64),
+    MpZ.from(<u64>0xffff_ffff_ffff) - MpZ.from(0xffff),
     0xffffffff0000,
   );
   assertSame(
@@ -43,5 +44,10 @@ describe('subtraction', () => {
   assertSame(
     MpZ.from(<u64>0xfedcba987654321) - MpZ.from(0x123456789abcdef as u64),
     0xeca8641fdb97532,
+  );
+
+  assertSame(
+    MpZ.from('36893488147419103232') - MpZ.from('18446744071076859612'),
+    '18446744076342243620',
   );
 });

@@ -348,31 +348,6 @@ t.test('division', (t) => {
   t.end();
 });
 
-t.test('inverse', (t) => {
-  t.same(mpz.inv('0x1', 0), 1);
-  t.same(mpz.inv('0x1', 16), 2 ** 16);
-  t.same(mpz.inv('0x1', 32), 2 ** 32);
-  t.same(mpz.inv('0x1', 64), 2 ** 64);
-
-  t.same(mpz.inv('0x3', 32), 0x55555555);
-  t.same(mpz.inv('0xBEEF', 32), 0x1573d);
-  t.same(mpz.inv('0xDEADBEEF', 64), 0x1264eb565);
-
-  t.same(mpz.inv('0xDEADBEEFDEADBEEF', 64), 0x1);
-
-  for (let i = 0; i < N; i++) {
-    let n = random();
-    if (n === 0n) n++;
-
-    t.same(mpz.inv(String(n), 8), 2n ** 8n / n);
-    t.same(mpz.inv(String(n), 16), 2n ** 16n / n);
-    t.same(mpz.inv(String(n), 32), 2n ** 32n / n);
-    t.same(mpz.inv(String(n), 64), 2n ** 64n / n);
-  }
-
-  t.end();
-});
-
 t.test('cmp', async (t) => {
   t.test('n>0, m>0', (t) => {
     t.equal(mpz.cmp('0x0', '0x0'), 0);

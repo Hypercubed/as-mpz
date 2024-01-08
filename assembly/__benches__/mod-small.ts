@@ -20,6 +20,7 @@ bench('MpZ#_umod', () => {
 });
 
 // bench('MpZ#_umodNewtonInv', () => {
+//   // @ts-ignore
 //   blackbox(mpzA._umodNewtonInv(mpzM));
 // });
 

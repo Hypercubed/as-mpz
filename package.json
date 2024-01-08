@@ -25,7 +25,7 @@
     "asbuild:debug": "asc assembly/main.ts --target debug",
     "asbuild:release": "asc assembly/main.ts --target release",
     "asbuild": "npm run asbuild:debug && npm run asbuild:release",
-    "bench": "astral",
+    "bench": "astral --uncheckedBehavior always --noAssert",
     "fix": "prettier . --write"
   },
   "author": "J. Harshbarger",

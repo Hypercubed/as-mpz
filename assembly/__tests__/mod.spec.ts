@@ -26,4 +26,15 @@ describe('mod', () => {
     assertSame(MpZ.from(-(10 ** 20)) % MpZ.from(-7), -5); // TODO: check this
     assertSame(MpZ.from(-(10 ** 20)) % MpZ.from(-7), -5);
   });
+
+  it('large m', () => {
+    const l = MpZ.from('542101086242752217003726400434970855712890625');
+
+    assertSame(l.mod(MpZ.from('10000000000000')), '855712890625');
+    assertSame(l.mod(MpZ.from('100000000000000000000')), '434970855712890625');
+    assertSame(
+      l.mod(MpZ.from('1000000000000000000000000000000000000000000000')),
+      '542101086242752217003726400434970855712890625',
+    );
+  });
 });
