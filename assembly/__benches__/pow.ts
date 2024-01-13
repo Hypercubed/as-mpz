@@ -8,31 +8,23 @@ const mpzA = blackbox(MpZ.from(a));
 const mpzB = blackbox(MpZ.from(b));
 const bigIntA = blackbox(BigInt.from(a));
 
-// const mpzM = blackbox(MpZ.from('100'));
-
-bench('MpZ#pow', () => {
-  blackbox(mpzA.pow(b));
+suite('pow', () => {
+  bench('MpZ#pow', () => {
+    blackbox(mpzA.pow(b));
+  });
+  
+  bench('MpZ#_upow', () => {
+    // @ts-ignore
+    blackbox(mpzA._upow(mpzB));
+  });
+  
+  bench('MpZ#_upowU32', () => {
+    // @ts-ignore
+    blackbox(mpzA._upowU32(b));
+  });
+  
+  bench('BigInt#pow', () => {
+    blackbox(bigIntA.pow(b));
+  });
 });
 
-bench('MpZ#_upow', () => {
-  // @ts-ignore
-  blackbox(mpzA._upow(mpzB));
-});
-
-bench('MpZ#_upowU32', () => {
-  // @ts-ignore
-  blackbox(mpzA._upowU32(b));
-});
-
-// bench('MpZ#_upowBySquaring', () => {
-//   // @ts-ignore
-//   blackbox(mpzA._upowBySquaring(mpzB));
-// });
-
-// bench('MpZ#powMod', () => {
-//   blackbox(mpzA.powMod(b, mpzM));
-// });
-
-bench('BigInt#pow', () => {
-  blackbox(bigIntA.pow(b));
-});
