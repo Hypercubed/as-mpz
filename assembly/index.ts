@@ -197,11 +197,14 @@ export class MpZ {
   }
 
   // unsigned addition
+  // assumes values are positive
   protected _uadd(rhs: MpZ): MpZ {
     return this.size < rhs.size ? rhs.__uadd(this) : this.__uadd(rhs); // a + b = b + a
   }
 
-  // unsigned addition, ordered such that Size(lhs) > Size(rhs)
+  // unsigned addition
+  // ordered such that Size(lhs) > Size(rhs)
+  // assumes values are positive
   protected __uadd(rhs: MpZ): MpZ {
     const q = this.size;
     const result = new StaticArray<u32>(q + 1);
@@ -218,6 +221,8 @@ export class MpZ {
     return new MpZ(result);
   }
 
+  // unsigned addition by uint32
+  // assumes values are positive
   protected _uaddU32(rhs: u32): MpZ {
     const q = this.size;
     const result = new StaticArray<u32>(q + 1);
@@ -245,14 +250,17 @@ export class MpZ {
     return this._usub(rhs);
   }
 
-  // unsigned ubtraction
+  // unsigned subtraction
+  // assumes values are positive
   protected _usub(rhs: MpZ): MpZ {
     if (this._ucmp(rhs) < 0) return rhs._usub(this).neg(); // a - b = -(b - a)
     if (rhs.size === 1) return this.__usub32(unchecked(rhs._data[0]));
     return this.__usub(rhs);
   }
 
-  // unsigned sub, ordered such that lhs >= rhs
+  // unsigned sub
+  // ordered such that lhs >= rhs
+  // assumes values are positive
   protected __usub(rhs: MpZ): MpZ {
     const q = this.size;
     const result = new StaticArray<u32>(q);
@@ -269,6 +277,8 @@ export class MpZ {
     return new MpZ(result);
   }
 
+  // unsigned sub by uint32
+  // assumes values are positive
   protected __usub32(rhs: u32): MpZ {
     const q = this.size;
     const result = new StaticArray<u32>(q);
@@ -309,6 +319,7 @@ export class MpZ {
   }
 
   // unsigned mul
+  // assumes values are positive
   protected _umul(rhs: MpZ): MpZ {
     const q = this.size;
     const p = rhs.size;
@@ -331,6 +342,7 @@ export class MpZ {
   }
 
   // unsigned square
+  // assumes values are positive
   // TODO: optimize for aij = aji
   protected _usqr(): MpZ {
     const q = this.size;
@@ -352,6 +364,8 @@ export class MpZ {
     return new MpZ(result);
   }
 
+  // unsigned multiply by uint32
+  // assumes values are positive
   protected _umulU32(rhs: u32): MpZ {
     const q = this.size;
     const result = new StaticArray<u32>(q + 1);
@@ -368,6 +382,7 @@ export class MpZ {
   }
 
   // unsigned mul by power of 2
+  // assumes values are positive
   protected _umul2powU32(rhs: u32): MpZ {
     const q = this.size;
     const result = new StaticArray<u32>(q + 1);
@@ -425,11 +440,11 @@ export class MpZ {
       '_bitShiftRight: n must be less than LIMB_BITS',
     );
 
-    return n === 0 ? this : this._divPow2(n);
+    return n === 0 ? this : this._udivPow2(n);
   }
 
   // unsigned divide by power of 2
-  protected _divPow2(n: u32): MpZ {
+  protected _udivPow2(n: u32): MpZ {
     const q = this.size;
     const result = new StaticArray<u32>(q);
     const n2 = 2 ** n;
@@ -445,7 +460,8 @@ export class MpZ {
   }
 
   // divide by 2
-  protected _div2(): MpZ {
+  // assumes values is positive
+  protected _udiv2(): MpZ {
     const q = this.size;
     const result = new StaticArray<u32>(q);
 
@@ -590,9 +606,9 @@ export class MpZ {
     return new MpZ(result);
   }
 
+  // unsigned divide by uint32
+  // assumes values are positive
   protected _udivU32(rhs: u32): MpZ {
-    assert(ASC_NO_ASSERT || !this.isNeg, '_udivU32: lhs must be positive');
-
     const q = this.size;
     const r = new StaticArray<u32>(q);
 
@@ -651,18 +667,15 @@ export class MpZ {
     if (this.eq(MpZ.ONE)) return MpZ.ONE;
 
     const neg = this.isNeg && rhs.isOdd();
-    const lhs = this.abs();
     const p =
-      rhs.size === 1 ? lhs._upowU32(unchecked(rhs._data[0])) : lhs._upow(rhs);
+      rhs.size === 1 ? this._upowU32(unchecked(rhs._data[0])) : this._upow(rhs);
     return neg ? p.neg() : p;
   }
 
   // unsigned pow
   // exponentiation by squaring (modified)
+  // ignores sign of base and exponent
   protected _upow(rhs: MpZ): MpZ {
-    assert(ASC_NO_ASSERT || !this.eqz(), '_upow: lhs must be non-zero');
-    assert(ASC_NO_ASSERT || !rhs.eqz(), '_upow: lhs must be non-zero');
-
     let result = MpZ.ONE;
     let lhs: MpZ = this;
 
@@ -685,9 +698,8 @@ export class MpZ {
   }
 
   // Exponentiation by squaring
+  // Ignores sign of base and exponent
   protected _upowU32(rhs: u32): MpZ {
-    assert(ASC_NO_ASSERT || !this.isNeg, '_upowU32: lhs must be positive');
-
     let result = MpZ.ONE;
     let lhs: MpZ = this;
 

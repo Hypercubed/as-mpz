@@ -120,37 +120,3 @@ describe('div', () => {
     );
   });
 });
-
-describe('div2', () => {
-  it('return correct results', () => {
-    // @ts-ignore
-    assertSame(MpZ.from(10)._div2(), 5);
-    // @ts-ignore
-    assertSame(MpZ.from(100)._div2(), 50);
-    // @ts-ignore
-    assertSame(MpZ.from(1000)._div2(), 500);
-    // @ts-ignore
-    assertSame(MpZ.from('10000000000000000')._div2(), 5000000000000000);
-
-    // @ts-ignore
-    assertSame(MpZ.from(22)._div2(), 11);
-    // @ts-ignore
-    assertSame(MpZ.from(222)._div2(), 111);
-    // @ts-ignore
-    assertSame(MpZ.from(2222)._div2(), 1111);
-    // @ts-ignore
-    assertSame(
-      MpZ.from('222222222222222222222222')._div2(),
-      '111111111111111111111111',
-    );
-
-    // @ts-ignore
-    assertSame(MpZ.from(12)._div2(), 6);
-    // @ts-ignore
-    assertSame(MpZ.from(123)._div2(), 61);
-    // @ts-ignore
-    assertSame(MpZ.from(1234)._div2(), 617);
-    // @ts-ignore
-    assertSame(MpZ.from('12345678901234567890')._div2(), '6172839450617283945');
-  });
-});

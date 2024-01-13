@@ -18,7 +18,7 @@ suite('add large', () => {
   bench('MpZ#add (large)', () => {
     blackbox(mpzA.add(mpzB));
   });
-  
+
   bench('BigInt#add (large)', () => {
     blackbox(bigIntA.add(bigIntB));
   });
@@ -42,7 +42,7 @@ suite('add small', () => {
   bench('MpZ#add (small)', () => {
     blackbox(mpzA.add(mpzC));
   });
-  
+
   bench('BigInt#add (small)', () => {
     blackbox(bigIntA.add(bigIntC));
   });

@@ -62,4 +62,13 @@ describe('pow', () => {
     expect(s.slice(0, 20)).toBe('62060698786608744707');
     expect(s.slice(-20)).toBe('92256259918212890625');
   });
+
+  it('Kunth test', () => {
+    const t = MpZ.from(10);
+    const m = MpZ.from(3);
+    const n = MpZ.from(8);
+
+    const p = (t ** m - MpZ.ONE) * (t ** n - MpZ.ONE);
+    expect(p.toString()).toBe('99899999001');
+  });
 });

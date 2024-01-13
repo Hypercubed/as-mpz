@@ -27,9 +27,8 @@ suite('mul small', () => {
   bench('MpZ#mul (small)', () => {
     blackbox(mpzA.mul(mpzC));
   });
-  
+
   bench('BigInt#mul (small)', () => {
     blackbox(bigIntA.mul(bigIntC));
   });
 });
-

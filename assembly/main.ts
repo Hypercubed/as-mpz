@@ -1,5 +1,7 @@
 import { MpZ } from '.';
 
+export const ONE = MpZ.ONE;
+
 export function from(a: string): MpZ {
   return MpZ.from(a);
 }

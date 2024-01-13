@@ -18,7 +18,7 @@ suite('sub large', () => {
   bench('MpZ#sub (large)', () => {
     blackbox(mpzA.sub(mpzB));
   });
-  
+
   bench('BigInt#sub (large)', () => {
     blackbox(bigIntA.sub(bigIntB));
   });
@@ -42,9 +42,8 @@ suite('sub small', () => {
   bench('MpZ#sub (small)', () => {
     blackbox(mpzA.sub(mpzC));
   });
-  
+
   bench('BigInt#sub (small)', () => {
     blackbox(bigIntA.sub(bigIntC));
   });
 });
-

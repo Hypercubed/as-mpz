@@ -18,7 +18,7 @@ suite('div large', () => {
   bench('MpZ#div (large)', () => {
     blackbox(mpzA.div(mpzB));
   });
-  
+
   bench('BigInt#div (large)', () => {
     blackbox(bigIntA.div(bigIntB));
   });
@@ -37,9 +37,8 @@ suite('div small', () => {
   bench('MpZ#div (small)', () => {
     blackbox(mpzA.div(mpzC));
   });
-  
+
   bench('BigInt#div (small)', () => {
     blackbox(bigIntA.div(bigIntC));
   });
 });
-

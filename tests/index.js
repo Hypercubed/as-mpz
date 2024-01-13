@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import t from 'tap';
 import { instantiate } from '../build/debug.js';
 import { brotliCompress, brotliCompressSync } from 'node:zlib';
+import { brotliDecompressSync } from 'node:zlib';
 
 const wasm = readFileSync('./build/debug.wasm');
 const module = await WebAssembly.compile(wasm);
@@ -458,6 +459,27 @@ t.test('modulo', (t) => {
   t.same(mpz.mod('-10000', '7'), 3);
   t.same(mpz.mod('10000', '-7'), '-0x3');
   t.same(mpz.mod('-10000', '-7'), '-0x4');
+
+  t.end();
+});
+
+t.test("Kunth's Test", (t) => {
+  const b = 10;
+
+  for (let i = 0; i < N; i++) {
+    const m = ((Math.random() * 2 ** 8) | 0) + 1;
+    const n = ((Math.random() * 2 ** 8) | 0) + m + 1;
+
+    const tm = mpz.sub(mpz.pow(`${b}`, `${m}`), '1');
+    const tn = mpz.sub(mpz.pow(`${b}`, `${n}`), '1');
+
+    const tm1 = `${b - 1}`;
+    const r = `${tm1.repeat(m - 1)}${b - 2}${tm1.repeat(n - m)}${'0'.repeat(
+      m - 1,
+    )}1`;
+
+    t.same(mpz.mul(tm, tn), toHex(BigInt(r)));
+  }
 
   t.end();
 });

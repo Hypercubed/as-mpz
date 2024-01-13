@@ -13,13 +13,12 @@ suite('to string', () => {
   bench('MpZ#toDecimal', () => {
     blackbox(mpz.toDecimal());
   });
-  
+
   bench('BigInt#toString()', () => {
     blackbox(bigInt.toString());
   });
-  
+
   bench('BigInt#toString(16)', () => {
     blackbox(bigInt.toString(16));
   });
 });
-
