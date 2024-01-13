@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import t from 'tap';
 import { instantiate } from '../build/debug.js';
+import { brotliCompress, brotliCompressSync } from 'node:zlib';
 
 const wasm = readFileSync('./build/debug.wasm');
 const module = await WebAssembly.compile(wasm);
@@ -16,16 +17,29 @@ function toHex(a) {
   return '0x' + a;
 }
 
-function random() {
-  const limbs = Math.floor(32 * Math.random());
-  return new Uint32Array(limbs).reduce((a, _, k) => {
-    const p = 2n ** BigInt(k * 32);
-    const l = BigInt(Math.floor(Math.random() * Math.pow(2, 32)));
-    return a + l * p;
-  }, 0n);
+function randomUint32() {
+  return (Math.random() * 2 ** 32) >>> 0;
 }
 
-const N = 100; // number of random iterations
+function randomSigned(limbs) {
+  const sign = Math.random() > 0.5 ? 1 : -1;
+  const n = new Uint32Array(limbs).reduce((a, _, k) => {
+    const p = 2n ** BigInt(k * 32);
+    const l = BigInt(randomUint32());
+    return a + l * p;
+  }, 0n);
+  return n * BigInt(sign);
+}
+
+function random() {
+  const r = Math.random();
+  if (r < 0.3) return randomSigned(1); // 30% chance of 1 limb
+  if (r < 0.6) return randomSigned(2); // 30% chance of 2 limbs
+  const limbs = Math.floor(Math.random() * (2 ** 6 - 2)) + 2; // 40% chance of 3-64 limbs
+  return randomSigned(limbs);
+}
+
+const N = 1000; // number of random iterations
 
 t.beforeEach(async () => {
   const module = await WebAssembly.compile(wasm);
@@ -83,19 +97,10 @@ t.test('toString', (t) => {
     t.end();
   });
 
-  t.test('convert random strings to mp integers', async (t) => {
+  t.test('fuzzing', async (t) => {
     for (let i = 1; i < N; i++) {
-      t.equal(mpz.toHex(mpz.from(String(i))), toHex(i));
-      t.equal(mpz.toHex(mpz.from(String(-i))), toHex(-i));
-
       const n = random();
       t.equal(mpz.toHex(mpz.from(String(n))), toHex(n));
-      t.equal(mpz.toHex(mpz.from(String(-n))), toHex(-n));
-
-      const m = random();
-      const v = n + m * 2n ** 53n;
-      t.equal(mpz.toHex(mpz.from(String(v))), toHex(v));
-      t.equal(mpz.toHex(mpz.from(String(-v))), toHex(-v));
     }
     t.end();
   });
@@ -132,14 +137,11 @@ t.test('addition', (t) => {
     t.end();
   });
 
-  t.test('addition random', async (t) => {
+  t.test('fuzzing', async (t) => {
     for (let i = 0; i < N; i++) {
       const n = random();
       const m = random();
       t.same(mpz.add(String(n), String(m)), toHex(n + m));
-      t.same(mpz.add(String(-n), String(m)), toHex(-n + m));
-      t.same(mpz.add(String(n), String(-m)), toHex(n + -m));
-      t.same(mpz.add(String(-n), String(-m)), toHex(-n + -m));
     }
     t.end();
   });
@@ -185,22 +187,11 @@ t.test('subtraction', (t) => {
     t.end();
   });
 
-  t.test('random', async (t) => {
+  t.test('fuzzing', async (t) => {
     for (let i = 0; i < N; i++) {
-      let n = random();
-      let m = random();
-
-      // lhs>0 rhs>0
+      const n = random();
+      const m = random();
       t.same(mpz.sub(String(n), String(m)), toHex(n - m));
-
-      // rhs<0
-      t.same(mpz.sub(String(n), String(-m)), toHex(n - -m));
-
-      // lhs<0
-      t.same(mpz.sub(String(-n), String(m)), toHex(-n - m));
-
-      // lhs<0 rhs<0
-      t.same(mpz.sub(String(-n), String(-m)), toHex(-n - -m));
     }
     t.end();
   });
@@ -248,16 +239,13 @@ t.test('multiplication', (t) => {
     t.end();
   });
 
-  t.test('multiplication random', async (t) => {
+  t.test('fuzzing', async (t) => {
     for (let i = 0; i < N; i++) {
       const n = random();
       const m = random();
-      const v = n * m;
-      t.same(mpz.mul(String(n), String(m)), toHex(v));
-      t.same(mpz.mul(String(-n), String(-m)), toHex(v));
-      t.same(mpz.mul(String(n), String(-m)), toHex(-v));
-      t.same(mpz.mul(String(-n), String(m)), toHex(-v));
+      t.same(mpz.mul(String(n), String(m)), toHex(n * m));
     }
+    t.end();
   });
 
   t.end();
@@ -270,11 +258,6 @@ t.test('division', (t) => {
     t.same(mpz.div('0x4', '0x1'), 4);
     t.end();
   });
-
-  // t.test("m=0", (t) => {
-  //   t.same(mpz.div('0x1', '0x0'), "Error: div(1, 0) = undefined");
-  //   t.end();
-  // });
 
   t.test('n<m', (t) => {
     t.same(mpz.div('0x2', '0x4'), 0);
@@ -331,18 +314,22 @@ t.test('division', (t) => {
     t.end();
   });
 
-  t.test('division random', async (t) => {
+  t.test('special case requiring two D6 steps in Algorithm D', (t) => {
+    const n = 34125305527818743474129076526n;
+    const m = 9580783237862390338n;
+    const v = n / m;
+    t.same(mpz.div(String(n), String(m)), toHex(v));
+
+    t.end();
+  });
+
+  t.test('fuzzing', async (t) => {
     for (let i = 0; i < N; i++) {
       const n = random();
-      let m = random();
-      if (m === 0n) m++;
-
-      const v = n / m;
-      t.same(mpz.div(String(n), String(m)), toHex(v));
-      t.same(mpz.div(String(-n), String(-m)), toHex(v));
-      t.same(mpz.div(String(-n), String(m)), toHex(-v));
-      t.same(mpz.div(String(n), String(-m)), toHex(-v));
+      const m = random() || 1n;
+      t.same(mpz.div(String(n), String(m)), toHex(n / m));
     }
+    t.end();
   });
 
   t.end();
@@ -405,12 +392,11 @@ t.test('cmp', async (t) => {
     t.end();
   });
 
-  t.test('random', async (t) => {
+  t.test('fuzzing', async (t) => {
     for (let i = 0; i < N; i++) {
       const n = random();
       const m = random();
-      t.equal(mpz.cmp(String(n), String(m)), n > m ? 1 : n < m ? -1 : 0);
-      t.equal(mpz.cmp(String(-n), String(-m)), n > m ? -1 : n < m ? 1 : 0);
+      t.same(mpz.cmp(String(n), String(m)), n > m ? 1 : n < m ? -1 : 0);
     }
     t.end();
   });
@@ -445,6 +431,33 @@ t.test('factorials', (t) => {
   t.same(mpz.factDiv('0', '0'), '0x1');
   t.same(mpz.factDiv('100', '99'), 100);
   t.same(mpz.factDiv('1000', '999'), 1000);
+
+  t.end();
+});
+
+t.test('rem', (t) => {
+  t.same(mpz.rem('10000', '7'), 4);
+  t.same(mpz.rem('-10000', '7'), '-0x4');
+  t.same(mpz.rem('10000', '-7'), 4);
+  t.same(mpz.rem('-10000', '-7'), '-0x4');
+
+  t.test('fuzzing', async (t) => {
+    for (let i = 0; i < N; i++) {
+      const n = random();
+      const m = random() || 1n;
+      t.same(mpz.rem(String(n), String(m)), toHex(n % m));
+    }
+    t.end();
+  });
+
+  t.end();
+});
+
+t.test('modulo', (t) => {
+  t.same(mpz.mod('10000', '7'), 4);
+  t.same(mpz.mod('-10000', '7'), 3);
+  t.same(mpz.mod('10000', '-7'), '-0x3');
+  t.same(mpz.mod('-10000', '-7'), '-0x4');
 
   t.end();
 });

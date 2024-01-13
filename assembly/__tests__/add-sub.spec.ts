@@ -2,14 +2,17 @@ import { MpZ } from '..';
 import { assertSame } from './assertions';
 
 describe('addition', () => {
-  it('should add 32bit values', () => {
+  it('should add positive values, Size(rhs) === 1', () => {
     assertSame(MpZ.from(0x0) + MpZ.from(0x0), 0);
-    assertSame(MpZ.from(0xbe00) + MpZ.from(0x00ef), 0xbeef);
+    assertSame(MpZ.from(0x0) + MpZ.from(0x1), 1);
+    assertSame(MpZ.from(0x1) + MpZ.from(0x0), 1);
+    assertSame(MpZ.from(0x3) + MpZ.from(0x5), 8);
     assertSame(MpZ.from(0xdead0000) + MpZ.from(0x0000beef), 0xdeadbeef);
+    assertSame(MpZ.from(0xbe00) + MpZ.from(0x00ef), 0xbeef);
     assertSame(MpZ.from(0xffffffff) + MpZ.from(0xffffffff), 0x1fffffffe);
   });
 
-  it('should add 64bit values', () => {
+  it('should add positive values, Size(rhs) === 2', () => {
     assertSame(
       MpZ.from(u64(0xdeadbeef00000000)) + MpZ.from(0x00000000ffffffff as u64),
       u64(0xdeadbeefffffffff),

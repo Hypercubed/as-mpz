@@ -41,6 +41,19 @@ export function div(_a: string, _b: string): string {
   return c.toHex();
 }
 
+export function mod(_a: string, _b: string): string {
+  const a = MpZ.from(_a);
+  const b = MpZ.from(_b);
+  return a.mod(b).toHex();
+}
+
+export function rem(_a: string, _b: string): string {
+  const a = MpZ.from(_a);
+  const b = MpZ.from(_b);
+  const c = a % b;
+  return c.toHex();
+}
+
 export function pow(_a: string, _b: string): string {
   const a = MpZ.from(_a);
   const b = MpZ.from(_b);
@@ -53,6 +66,11 @@ export function sub(_a: string, _b: string): string {
   const a = MpZ.from(_a);
   const b = MpZ.from(_b);
   return (a - b).toHex();
+}
+
+export function eqz(_a: string): boolean {
+  const a = MpZ.from(_a);
+  return a.eqz();
 }
 
 export function cmp(_a: string, _b: string): i32 {

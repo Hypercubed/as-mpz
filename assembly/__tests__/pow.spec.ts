@@ -63,10 +63,3 @@ describe('pow', () => {
     expect(s.slice(-20)).toBe('92256259918212890625');
   });
 });
-
-describe('powMod', () => {
-  it('return correct results', () => {
-    assertSame(MpZ.from('2').powMod('0xFF', 100000), '19968');
-    assertSame(MpZ.from(5).powMod(4 ** 3, 100000), '90625');
-  });
-});
