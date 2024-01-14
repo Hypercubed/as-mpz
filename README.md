@@ -4,13 +4,13 @@ Arbitrary precision integer library for AssemblyScript.
 
 ## Features
 
-* Arbitrary precision integers (theoretically limited by memory)
-* Fast (extensivly benchmarked)
-* Accurate* (tested against JS BigInt)
-* For use in AssemblyScript projects
-* No dependencies
+- Arbitrary precision integers (theoretically limited by memory)
+- Fast (extensivly benchmarked)
+- Accurate\* (tested against JS BigInt)
+- For use in AssemblyScript projects
+- No dependencies
 
-## * Disclaimer
+## \* Disclaimer
 
 > While `as-mpz`` has undergone rigorous testing and benchmarking to ensure its reliability and performance, the developers would like to emphasize that the library is provided "as is," and they assume no responsibility for any issues that may arise from its use.
 

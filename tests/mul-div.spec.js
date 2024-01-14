@@ -1,60 +1,46 @@
-import { readFileSync } from 'node:fs';
 import t from 'tap';
-import { instantiate } from '../build/debug.js';
-import { toHex, random } from './setup.js';
-
-const wasm = readFileSync('./build/debug.wasm');
-const module = await WebAssembly.compile(wasm);
-
-let mpz = await instantiate(module, {});
+import { mpz, t_mul, t_div, random } from './setup.js';
 
 const N = 500; // number of random iterations
 const M = 2 ** 7; // number of limbs
 
-t.beforeEach(async () => {
-  const module = await WebAssembly.compile(wasm);
-  mpz = await instantiate(module, {});
-});
-
-const mul = (n, m) => mpz.toHex(mpz.mul(mpz.from(n), mpz.from(m)));
-
 t.test('multiplication', (t) => {
   t.test('n>0, m>0', (t) => {
-    t.same(mul('0x0', '0x0'), 0);
-    t.same(mul('0x1', '0x1'), 1);
-    t.same(mul('0x10', '0x10'), 0x100);
-    t.same(mul('0xffff', '0xffff'), 0xfffe0001n);
-    t.same(mul('0xffffffff', '0xffffffff'), 0xfffffffe00000001n);
+    t.equal(t_mul(0, 0), 0n);
+    t.equal(t_mul(1, 1), 1n);
+    t.equal(t_mul(0x10, 0x10), 0x100n);
+    t.equal(t_mul('0xffff', '0xffff'), 0xfffe0001n);
+    t.equal(t_mul('0xffffffff', '0xffffffff'), 0xfffffffe00000001n);
 
-    t.same(
-      mul(
+    t.equal(
+      t_mul(
         '0x2E75F2AA067132A276C13262E7268D7CECC8190A00000',
         '0x35F29E388C20BFBAC4964BFBA000',
       ),
-      '0x9ca7373a70ffde7fc610fc43850f3bb95922dd391b0c36b388502f72f5f8a74400000000',
+      0x9ca7373a70ffde7fc610fc43850f3bb95922dd391b0c36b388502f72f5f8a74400000000n,
     );
 
     t.end();
   });
 
   t.test('n<0, m<0', (t) => {
-    t.same(mul('-0x10', '-0x10'), 0x100);
-    t.same(mul('-0xffff', '-0xffff'), 0xfffe0001n);
-    t.same(mul('-0xffffffff', '-0xffffffff'), 0xfffffffe00000001n);
+    t.equal(t_mul(-0x10, -0x10), 0x100n);
+    t.equal(t_mul('-0xffff', '-0xffff'), 0xfffe0001n);
+    t.equal(t_mul('-0xffffffff', '-0xffffffff'), 0xfffffffe00000001n);
     t.end();
   });
 
   t.test('n>0, m<0', (t) => {
-    t.same(mul('0x10', '-0x10'), '-0x100');
-    t.same(mul('0xffff', '-0xffff'), '-0xfffe0001');
-    t.same(mul('0xffffffff', '-0xffffffff'), '-0xfffffffe00000001');
+    t.equal(t_mul(0x10, -0x10), -0x100n);
+    t.equal(t_mul('0xffff', '-0xffff'), -0xfffe0001n);
+    t.equal(t_mul('0xffffffff', '-0xffffffff'), -0xfffffffe00000001n);
     t.end();
   });
 
   t.test('n<0, m>0', (t) => {
-    t.same(mul('-0x10', '0x10'), '-0x100');
-    t.same(mul('-0xffff', '0xffff'), '-0xfffe0001');
-    t.same(mul('-0xffffffff', '0xffffffff'), '-0xfffffffe00000001');
+    t.equal(t_mul(-0x10, 0x10), -0x100n);
+    t.equal(t_mul('-0xffff', '0xffff'), -0xfffe0001n);
+    t.equal(t_mul('-0xffffffff', '0xffffffff'), -0xfffffffe00000001n);
     t.end();
   });
 
@@ -62,13 +48,13 @@ t.test('multiplication', (t) => {
     for (let i = 0; i < N; i++) {
       const n = random(M);
       const m = random(M);
-      t.same(mul(String(n), String(m)), toHex(n * m));
+      t.equal(t_mul(n, m), n * m);
     }
 
     // very large
     const a = random(2 ** 12);
     const b = random(2 ** 12);
-    t.same(mul(String(a), String(b)), toHex(a * b));
+    t.equal(t_mul(a, b), a * b);
 
     t.end();
   });
@@ -76,66 +62,64 @@ t.test('multiplication', (t) => {
   t.end();
 });
 
-const div = (n, m) => mpz.toHex(mpz.div(mpz.from(n), mpz.from(m)));
-
 t.test('division', (t) => {
   t.test('m=1', (t) => {
-    t.same(div('0x1', '0x1'), 1);
-    t.same(div('0x2', '0x1'), 2);
-    t.same(div('0x4', '0x1'), 4);
+    t.equal(t_div(1, 1), 1n);
+    t.equal(t_div(2, 1), 2n);
+    t.equal(t_div(4, 1), 4n);
     t.end();
   });
 
   t.test('n<m', (t) => {
-    t.same(div('0x2', '0x4'), 0);
-    t.same(div('0xFFFFFFFFFFFFFFFF', '0xFFFFFFFFFFFFFFFFF'), 0);
+    t.equal(t_div(2, 4), 0n);
+    t.equal(t_div(0xffffffffffffffffn, 0xfffffffffffffffffn), 0n);
     t.end();
   });
 
   t.test('n=m', (t) => {
-    t.same(div('0x2', '0x2'), 1);
-    t.same(div('0xFFFFFFFFFFFFFFFF', '0xFFFFFFFFFFFFFFFF'), 1);
+    t.equal(t_div(2, 2), 1n);
+    t.equal(t_div(0xffffffffffffffffn, 0xffffffffffffffffn), 1n);
     t.end();
   });
 
   t.test('1<m<0xFFFFFFFF, 1<n<0xFFFFFFFF', (t) => {
-    t.same(div('0x2', '0x2'), 1);
-    t.same(div('0x4', '0x2'), 2);
-    t.same(div('0x8', '0x2'), 4);
+    t.equal(t_div(2, 2), 1n);
+    t.equal(t_div(4, 2), 2n);
+    t.equal(t_div(8, 2), 4n);
 
-    t.same(div('0xbeef', '16'), 0xbee);
-    t.same(div('0x1000', '0x10'), 0x100);
-    t.same(div('0x10000000', '0x10'), 0x1000000);
-    t.same(div('0xDEADBEEF', '16'), 0xdeadbee);
-    t.same(div('0xDEADBEEF', '0x100'), 0xdeadbe);
-    t.same(div('0xDEADBEEF', '0x10000000'), 0xd);
-    t.same(div('0xFFFFFFFF', '0xf'), 0x11111111);
-    t.same(div('0xFFFFFFFF', '0xffffffff'), 0x1);
-    t.same(div('0xFFFFFFFF', '0xfffffff'), 0x10);
+    t.equal(t_div('0xbeef', '16'), 0xbeen);
+    t.equal(t_div('0x1000', 0x10), 0x100n);
+    t.equal(t_div('0x10000000', 0x10), 0x1000000n);
+    t.equal(t_div('0xDEADBEEF', '16'), 0xdeadbeen);
+    t.equal(t_div('0xDEADBEEF', '0x100'), 0xdeadben);
+    t.equal(t_div('0xDEADBEEF', '0x10000000'), 0xdn);
+    t.equal(t_div('0xFFFFFFFF', '0xf'), 0x11111111n);
+    t.equal(t_div('0xFFFFFFFF', '0xffffffff'), 0x1n);
+    t.equal(t_div('0xFFFFFFFF', '0xfffffff'), 0x10n);
 
     t.end();
   });
 
   t.test('n>0xFFFFFFFF, 1<m<0xFFFFFFFF', (t) => {
-    t.same(div('0xDEADBEEFDEADBEEF', '0x1'), '0xdeadbeefdeadbeef');
-    t.same(div('0xdeadbeefdeadbeef', '0x10'), '0xdeadbeefdeadbee');
-    t.same(div('0xdeadbeefdeadbeef', '0x100'), '0xdeadbeefdeadbe');
-    t.same(div('0xFFFFFFFFFFFFFFFF', '0xf'), '0x1111111111111111');
-    t.same(div('0xFFFFFFFFFFFFFFFF', '0xffffffff'), '0x100000001');
-    t.same(div('0xFFFFFFFFFFFFFFFF', '0xfffffff'), '0x1000000100');
+    t.equal(t_div('0xDEADBEEFDEADBEEF', 1), 0xdeadbeefdeadbeefn);
+    t.equal(t_div('0xdeadbeefdeadbeef', 0x10), 0xdeadbeefdeadbeen);
+    t.equal(t_div('0xdeadbeefdeadbeef', '0x100'), 0xdeadbeefdeadben);
+    t.equal(t_div('0xFFFFFFFFFFFFFFFF', '0xf'), 0x1111111111111111n);
+    t.equal(t_div('0xFFFFFFFFFFFFFFFF', '0xffffffff'), 0x100000001n);
+    t.equal(t_div('0xFFFFFFFFFFFFFFFF', '0xfffffff'), 0x1000000100n);
     t.end();
   });
 
   t.test('n>m>0xFFFFFFFF', (t) => {
-    t.same(div('0xFFFFFFFFFFFFFFFF', '0xFFFFFFFFFFFFFFF'), 0x10);
-    t.same(div('0xFFFFFFFFFFFFFFFF', '0xFFFFFFFFFFFFF'), 0x1000);
+    t.equal(t_div('0xFFFFFFFFFFFFFFFF', '0xFFFFFFFFFFFFFFF'), 0x10n);
+    t.equal(t_div('0xFFFFFFFFFFFFFFFF', '0xFFFFFFFFFFFFF'), 0x1000n);
 
-    t.same(div('0xFFFFFFFFFFFFFFFFFFFF', '0xFFFFFFFFFFFFFFFFFFF'), 0x10);
-    t.same(div('0xFFFFFFFFFFFFFFFFFFFF', '0xFFFFFFFFFFFFFFFFF'), 0x1000);
+    t.equal(t_div('0xFFFFFFFFFFFFFFFFFFFF', '0xFFFFFFFFFFFFFFFFFFF'), 0x10n);
+    t.equal(t_div('0xFFFFFFFFFFFFFFFFFFFF', '0xFFFFFFFFFFFFFFFFF'), 0x1000n);
 
-    t.same(
-      div('0xDEADBEEFDEADBEEF00000000', '0xDEADBEEFDEADBEEF0000'),
-      0x10000,
+    t.equal(
+      t_div('0xDEADBEEFDEADBEEF00000000', 0xdeadbeefdeadbeef0000n),
+      0x10000n,
     );
 
     t.end();
@@ -144,8 +128,7 @@ t.test('division', (t) => {
   t.test('special case requiring two D6 steps in Algorithm D', (t) => {
     const n = 34125305527818743474129076526n;
     const m = 9580783237862390338n;
-    const v = n / m;
-    t.same(div(String(n), String(m)), toHex(v));
+    t.equal(t_div(n, m), n / m);
 
     t.end();
   });
@@ -154,7 +137,7 @@ t.test('division', (t) => {
     for (let i = 0; i < N; i++) {
       const n = random(M);
       const m = random(M) || 1n;
-      t.same(div(String(n), String(m)), toHex(n / m));
+      t.equal(t_div(n, m), n / m);
     }
     t.end();
   });
@@ -162,34 +145,15 @@ t.test('division', (t) => {
   t.end();
 });
 
-const pow = (n, m) =>
-  mpz.toHex(mpz.pow(mpz.from(String(n)), mpz.from(String(m))));
-
-t.test('pow', (t) => {
-  t.same(pow('1', '1'), '0x1');
-  t.same(pow('1', '2'), '0x1');
-  t.same(pow('2', '2'), '0x4');
-  t.same(pow('0xdeadbeef', '1'), '0xdeadbeef');
-  t.end();
-});
-
-t.test("Kunth's Test", (t) => {
-  const b = 10;
-
+t.test('mul-div invariants', (t) => {
   for (let i = 0; i < N; i++) {
-    const m = ((Math.random(M) * 2 ** 8) | 0) + 1;
-    const n = ((Math.random(M) * 2 ** 8) | 0) + m + 1;
+    const n = mpz.from(String(random(M)));
+    const d = mpz.from(String(random(M) || 1n));
 
-    const tm1 = `${b - 1}`;
-    const r = `${tm1.repeat(m - 1)}${b - 2}${tm1.repeat(n - m)}${'0'.repeat(
-      m - 1,
-    )}1`;
-
-    const tm = mpz.sub(mpz.pow(mpz.from(String(b)), mpz.from(String(m))), mpz.from('1'));
-    const tn = mpz.sub(mpz.pow(mpz.from(String(b)), mpz.from(String(n))), mpz.from('1'));
-
-    t.same(mpz.toString(mpz.mul(tm, tn)), BigInt(r));
+    const q = mpz.div(n, d);
+    const m = mpz.rem(n, d);
+    const r = mpz.add(mpz.mul(q, d), m);
+    t.equal(mpz.toHex(r), mpz.toHex(n));
   }
-
   t.end();
 });
