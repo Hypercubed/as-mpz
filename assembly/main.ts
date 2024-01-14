@@ -1,12 +1,19 @@
+/**
+ * Warning: These exports may change unexpectedly.
+ * This file is provided as a convenience for testing in JavaScript.
+ * Please use the MpZ class directly for AssemblyScript development.
+ */
+
 import { MpZ } from '.';
 
+export const ZERO = MpZ.ZERO;
 export const ONE = MpZ.ONE;
 
 export function from(a: string): MpZ {
   return MpZ.from(a);
 }
 
-export function toString(a: MpZ, base: u32): string {
+export function toString(a: MpZ, base: u32 = 10): string {
   return a.toString(base);
 }
 
@@ -14,87 +21,50 @@ export function toHex(a: MpZ): string {
   return a.toHex();
 }
 
-export function int(a: string): string {
-  return MpZ.from(a).toHex();
+export function shl(a: MpZ, b: u32): MpZ {
+  return a.shl(b);
 }
 
-export function shl(_a: string, _b: u32): string {
-  const a = MpZ.from(_a);
-  return a._shl(_b).toHex();
+export function add(a: MpZ, b: MpZ): MpZ {
+  return a.add(b);
 }
 
-export function add(_a: string, _b: string): string {
-  const a = MpZ.from(_a);
-  const b = MpZ.from(_b);
-  return (a + b).toHex();
+export function mul(a: MpZ, b: MpZ): MpZ {
+  return a.mul(b);
 }
 
-export function mul(_a: string, _b: string): string {
-  const a = MpZ.from(_a);
-  const b = MpZ.from(_b);
-  return (a * b).toHex();
+export function div(a: MpZ, b: MpZ): MpZ {
+  return a.div(b);
 }
 
-export function div(_a: string, _b: string): string {
-  const a = MpZ.from(_a);
-  const b = MpZ.from(_b);
-  const c = a / b;
-
-  return c.toHex();
+export function mod(a: MpZ, b: MpZ): MpZ {
+  return a.mod(b);
 }
 
-export function mod(_a: string, _b: string): string {
-  const a = MpZ.from(_a);
-  const b = MpZ.from(_b);
-  return a.mod(b).toHex();
+export function rem(a: MpZ, b: MpZ): MpZ {
+  return a.rem(b);
 }
 
-export function rem(_a: string, _b: string): string {
-  const a = MpZ.from(_a);
-  const b = MpZ.from(_b);
-  const c = a % b;
-  return c.toHex();
+export function pow(a: MpZ, b: MpZ): MpZ {
+  return a.pow(b);
 }
 
-export function pow(_a: string, _b: string): string {
-  const a = MpZ.from(_a);
-  const b = MpZ.from(_b);
-  const c = a.pow(b);
-
-  return c.toHex();
+export function sub(a: MpZ, b: MpZ): MpZ {
+  return a.sub(b);
 }
 
-export function sub(_a: string, _b: string): string {
-  const a = MpZ.from(_a);
-  const b = MpZ.from(_b);
-  return (a - b).toHex();
-}
-
-export function eqz(_a: string): boolean {
-  const a = MpZ.from(_a);
+export function eqz(a: MpZ): boolean {
   return a.eqz();
 }
 
-export function cmp(_a: string, _b: string): i32 {
-  const a = MpZ.from(_a);
-  const b = MpZ.from(_b);
+export function cmp(a: MpZ, b: MpZ): i32 {
   return a.cmp(b);
 }
 
-function __fact(n: u32): MpZ {
+export function fact(n: u32): MpZ {
   let a = MpZ.from(1);
   for (let i: u32 = 1; i <= n; ++i) {
-    a *= MpZ.from(i);
+    a = MpZ.from(i).mul(a);
   }
   return a;
-}
-
-export function fact(n: u32): string {
-  return __fact(n).toHex();
-}
-
-export function factDiv(_a: u32, _b: u32): string {
-  const a = __fact(_a);
-  const b = __fact(_b);
-  return (a / b).toHex();
 }
