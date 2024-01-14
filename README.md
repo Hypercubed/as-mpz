@@ -2,6 +2,18 @@
 
 Arbitrary precision integer library for AssemblyScript.
 
+## Features
+
+* Arbitrary precision integers (theoretically limited by memory)
+* Fast (extensivly benchmarked)
+* Accurate* (tested against JS BigInt)
+* For use in AssemblyScript projects
+* No dependencies
+
+## * Disclaimer
+
+> While `as-mpz`` has undergone rigorous testing and benchmarking to ensure its reliability and performance, the developers would like to emphasize that the library is provided "as is," and they assume no responsibility for any issues that may arise from its use.
+
 ## Installations
 
 ```sh
@@ -56,7 +68,7 @@ Returns the absolute value of the MpZ.
 
 Returns the negated value of the MpZ.
 
-#### `#eqz(): bool`
+#### `#eqz(): boolean`
 
 Returns true if the MpZ is zero.
 
@@ -76,7 +88,7 @@ Returns the product of the MpZ and rhs.
 
 #### `#div(rhs: MpZ | i32 | u32 | i64 | u64 | string): MpZ`
 
-Returns the quotient of the MpZ and rhs.
+Returns the quotient of the MpZ and rhs truncated towards zero.
 
 #### `#mod(rhs: MpZ | i32 | u32 | i64 | u64 | string): MpZ`
 
@@ -88,15 +100,15 @@ Returns the power of the MpZ and rhs.
 
 #### `#cmp(rhs: MpZ | i32 | u32 | i64 | u64 | string): i32`
 
-Returns the comparison of the MpZ and rhs. A `1` if the MpZ is greater than `rhs`, `-1` if the MpZ is less than `rhs`, and `0` if the MpZ equals the `rhs`.
+Returns the comparison of the MpZ and rhs. Returns a `1` if the MpZ is greater than `rhs`, `-1` if the MpZ is less than `rhs`, and `0` if the MpZ equals the `rhs`.
 
 #### `#eq(rhs: MpZ | i32 | u32 | i64 | u64 | string): boolean`
 
-Returns `true` if the MpZ and rhs are equal.
+Returns `true` if the MpZ and rhs are equal (same value).
 
 #### `#neq(rhs: MpZ | i32 | u32 | i64 | u64 | string): boolean`
 
-Returns `true` if the MpZ and rhs are not equal.
+Returns `true` if the MpZ and rhs are not equal (not the same value).
 
 #### `#lt(rhs: MpZ | i32 | u32 | i64 | u64 | string): boolean`
 
