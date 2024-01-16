@@ -65,9 +65,9 @@ t.test('toHex', (t) => {
       t.equal(t_hex(n), toHex(n));
     }
 
-    // // very large
-    // const a = random(2 ** 30);  // upper limit of 2 ** 32 - 1
-    // t.equal(t_hex(a), toHex(a));
+    // very large
+    const a = random(2 ** 30); // absolute upper limit of 2 ** 32 - 1
+    t.equal(t_hex(a), toHex(a));
 
     t.end();
   });

@@ -133,6 +133,14 @@ t.test('division', (t) => {
     t.end();
   });
 
+  t.test('special test', (t) => {
+    const n = 95831533180238710728923033458509322018983859937136719n;
+    const m = 618970019642690137449562111n;
+    t.equal(t_div(n, m), n / m);
+
+    t.end();
+  });
+
   t.test('fuzzing', async (t) => {
     for (let i = 0; i < N; i++) {
       const n = random(M);

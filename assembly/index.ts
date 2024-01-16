@@ -568,12 +568,12 @@ export class MpZ {
 
       const vn_n_2 = u64(unchecked(vn[n - 2]));
       const un_j_n_2 = u64(unchecked(un[j + n - 2]));
-      const un_n_1 = unchecked(vn[n - 1]);
+      const vn_n_1 = unchecked(vn[n - 1]);
 
       while (true) {
         if (qhat >= BASE || LOW(qhat) * vn_n_2 > (rhat << 32) + un_j_n_2) {
           qhat -= 1;
-          rhat += un_n_1;
+          rhat += vn_n_1;
           if (rhat < BASE) continue;
         }
         break;
@@ -593,10 +593,10 @@ export class MpZ {
       unchecked((result[j] = LOW(qhat))); // Store quotient digit.
       if (t < 0) {
         // If we subtracted too much, add back.
-        result[j] -= result[j];
+        result[j] -= 1;
         k = 0;
         for (let i = 0; i < n; i++) {
-          unchecked((t = un[i + j] + vn[i] + k));
+          t = unchecked(un[i + j] + vn[i]) + k;
           unchecked((un[i + j] = LOW(t)));
           k = t >> 32;
         }
@@ -721,7 +721,7 @@ export class MpZ {
   }
 
   isEven(): boolean {
-    return !this.isOdd();
+    return (unchecked(this._data[0]) & 1) === 0;
   }
 
   // @ts-ignore
@@ -807,6 +807,15 @@ export class MpZ {
   }
 
   // *** ToValue ***
+  toValue(): number {
+    const n = this.size;
+    const l1: u64 = unchecked(this._data[n - 1]);
+    const r1 = f64(l1) * f64(BASE) ** (n - 1);
+    const l2: u64 = n > 1 ? unchecked(this._data[n - 2]) : 0;
+    const r2 = f64(l2) * f64(BASE) ** (n - 2);
+    return r1 + r2;
+  }
+
   toArray(): u32[] {
     return this._data.slice<u32[]>(0, this.size);
   }
@@ -815,8 +824,8 @@ export class MpZ {
     return unchecked(this._data[0]);
   }
 
-  toI32(): u32 {
-    return unchecked(<i32>this._data[0]);
+  toI32(): i32 {
+    return this.isNeg ? -unchecked(this._data[0]) : unchecked(this._data[0]);
   }
 
   // *** Comparison ***
@@ -969,4 +978,8 @@ export class MpZ {
 
   static readonly A: MpZ = MpZ.from(48 / 17);
   static readonly B: MpZ = MpZ.from(32 / 17);
+}
+
+function mod<T>(a: T, b: T): T {
+  return a - b * (a / b);
 }
