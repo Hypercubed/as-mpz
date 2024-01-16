@@ -13,7 +13,7 @@ function isPrime32(p: i32): boolean {
   return true;
 }
 
-// Lucas-Lehmer primality test
+// Lucas-Lehmer primality test for Mersenne numbers
 function lucasLehmer(p: i32, Mp: MpZ = MpZ.ONE.shl(p).sub(1)): boolean {
   let s = MpZ.from(4).rem(Mp);
 
@@ -30,7 +30,7 @@ function lucasLehmer(p: i32, Mp: MpZ = MpZ.ONE.shl(p).sub(1)): boolean {
 let u = MpZ.ONE.shl(1);
 for (let p = 2; p < 1500; p++) {
   u = u.shl(1);
-  if (p > 3 && !isPrime32(p)) continue;
+  if (!isPrime32(p)) continue;
 
   const Mp = u.sub(1);
   if (p === 2 || lucasLehmer(p, Mp)) {
@@ -43,5 +43,5 @@ for (let p = 2; p < 1500; p++) {
 
 function trim(m: MpZ): string {
   const s = m.toString();
-  return s.length > 12 ? (s.slice(0, 6) + '...' + s.slice(-6)) : s;
+  return s.length > 12 ? s.slice(0, 6) + '...' + s.slice(-6) : s;
 }
