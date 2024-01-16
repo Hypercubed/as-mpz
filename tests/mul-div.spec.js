@@ -1,8 +1,8 @@
 import t from 'tap';
-import { mpz, t_mul, t_div, random } from './setup.js';
+import { mpz, t_mul, t_div } from './setup.js';
+import fc from 'fast-check';
 
-const N = 500; // number of random iterations
-const M = 2 ** 7; // number of limbs
+fc.configureGlobal({ numRuns: 200 });
 
 t.test('multiplication', (t) => {
   t.test('n>0, m>0', (t) => {
@@ -45,16 +45,11 @@ t.test('multiplication', (t) => {
   });
 
   t.test('fuzzing', async (t) => {
-    for (let i = 0; i < N; i++) {
-      const n = random(M);
-      const m = random(M);
-      t.equal(t_mul(n, m), n * m);
-    }
-
-    // very large
-    const a = random(2 ** 12);
-    const b = random(2 ** 12);
-    t.equal(t_mul(a, b), a * b);
+    fc.assert(
+      fc.property(fc.bigIntN(5000), fc.bigIntN(5000), (n, m) => {
+        t.equal(t_mul(n, m), n * m);
+      }),
+    );
 
     t.end();
   });
@@ -135,22 +130,25 @@ t.test('division', (t) => {
 
   t.test('special cases', (t) => {
     let n = 0x100229888f0870594265f617feeb3bb879c7d35ecd04fn;
-    let m = 2n**89n - 1n;
+    let m = 2n ** 89n - 1n;
     t.equal(t_div(n, m), n / m);
 
-    n = 0x3ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff80000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffn;
-    m = 2n**521n - 1n;
+    n =
+      0x3ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff80000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffn;
+    m = 2n ** 521n - 1n;
     t.equal(t_div(n, m), n / m);
 
     t.end();
   });
 
   t.test('fuzzing', async (t) => {
-    for (let i = 0; i < N; i++) {
-      const n = random(M);
-      const m = random(M) || 1n;
-      t.equal(t_div(n, m), n / m);
-    }
+    fc.assert(
+      fc.property(fc.bigIntN(5000), fc.bigIntN(5000), (n, m) => {
+        m = m || 1n;
+        t.equal(t_div(n, m), n / m);
+      }),
+    );
+
     t.end();
   });
 
@@ -158,14 +156,17 @@ t.test('division', (t) => {
 });
 
 t.test('mul-div invariants', (t) => {
-  for (let i = 0; i < N; i++) {
-    const n = mpz.from(String(random(M)));
-    const d = mpz.from(String(random(M) || 1n));
+  fc.assert(
+    fc.property(fc.bigIntN(5000), fc.bigIntN(5000), (_n, _d) => {
+      const n = mpz.from(_n);
+      const d = mpz.from(_d || 1n);
 
-    const q = mpz.div(n, d);
-    const m = mpz.rem(n, d);
-    const r = mpz.add(mpz.mul(q, d), m);
-    t.equal(mpz.toHex(r), mpz.toHex(n));
-  }
+      const q = mpz.div(n, d);
+      const m = mpz.rem(n, d);
+      const r = mpz.add(mpz.mul(q, d), m);
+      t.equal(mpz.toHex(r), mpz.toHex(n));
+    }),
+  );
+
   t.end();
 });

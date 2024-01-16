@@ -1,8 +1,8 @@
 import t from 'tap';
-import { mpz, t_add, t_sub, random } from './setup.js';
+import { mpz, t_add, t_sub } from './setup.js';
+import fc from 'fast-check';
 
-const N = 1000; // number of random iterations
-const M = 2 ** 7; // max number of limbs
+fc.configureGlobal({ numRuns: 200 });
 
 t.test('addition', (t) => {
   t.test('positive', (t) => {
@@ -34,16 +34,11 @@ t.test('addition', (t) => {
   });
 
   t.test('fuzzing', async (t) => {
-    for (let i = 0; i < N; i++) {
-      const n = random(M);
-      const m = random(M);
-      t.equal(t_add(n, m), n + m);
-    }
-
-    // very large
-    const a = random(2 ** 12);
-    const b = random(2 ** 12);
-    t.equal(t_add(a, b), a + b);
+    fc.assert(
+      fc.property(fc.bigIntN(5000), fc.bigIntN(5000), (n, m) => {
+        t.equal(t_add(n, m), n + m);
+      }),
+    );
 
     t.end();
   });
@@ -90,11 +85,12 @@ t.test('subtraction', (t) => {
   });
 
   t.test('fuzzing', async (t) => {
-    for (let i = 0; i < N; i++) {
-      const n = random(M);
-      const m = random(M);
-      t.equal(t_sub(n, m), n - m);
-    }
+    fc.assert(
+      fc.property(fc.bigIntN(5000), fc.bigIntN(5000), (n, m) => {
+        t.equal(t_sub(n, m), n - m);
+      }),
+    );
+
     t.end();
   });
 
@@ -102,14 +98,13 @@ t.test('subtraction', (t) => {
 });
 
 t.test('invariants', (t) => {
-  for (let i = 0; i < N; i++) {
-    const n = random(M);
-    const m = random(M);
+  fc.assert(
+    fc.property(fc.bigIntN(5000), fc.bigIntN(5000), (n, m) => {
+      const r = mpz.add(mpz.from(n), mpz.from(m));
+      const s = mpz.sub(r, mpz.from(m));
+      t.equal(mpz.toHex(r), mpz.toHex(s));
+    }),
+  );
 
-    const r = mpz.add(mpz.from(n), mpz.from(m));
-    const s = mpz.sub(r, mpz.from(m));
-
-    t.equal(mpz.toHex(r), mpz.toHex(s));
-  }
   t.end();
 });

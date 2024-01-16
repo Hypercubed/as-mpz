@@ -209,14 +209,15 @@ export class MpZ {
     const q = this.size;
     const result = new StaticArray<u32>(q + 1);
 
-    let carry: u32 = 0;
+    let carry: u64 = 0;
     for (let i: i32 = 0; i < q; ++i) {
-      unchecked(
-        (result[i] = carry + this._data[i] + (rhs.size > i ? rhs._data[i] : 0)),
-      );
-      carry = unchecked(result[i] < this._data[i]) ? 1 : 0;
+      const lhs_limb = unchecked(this._data[i]);
+      const rhs_limb = rhs.size > i ? unchecked(rhs._data[i]) : 0;
+      carry += u64(lhs_limb) + u64(rhs_limb);
+      unchecked((result[i] = LOW(carry)));
+      carry = HIGH(carry);
     }
-    unchecked((result[q] = carry));
+    unchecked((result[q] = LOW(carry)));
 
     return new MpZ(result);
   }
@@ -265,14 +266,14 @@ export class MpZ {
     const q = this.size;
     const result = new StaticArray<u32>(q);
 
-    let borrow: u32 = 0;
+    let borrow: i64 = 0;
     for (let i: i32 = 0; i < q; ++i) {
       const lhs_limb = unchecked(this._data[i]);
       const rhs_limb = rhs.size > i ? unchecked(rhs._data[i]) : 0;
 
-      unchecked((result[i] = lhs_limb - borrow));
-      borrow = borrow > lhs_limb || unchecked(rhs_limb > result[i]) ? 1 : 0;
-      unchecked((result[i] -= rhs_limb));
+      borrow = i64(lhs_limb) - i64(rhs_limb) - borrow;
+      unchecked((result[i] = LOW(borrow)));
+      borrow = borrow < 0 ? 1 : 0;
     }
     return new MpZ(result);
   }
@@ -561,7 +562,8 @@ export class MpZ {
 
     // Main loop.
     for (let j = m - n; j >= 0; j--) {
-      const h: u64 = unchecked(u64(un[j + n]) << 32) + unchecked(u64(un[j + n - 1]));
+      const h: u64 =
+        unchecked(u64(un[j + n]) << 32) + unchecked(u64(un[j + n - 1]));
       const v = unchecked(u64(vn[n - 1]));
       let qhat: u64 = h / v;
       let rhat: u64 = h % v;

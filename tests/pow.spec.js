@@ -1,8 +1,8 @@
 import t from 'tap';
-import { mpz, to, from, t_pow, random } from './setup.js';
+import { mpz, to, from, t_pow } from './setup.js';
+import fc from 'fast-check';
 
-const N = 500; // number of random iterations
-const M = 2 ** 7; // number of limbs
+fc.configureGlobal({ numRuns: 100 });
 
 t.test('pow', (t) => {
   t.equal(t_pow(1, 1), 1n);
@@ -11,18 +11,19 @@ t.test('pow', (t) => {
   t.equal(t_pow('0xdeadbeef', 1), 0xdeadbeefn);
 
   t.test('fuzzing', async (t) => {
-    for (let i = 0; i < 100; i++) {
-      const n = random(3);
+    fc.assert(
+      fc.property(fc.bigIntN(256), (n) => {
+        let r = from(1);
 
-      let r = from(1);
+        for (let j = 1; j < 20; j++) {
+          r = mpz.mul(r, from(n));
 
-      for (let j = 1; j < 20; j++) {
-        r = mpz.mul(r, from(n));
+          t.equal(t_pow(n, j), to(r));
+          t.equal(t_pow(n, j), n ** BigInt(j));
+        }
+      }),
+    );
 
-        t.equal(t_pow(n, j), to(r));
-        t.equal(t_pow(n, j), n ** BigInt(j));
-      }
-    }
     t.end();
   });
 
@@ -30,6 +31,9 @@ t.test('pow', (t) => {
 });
 
 t.test("Kunth's Test", (t) => {
+  const N = 200; // number of random iterations
+  const M = 2 ** 7; // number of limbs
+
   const b = 10;
   const bm1 = `9`;
   const bm2 = `8`;

@@ -1,8 +1,8 @@
 import t from 'tap';
-import { toHex, random, t_string, t_hex } from './setup.js';
+import { toHex, t_string, t_hex } from './setup.js';
+import fc from 'fast-check';
 
-const N = 100; // number of random iterations
-const M = 2 ** 6; // max number of limbs
+fc.configureGlobal({ numRuns: 300 });
 
 t.test('toString', (t) => {
   t.test('toString(10)', (t) => {
@@ -60,14 +60,11 @@ t.test('toHex', (t) => {
   });
 
   t.test('fuzzing', async (t) => {
-    for (let i = 1; i < N; i++) {
-      const n = random(M);
-      t.equal(t_hex(n), toHex(n));
-    }
-
-    // very large
-    const a = random(2 ** 30); // absolute upper limit of 2 ** 32 - 1
-    t.equal(t_hex(a), toHex(a));
+    fc.assert(
+      fc.property(fc.bigIntN(5000), fc.bigIntN(5000), (n, m) => {
+        t.equal(t_hex(n), toHex(n));
+      }),
+    );
 
     t.end();
   });
