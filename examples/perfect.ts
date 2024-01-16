@@ -28,16 +28,20 @@ function lucasLehmer(p: i32, Mp: MpZ = MpZ.ONE.shl(p).sub(1)): boolean {
 // If Mp is prime, then (2**p-1) * 2**(p-1) is perfect.
 
 let u = MpZ.ONE.shl(1);
-for (let p = 2; p < 100; p++) {
-  // 100
+for (let p = 2; p < 1500; p++) {
   u = u.shl(1);
   if (p > 3 && !isPrime32(p)) continue;
 
   const Mp = u.sub(1);
   if (p === 2 || lucasLehmer(p, Mp)) {
     const perfect = Mp.mul(u.shr(1));
-    console.log(`${p} : ${Mp} : ${perfect}`);
+    console.log(`${p} : ${trim(Mp)} : ${trim(perfect)}`);
   }
 }
 
 // Outputs perfect primes < 100: https://en.wikipedia.org/wiki/List_of_Mersenne_primes_and_perfect_numbers
+
+function trim(m: MpZ): string {
+  const s = m.toString();
+  return s.length > 12 ? (s.slice(0, 6) + '...' + s.slice(-6)) : s;
+}

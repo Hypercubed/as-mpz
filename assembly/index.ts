@@ -561,14 +561,14 @@ export class MpZ {
 
     // Main loop.
     for (let j = m - n; j >= 0; j--) {
-      const h: u64 = unchecked(u64(un[j + n]) << 32) + unchecked(un[j + n - 1]);
-      const v = u64(unchecked(vn[n - 1]));
+      const h: u64 = unchecked(u64(un[j + n]) << 32) + unchecked(u64(un[j + n - 1]));
+      const v = unchecked(u64(vn[n - 1]));
       let qhat: u64 = h / v;
       let rhat: u64 = h % v;
 
-      const vn_n_2 = u64(unchecked(vn[n - 2]));
-      const un_j_n_2 = u64(unchecked(un[j + n - 2]));
-      const vn_n_1 = unchecked(vn[n - 1]);
+      const vn_n_2 = unchecked(u64(vn[n - 2]));
+      const un_j_n_2 = unchecked(u64(un[j + n - 2]));
+      const vn_n_1 = unchecked(u64(vn[n - 1]));
 
       while (true) {
         if (qhat >= BASE || LOW(qhat) * vn_n_2 > (rhat << 32) + un_j_n_2) {
@@ -583,12 +583,12 @@ export class MpZ {
       let k: i64 = 0;
       let t: i64 = 0;
       for (let i = 0; i < n; i++) {
-        const p: u64 = qhat * u64(unchecked(vn[i]));
-        t = unchecked(un[i + j]) - k - LOW(p);
+        const p: u64 = qhat * unchecked(u64(vn[i]));
+        t = unchecked(u64(un[i + j])) - k - LOW(p);
         unchecked((un[i + j] = LOW(t)));
         k = (p >> 32) - (t >> 32);
       }
-      unchecked((un[j + n] = LOW((t = un[j + n] - k))));
+      unchecked((un[j + n] = LOW((t = u64(un[j + n]) - k))));
 
       unchecked((result[j] = LOW(qhat))); // Store quotient digit.
       if (t < 0) {
@@ -596,11 +596,11 @@ export class MpZ {
         result[j] -= 1;
         k = 0;
         for (let i = 0; i < n; i++) {
-          t = unchecked(un[i + j] + vn[i]) + k;
+          t = unchecked(u64(un[i + j]) + u64(vn[i])) + k;
           unchecked((un[i + j] = LOW(t)));
           k = t >> 32;
         }
-        unchecked((un[j + n] = LOW(un[j + n] + k)));
+        unchecked((un[j + n] = LOW(u64(un[j + n]) + k)));
       }
     }
     return new MpZ(result);
