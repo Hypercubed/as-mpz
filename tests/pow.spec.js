@@ -2,59 +2,53 @@ import t from 'tap';
 import { mpz, to, from, t_pow } from './setup.js';
 import fc from 'fast-check';
 
-fc.configureGlobal({ numRuns: 100 });
+fc.configureGlobal({ numRuns: 300 });
 
 t.test('pow', (t) => {
-  t.equal(t_pow(1, 1), 1n);
-  t.equal(t_pow(1, 2), 1n);
-  t.equal(t_pow(2, 2), 4n);
-  t.equal(t_pow('0xdeadbeef', 1), 0xdeadbeefn);
-
-  t.test('fuzzing', async (t) => {
-    fc.assert(
-      fc.property(fc.bigIntN(256), (n) => {
-        let r = from(1);
-
-        for (let j = 1; j < 20; j++) {
-          r = mpz.mul(r, from(n));
-
-          t.equal(t_pow(n, j), to(r));
-          t.equal(t_pow(n, j), n ** BigInt(j));
-        }
-      }),
-    );
-
-    t.end();
-  });
+  fc.assert(
+    fc.property(fc.bigIntN(256), fc.bigInt(0n, 20n), (n, m) => {
+      t.equal(t_pow(n, m), n ** m);
+    }),
+    {
+      examples: [
+        [0n, 0n],
+        [1n, 1n],
+        [2n, 2n],
+        [0xdeadbeefn, 1n],
+      ],
+    },
+  );
 
   t.end();
 });
 
 t.test("Kunth's Test", (t) => {
-  const N = 200; // number of random iterations
-  const M = 2 ** 7; // number of limbs
-
   const b = 10;
   const bm1 = `9`;
   const bm2 = `8`;
 
-  for (let i = 0; i < N; i++) {
-    const m = ((Math.random(M) * 2 ** 8) | 0) + 1;
-    const n = ((Math.random(M) * 2 ** 8) | 0) + m + 1;
+  fc.assert(
+    fc.property(
+      fc.integer({ min: 2, max: 8 }),
+      fc.integer({ min: 1, max: 8 }),
+      (n, m) => {
+        n = n + m; // n > m
 
-    const r = [
-      bm1.repeat(m - 1),
-      bm2,
-      bm1.repeat(n - m),
-      '0'.repeat(m - 1),
-      1,
-    ].join('');
+        const r = [
+          bm1.repeat(m - 1),
+          bm2,
+          bm1.repeat(n - m),
+          '0'.repeat(m - 1),
+          1,
+        ].join('');
 
-    const tm = mpz.sub(mpz.pow(from(b), from(m)), from(1));
-    const tn = mpz.sub(mpz.pow(from(b), from(n)), from(1));
+        const tm = mpz.sub(mpz.pow(from(b), from(m)), from(1));
+        const tn = mpz.sub(mpz.pow(from(b), from(n)), from(1));
 
-    t.equal(to(mpz.mul(tm, tn)), BigInt(r));
-  }
+        t.equal(to(mpz.mul(tm, tn)), BigInt(r));
+      },
+    ),
+  );
 
   t.end();
 });

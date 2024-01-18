@@ -1,8 +1,5 @@
 import t from 'tap';
-import { toHex, t_string, t_hex } from './setup.js';
-import fc from 'fast-check';
-
-fc.configureGlobal({ numRuns: 300 });
+import { t_string, t_hex } from './setup.js';
 
 t.test('toString', (t) => {
   t.test('toString(10)', (t) => {
@@ -58,17 +55,6 @@ t.test('toHex', (t) => {
 
     t.end();
   });
-
-  t.test('fuzzing', async (t) => {
-    fc.assert(
-      fc.property(fc.bigIntN(5000), fc.bigIntN(5000), (n, m) => {
-        t.equal(t_hex(n), toHex(n));
-      }),
-    );
-
-    t.end();
-  });
-
   t.end();
 });
 

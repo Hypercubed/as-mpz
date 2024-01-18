@@ -21,8 +21,20 @@ export function toHex(a: MpZ): string {
   return a.toHex();
 }
 
-export function shl(a: MpZ, b: u32): MpZ {
+export function shl(a: MpZ, b: i32): MpZ {
   return a.shl(b);
+}
+
+export function shr(a: MpZ, b: i32): MpZ {
+  return a.shr(b);
+}
+
+export function shl_op(a: MpZ, b: MpZ): MpZ {
+  return MpZ.shl_op(a, b);
+}
+
+export function shr_op(a: MpZ, b: MpZ): MpZ {
+  return MpZ.shr_op(a, b);
 }
 
 export function add(a: MpZ, b: MpZ): MpZ {

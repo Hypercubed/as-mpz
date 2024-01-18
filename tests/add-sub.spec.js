@@ -2,104 +2,75 @@ import t from 'tap';
 import { mpz, t_add, t_sub } from './setup.js';
 import fc from 'fast-check';
 
-fc.configureGlobal({ numRuns: 200 });
+fc.configureGlobal({ numRuns: 300 });
 
 t.test('addition', (t) => {
-  t.test('positive', (t) => {
-    t.equal(t_add(0, 0), 0n);
-    t.equal(t_add(3, 5), 8n);
-    t.equal(t_add('0xdead0000', '0x0000beef'), 0xdeadbeefn);
-    t.equal(
-      t_add('0x00000000deadbeef', '0xdeadbeef00000000'),
-      0xdeadbeefdeadbeefn,
-    );
+  fc.assert(
+    fc.property(fc.bigIntN(4096), fc.bigIntN(4096), (n, m) => {
+      t.equal(t_add(n, m), n + m);
+    }),
+    {
+      examples: [
+        // positive
+        [0n, 0n],
+        [3n, 5n],
+        [0xdead0000n, 0x0000beefn],
+        [0x00000000deadbeefn, 0xdeadbeef00000000n],
+        [0x2950793089775236n, 0x2160715205785584n],
+        [0x403105631078710n, 0x3402969886132728n],
 
-    t.equal(t_add('2950793089775236', '2160715205785584'), 0x1228e3c4392e74n);
-    t.equal(t_add('403105631078710', '3402969886132728'), 3806075517211438n);
-    t.end();
-  });
+        // rhs<0
+        [8n, -3n],
+        [3n, -8n],
+        [0xdeadbeefn, -0x0000beefn],
 
-  t.test('negitive (rhs<0)', (t) => {
-    t.equal(t_add(8, -3), 5n);
-    t.equal(t_add(3, -8), -5n);
-    t.equal(t_add('0xdeadbeef', '-0x0000beef'), 0xdead0000n);
-    t.end();
-  });
-
-  t.test('negitive (lhs<0, rhs<0)', (t) => {
-    t.equal(t_add(-8, -3), -11n);
-    t.equal(t_add(-3, -8), -11n);
-    t.equal(t_add(-0xdead0000, -0x0000beef), -0xdeadbeefn);
-    t.end();
-  });
-
-  t.test('fuzzing', async (t) => {
-    fc.assert(
-      fc.property(fc.bigIntN(5000), fc.bigIntN(5000), (n, m) => {
-        t.equal(t_add(n, m), n + m);
-      }),
-    );
-
-    t.end();
-  });
+        // lhs<0, rhs<0
+        [-8n, -3n],
+        [-3n, -8n],
+        [-0xdead0000n, -0x0000beefn],
+      ],
+    },
+  );
 
   t.end();
 });
 
 t.test('subtraction', (t) => {
-  t.test('lhs>rhs>0', (t) => {
-    t.equal(t_sub(8, 5), 0x3n);
-    t.equal(t_sub(0xdead0000, 0x0000beef), 0xdeac4111n);
-    t.equal(t_sub(0xdeadbeef, 0xbeef), 0xdead0000n);
-    t.equal(t_sub(0xdeadbeefdeadbeefn, 0xdeadbeef00000000n), 0xdeadbeefn);
-    t.end();
-  });
-
-  t.test('rhs>lhs>0)', (t) => {
-    t.equal(t_sub(5, 8), -3n);
-    t.end();
-  });
-
-  t.test('rhs<0, |lhs|>|rhs|', (t) => {
-    t.equal(t_sub(8, -3), 11n);
-    t.equal(t_sub(0xdead0000, -0x0000beef), 0xdeadbeefn);
-    t.equal(t_sub(2779068574725052, -2776491312893844), 0x13bcc095a14350n);
-    t.end();
-  });
-
-  t.test('rhs<0, |rhs|>|lhs|', (t) => {
-    t.equal(t_sub(3, -8), 11n);
-    t.end();
-  });
-
-  t.test('lhs<rhs<0', (t) => {
-    t.equal(t_sub(-8, -3), -0x5n);
-    t.equal(t_sub(-3, -8), 0x5n);
-    t.equal(t_sub(-0xdeadbeef, -0x0000beef), -0xdead0000n);
-    t.end();
-  });
-
-  t.test('rhs<lhs<0', (t) => {
-    t.equal(t_sub(-3, -8), 0x5n);
-    t.end();
-  });
-
-  t.test('fuzzing', async (t) => {
-    fc.assert(
-      fc.property(fc.bigIntN(5000), fc.bigIntN(5000), (n, m) => {
-        t.equal(t_sub(n, m), n - m);
-      }),
-    );
-
-    t.end();
-  });
+  fc.assert(
+    fc.property(fc.bigIntN(4096), fc.bigIntN(4096), (n, m) => {
+      t.equal(t_sub(n, m), n - m);
+    }),
+    {
+      examples: [
+        // lhs>rhs>0
+        [8n, 5n],
+        [0xdead0000n, 0x0000beefn],
+        [0xdeadbeefn, 0xbeefn],
+        [0xdeadbeefdeadbeefn, 0xdeadbeef00000000n],
+        // rhs>lhs>0
+        [5n, 8n],
+        // rhs<0, |lhs|>|rhs|
+        [8n, -3n],
+        [0xdead0000n, -0x0000beefn],
+        [2779068574725052n, -2776491312893844n],
+        // rhs<0, |rhs|>|lhs|
+        [3n, -8n],
+        // lhs<rhs<0
+        [-8n, -3n],
+        [-3n, -8n],
+        [-0xdeadbeefn, -0x0000beefn],
+        // rhs<lhs<0
+        [-3n, -8n],
+      ],
+    },
+  );
 
   t.end();
 });
 
 t.test('invariants', (t) => {
   fc.assert(
-    fc.property(fc.bigIntN(5000), fc.bigIntN(5000), (n, m) => {
+    fc.property(fc.bigIntN(4096), fc.bigIntN(4096), (n, m) => {
       const r = mpz.add(mpz.from(n), mpz.from(m));
       const s = mpz.sub(r, mpz.from(m));
       t.equal(mpz.toHex(r), mpz.toHex(s));

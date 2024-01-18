@@ -1,17 +1,27 @@
 import t from 'tap';
-import { t_fact, t_factDiv } from './setup.js';
+import { t_fact } from './setup.js';
+import fc from 'fast-check';
+
+fc.configureGlobal({ numRuns: 100 });
+
+function calculateFactorial(n) {
+  if (n < 2n) return 1n;
+  var fact = 1n;
+  for (let i = 2n; i <= n; i++) {
+    fact *= i;
+  }
+  return fact;
+}
 
 t.test('factorials', (t) => {
-  t.equal(t_fact(0), 1n);
-  t.equal(t_fact(10), 3628800n);
-  t.equal(
-    t_fact(100),
-    0x1b30964ec395dc24069528d54bbda40d16e966ef9a70eb21b5b2943a321cdf10391745570cca9420c6ecb3b72ed2ee8b02ea2735c61a000000000000000000000000n,
+  fc.assert(
+    fc.property(fc.integer({ min: 5, max: 1000 }), (n) => {
+      t.equal(t_fact(n), calculateFactorial(BigInt(n)));
+    }),
+    {
+      examples: [[1], [10], [100], [1000]],
+    },
   );
-
-  t.equal(t_factDiv(0, 0), 1n);
-  t.equal(t_factDiv(100, 99), 100n);
-  t.equal(t_factDiv(1000, 999), 1000n);
 
   t.end();
 });

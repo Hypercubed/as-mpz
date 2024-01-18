@@ -2,162 +2,115 @@ import t from 'tap';
 import { mpz, t_mul, t_div } from './setup.js';
 import fc from 'fast-check';
 
-fc.configureGlobal({ numRuns: 200 });
+fc.configureGlobal({ numRuns: 300 });
 
 t.test('multiplication', (t) => {
-  t.test('n>0, m>0', (t) => {
-    t.equal(t_mul(0, 0), 0n);
-    t.equal(t_mul(1, 1), 1n);
-    t.equal(t_mul(0x10, 0x10), 0x100n);
-    t.equal(t_mul('0xffff', '0xffff'), 0xfffe0001n);
-    t.equal(t_mul('0xffffffff', '0xffffffff'), 0xfffffffe00000001n);
+  fc.assert(
+    fc.property(fc.bigIntN(4096), fc.bigIntN(4096), (n, m) => {
+      t.equal(t_mul(n, m), n * m);
+    }),
+    {
+      examples: [
+        // positive
+        [0n, 0n],
+        [1n, 1n],
+        [0x10n, 0x10n],
+        [0xdead0000n, 0x0000beefn],
+        [0xffffn, 0xffffn],
+        [0xffffffffn, 0xffffffffn],
+        [
+          0x2e75f2aa067132a276c13262e7268d7cecc8190a00000n,
+          0x35f29e388c20bfbac4964bfba000n,
+        ],
 
-    t.equal(
-      t_mul(
-        '0x2E75F2AA067132A276C13262E7268D7CECC8190A00000',
-        '0x35F29E388C20BFBAC4964BFBA000',
-      ),
-      0x9ca7373a70ffde7fc610fc43850f3bb95922dd391b0c36b388502f72f5f8a74400000000n,
-    );
+        // n<0, m<0
+        [-0x10n, -0x10n],
+        [-0xffffn, -0xffffn],
+        [-0xffffffffn, -0xffffffffn],
 
-    t.end();
-  });
+        // n>0, m<0
+        [0x10n, -0x10n],
+        [0xffffn, -0xffffn],
+        [0xffffffffn, -0xffffffffn],
 
-  t.test('n<0, m<0', (t) => {
-    t.equal(t_mul(-0x10, -0x10), 0x100n);
-    t.equal(t_mul('-0xffff', '-0xffff'), 0xfffe0001n);
-    t.equal(t_mul('-0xffffffff', '-0xffffffff'), 0xfffffffe00000001n);
-    t.end();
-  });
-
-  t.test('n>0, m<0', (t) => {
-    t.equal(t_mul(0x10, -0x10), -0x100n);
-    t.equal(t_mul('0xffff', '-0xffff'), -0xfffe0001n);
-    t.equal(t_mul('0xffffffff', '-0xffffffff'), -0xfffffffe00000001n);
-    t.end();
-  });
-
-  t.test('n<0, m>0', (t) => {
-    t.equal(t_mul(-0x10, 0x10), -0x100n);
-    t.equal(t_mul('-0xffff', '0xffff'), -0xfffe0001n);
-    t.equal(t_mul('-0xffffffff', '0xffffffff'), -0xfffffffe00000001n);
-    t.end();
-  });
-
-  t.test('fuzzing', async (t) => {
-    fc.assert(
-      fc.property(fc.bigIntN(5000), fc.bigIntN(5000), (n, m) => {
-        t.equal(t_mul(n, m), n * m);
-      }),
-    );
-
-    t.end();
-  });
+        // n<0, m>0
+        [-0x10n, 0x10n],
+        [-0xffffn, 0xffffn],
+        [-0xffffffffn, 0xffffffffn],
+      ],
+    },
+  );
 
   t.end();
 });
 
 t.test('division', (t) => {
-  t.test('m=1', (t) => {
-    t.equal(t_div(1, 1), 1n);
-    t.equal(t_div(2, 1), 2n);
-    t.equal(t_div(4, 1), 4n);
-    t.end();
-  });
+  fc.assert(
+    fc.property(fc.bigIntN(4096), fc.bigIntN(4096), (n, m) => {
+      m = m || 1n;
+      t.equal(t_div(n, m), n / m);
+    }),
+    {
+      examples: [
+        // S(m)=1
+        [1n, 1n],
+        [2n, 1n],
+        [4n, 1n],
 
-  t.test('n<m', (t) => {
-    t.equal(t_div(2, 4), 0n);
-    t.equal(t_div(0xffffffffffffffffn, 0xfffffffffffffffffn), 0n);
-    t.end();
-  });
+        // n<m
+        [2n, 4n],
+        [0xffffffffffffffffn, 0xfffffffffffffffffn],
 
-  t.test('n=m', (t) => {
-    t.equal(t_div(2, 2), 1n);
-    t.equal(t_div(0xffffffffffffffffn, 0xffffffffffffffffn), 1n);
-    t.end();
-  });
+        // n=m
+        [2n, 2n],
+        [0xffffffffffffffffn, 0xffffffffffffffffn],
 
-  t.test('1<m<0xFFFFFFFF, 1<n<0xFFFFFFFF', (t) => {
-    t.equal(t_div(2, 2), 1n);
-    t.equal(t_div(4, 2), 2n);
-    t.equal(t_div(8, 2), 4n);
+        // 1<m<0xFFFFFFFF, 1<n<0xFFFFFFFF
+        [2n, 2n],
+        [4n, 2n],
+        [8n, 2n],
+        [0xbeefn, 16n],
+        [0x1000n, 0x10n],
+        [0x10000000n, 0x10n],
+        [0xdeadbeefn, 16n],
+        [0xdeadbeefn, 0x100n],
+        [0xdeadbeefn, 0x10000000n],
+        [0xffffffffn, 0xfn],
+        [0xffffffffn, 0xffffffffn],
+        [0xffffffffn, 0xfffffffn],
 
-    t.equal(t_div('0xbeef', '16'), 0xbeen);
-    t.equal(t_div('0x1000', 0x10), 0x100n);
-    t.equal(t_div('0x10000000', 0x10), 0x1000000n);
-    t.equal(t_div('0xDEADBEEF', '16'), 0xdeadbeen);
-    t.equal(t_div('0xDEADBEEF', '0x100'), 0xdeadben);
-    t.equal(t_div('0xDEADBEEF', '0x10000000'), 0xdn);
-    t.equal(t_div('0xFFFFFFFF', '0xf'), 0x11111111n);
-    t.equal(t_div('0xFFFFFFFF', '0xffffffff'), 0x1n);
-    t.equal(t_div('0xFFFFFFFF', '0xfffffff'), 0x10n);
+        // n>0xFFFFFFFF, 1<m<0xFFFFFFFF
+        [0xdeadbeefdeadbeefn, 1n],
+        [0xdeadbeefdeadbeefn, 0x10n],
+        [0xdeadbeefdeadbeefn, 0x100n],
+        [0xffffffffffffffffn, 0xfn],
+        [0xffffffffffffffffn, 0xffffffffn],
+        [0xffffffffffffffffn, 0xfffffffn],
 
-    t.end();
-  });
+        // n>m>0xFFFFFFFF
+        [0xffffffffffffffffn, 0xfffffffffffffffn],
+        [0xffffffffffffffffn, 0xfffffffffffffn],
+        [0xffffffffffffffffffffn, 0xfffffffffffffffffffn],
+        [0xffffffffffffffffffffn, 0xfffffffffffffffffn],
+        [0xdeadbeefdeadbeef00000000n, 0xdeadbeefdeadbeef0000n],
 
-  t.test('n>0xFFFFFFFF, 1<m<0xFFFFFFFF', (t) => {
-    t.equal(t_div('0xDEADBEEFDEADBEEF', 1), 0xdeadbeefdeadbeefn);
-    t.equal(t_div('0xdeadbeefdeadbeef', 0x10), 0xdeadbeefdeadbeen);
-    t.equal(t_div('0xdeadbeefdeadbeef', '0x100'), 0xdeadbeefdeadben);
-    t.equal(t_div('0xFFFFFFFFFFFFFFFF', '0xf'), 0x1111111111111111n);
-    t.equal(t_div('0xFFFFFFFFFFFFFFFF', '0xffffffff'), 0x100000001n);
-    t.equal(t_div('0xFFFFFFFFFFFFFFFF', '0xfffffff'), 0x1000000100n);
-    t.end();
-  });
-
-  t.test('n>m>0xFFFFFFFF', (t) => {
-    t.equal(t_div('0xFFFFFFFFFFFFFFFF', '0xFFFFFFFFFFFFFFF'), 0x10n);
-    t.equal(t_div('0xFFFFFFFFFFFFFFFF', '0xFFFFFFFFFFFFF'), 0x1000n);
-
-    t.equal(t_div('0xFFFFFFFFFFFFFFFFFFFF', '0xFFFFFFFFFFFFFFFFFFF'), 0x10n);
-    t.equal(t_div('0xFFFFFFFFFFFFFFFFFFFF', '0xFFFFFFFFFFFFFFFFF'), 0x1000n);
-
-    t.equal(
-      t_div('0xDEADBEEFDEADBEEF00000000', 0xdeadbeefdeadbeef0000n),
-      0x10000n,
-    );
-
-    t.end();
-  });
-
-  t.test('special case requiring two D6 steps in Algorithm D', (t) => {
-    const n = 34125305527818743474129076526n;
-    const m = 9580783237862390338n;
-    t.equal(t_div(n, m), n / m);
-
-    t.end();
-  });
-
-  t.test('special cases', (t) => {
-    let n = 0x100229888f0870594265f617feeb3bb879c7d35ecd04fn;
-    let m = 2n ** 89n - 1n;
-    t.equal(t_div(n, m), n / m);
-
-    n =
-      0x3ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff80000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffn;
-    m = 2n ** 521n - 1n;
-    t.equal(t_div(n, m), n / m);
-
-    t.end();
-  });
-
-  t.test('fuzzing', async (t) => {
-    fc.assert(
-      fc.property(fc.bigIntN(5000), fc.bigIntN(5000), (n, m) => {
-        m = m || 1n;
-        t.equal(t_div(n, m), n / m);
-      }),
-    );
-
-    t.end();
-  });
+        // Special Cases
+        [34125305527818743474129076526n, 9580783237862390338n], // requires two D3 correction steps
+        [0x100229888f0870594265f617feeb3bb879c7d35ecd04fn, 2n ** 89n - 1n], // Requires D6 correction step
+        [
+          0x3ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff80000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffn,
+          2n ** 521n - 1n,
+        ],
+      ],
+    },
+  );
 
   t.end();
 });
 
 t.test('mul-div invariants', (t) => {
   fc.assert(
-    fc.property(fc.bigIntN(5000), fc.bigIntN(5000), (_n, _d) => {
+    fc.property(fc.bigIntN(4096), fc.bigIntN(4096), (_n, _d) => {
       const n = mpz.from(_n);
       const d = mpz.from(_d || 1n);
 
