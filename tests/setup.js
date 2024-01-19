@@ -31,11 +31,11 @@ export const t_pow = (n, m) => to(mpz.pow(from(n), from(m)));
 export const t_rem = (n, m) => to(mpz.rem(from(n), from(m)));
 export const t_mod = (n, m) => to(mpz.mod(from(n), from(m)));
 
-export const t_shl = (n, m) => to(mpz.shl(from(n), m));
-export const t_shr = (n, m) => to(mpz.shr(from(n), m));
+export const t_mul_pow2 = (n, m) => to(mpz.mul_pow2(from(n), m));
+export const t_div_pow2 = (n, m) => to(mpz.div_pow2(from(n), m));
 
-export const t_shr_op = (n, m) => to(mpz.shr_op(from(n), from(m)));
-export const t_shl_op = (n, m) => to(mpz.shl_op(from(n), from(m)));
+export const t_shr = (n, m) => to(mpz.shr(from(n), from(m)));
+export const t_shl = (n, m) => to(mpz.shl(from(n), from(m)));
 
 export const t_cmp = (n, m) => mpz.cmp(from(n), from(m));
 

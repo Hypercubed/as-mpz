@@ -12,6 +12,10 @@ const BASE: u64 = 1 << LIMB_BITS;
 
 // @ts-ignore
 @inline
+const MAX_LIMBS: u32 = I32.MAX_VALUE;
+
+// @ts-ignore
+@inline
 function LOW(value: u64): u32 {
   return u32(value & LOW_MASK);
 }
@@ -255,7 +259,7 @@ export class MpZ {
   // assumes values are positive
   protected _usub(rhs: MpZ): MpZ {
     if (this._ucmp(rhs) < 0) return rhs._usub(this).neg(); // a - b = -(b - a)
-    if (rhs.size === 1) return this.__usub32(unchecked(rhs._data[0]));
+    if (rhs.size === 1) return this._usubU32(unchecked(rhs._data[0]));
     return this.__usub(rhs);
   }
 
@@ -280,7 +284,7 @@ export class MpZ {
 
   // unsigned sub by uint32
   // assumes values are positive
-  protected __usub32(rhs: u32): MpZ {
+  protected _usubU32(rhs: u32): MpZ {
     const q = this.size;
     const result = new StaticArray<u32>(q);
 
@@ -384,7 +388,7 @@ export class MpZ {
 
   // unsigned mul by power of 2
   // assumes values are positive
-  protected _umul2powU32(rhs: u32): MpZ {
+  protected _umulpow2U32(rhs: u32): MpZ {
     const q = this.size;
     const result = new StaticArray<u32>(q + 1);
 
@@ -414,8 +418,8 @@ export class MpZ {
 
   protected _limbShiftLeft(n: u32): MpZ {
     assert(
-      ASC_NO_ASSERT || n < u32(i32.MAX_VALUE),
-      '_bitShiftRight: n must be less than i32.MAX_VALUE',
+      ASC_NO_ASSERT || n < MAX_LIMBS,
+      '_limbShiftLeft: n must be less than i32.MAX_VALUE',
     );
     assert(ASC_NO_ASSERT || n >= 0, '_bitShiftRight: n must be > 0');
 
@@ -426,10 +430,6 @@ export class MpZ {
   }
 
   protected _limbShiftRight(n: u32): MpZ {
-    assert(
-      ASC_NO_ASSERT || u32(i32.MAX_VALUE),
-      '_bitShiftRight: n must be less than i32.MAX_VALUE',
-    );
     assert(ASC_NO_ASSERT || n >= 0, '_bitShiftRight: n must be > 0');
 
     if (n === 0) return this;
@@ -445,7 +445,7 @@ export class MpZ {
     );
     assert(ASC_NO_ASSERT || n >= 0, '_bitShiftRight: n must be > 0');
 
-    return n === 0 ? this : this._umul2powU32(n);
+    return n === 0 ? this : this._umulpow2U32(n);
   }
 
   protected _bitShiftRight(n: u32): MpZ {
@@ -455,11 +455,11 @@ export class MpZ {
     );
     assert(ASC_NO_ASSERT || n >= 0, '_bitShiftRight: n must be > 0');
 
-    return n === 0 ? this : this._udivPow2(n);
+    return n === 0 ? this : this._udivPow2U32(n);
   }
 
   // unsigned divide by power of 2
-  protected _udivPow2(n: u32): MpZ {
+  protected _udivPow2U32(n: u32): MpZ {
     const q = this.size;
     const result = new StaticArray<u32>(q);
     const n2 = 2 ** n;
@@ -474,43 +474,26 @@ export class MpZ {
     return new MpZ(result);
   }
 
-  // divide by 2
-  // assumes values is positive
-  protected _udiv2(): MpZ {
-    const q = this.size;
-    const result = new StaticArray<u32>(q);
-
-    let rem: u32 = 0;
-    for (let i: i32 = this.size - 1; i >= 0; --i) {
-      const d = unchecked(this._data[i]);
-      unchecked((result[i] = (d >> 1) + (rem << 31)));
-      rem = d % 2;
-    }
-
-    return new MpZ(result);
-  }
-
-  protected _ushl(n: u64): MpZ {
-    // umul_pow2
+  protected _umul_pow2(n: u64): MpZ {
     assert(
-      ASC_NO_ASSERT || n < LIMB_BITS * i32.MAX_VALUE,
-      '_ushr: rhs must be < 32*i32.MAX_VALUE',
+      ASC_NO_ASSERT || n < LIMB_BITS * MAX_LIMBS,
+      '_udiv_pow2: rhs must be < 32*MAX_LIMBS',
     );
-    assert(ASC_NO_ASSERT || n >= 0, '_ushr: rhs must be > 0');
+    assert(ASC_NO_ASSERT || n >= 0, '_udiv_pow2: rhs must be > 0');
 
     if (n === 0) return this;
+
     return this._limbShiftLeft(u32(n / LIMB_BITS))._bitShiftLeft(
       u32(n % LIMB_BITS),
     );
   }
 
-  protected _ushr(n: u64): MpZ {
-    // udiv_pow2
+  protected _udiv_pow2(n: u64): MpZ {
     assert(
-      ASC_NO_ASSERT || n < LIMB_BITS * i32.MAX_VALUE,
-      '_ushr: rhs must be < 32*i32.MAX_VALUE',
+      ASC_NO_ASSERT || n < LIMB_BITS * MAX_LIMBS,
+      '_udiv_pow2: rhs must be < 32*MAX_LIMBS',
     );
-    assert(ASC_NO_ASSERT || n >= 0, '_ushr: rhs must be > 0');
+    assert(ASC_NO_ASSERT || n >= 0, '_udiv_pow2: rhs must be > 0');
 
     if (n === 0) return this;
     return this._limbShiftRight(u32(n / LIMB_BITS))._bitShiftRight(
@@ -518,25 +501,51 @@ export class MpZ {
     );
   }
 
-  // @ts-ignore
-  // logical left shift (rename mul_pow2)
-  shl(n: i32): MpZ {
-    // TODO: support > i32 check if (n / LIMB_BITS) > MaxInt
+  // multiply by power of 2, using bit shifts
+  mul_pow2(n: u64): MpZ {
     if (n === 0) return this;
     if (this.eqz()) return MpZ.ZERO;
-    if (n < 0) return this.shr(-n);
-    return this.isNeg ? this._ushl(n).neg() : this._ushl(n);
+    if (n > 32 * MAX_LIMBS) {
+      throw new RangeError('Maximum MpZ size exceeded');
+    }
+    return this.isNeg ? this._umul_pow2(n).neg() : this._umul_pow2(n);
   }
 
-  // @ts-ignore
   // logical right shift (rename div_pow2)
   // Note: this is not arithmetic shift (unlike JavaScript)
-  shr(n: i32): MpZ {
-    // TODO: support > i32
+  div_pow2(n: u64): MpZ {
     if (n === 0) return this;
     if (this.eqz()) return MpZ.ZERO;
-    if (n < 0) return this.shl(-n);
-    return this.isNeg ? this._ushr(n).neg() : this._ushr(n);
+    if (n > 32 * MAX_LIMBS) return MpZ.ZERO;
+    return this.isNeg ? this._udiv_pow2(n).neg() : this._udiv_pow2(n);
+  }
+
+  protected _leftShift(rhs: MpZ): MpZ {
+    if (rhs.eqz()) return this;
+    if (this.eqz()) return MpZ.ZERO;
+    if (rhs.size > 2) {
+      throw new RangeError('Maximum MpZ size exceeded');
+    }
+    const l = rhs.toU64();
+    if (l > 32 * MAX_LIMBS) {
+      throw new RangeError('Maximum MpZ size exceeded');
+    }
+    return this.isNeg ? this._umul_pow2(l).neg() : this._umul_pow2(l);
+  }
+
+  protected _rightShift(rhs: MpZ): MpZ {
+    if (rhs.eqz()) return this;
+    if (this.eqz()) return MpZ.ZERO;
+    const r = rhs.toU64();
+    if (rhs.size > 2) return MpZ.ZERO;
+    if (r > 32 * MAX_LIMBS) return MpZ.ZERO;
+    return this.isNeg ? this._udiv_pow2(r).neg() : this._udiv_pow2(r);
+  }
+
+  bitShift(_rhs: MpZ): MpZ {
+    const rhs = MpZ.from(_rhs);
+    if (rhs.isNeg) return this._rightShift(rhs.abs());
+    return this._leftShift(rhs);
   }
 
   // *** Division ***
@@ -584,8 +593,8 @@ export class MpZ {
     // its high-order bit is on, and shift lhs left the
     // same amount.
     const s = rhs._clz();
-    const un = this._ushl(s).toArray();
-    const vn = rhs._ushl(s).toArray();
+    const un = this._umul_pow2(s).toArray();
+    const vn = rhs._umul_pow2(s).toArray();
 
     // We may have to append a high-order
     // digit on the dividend;
@@ -1030,28 +1039,17 @@ export class MpZ {
 
   // @ts-ignore
   @operator('<<')
-  static shl_op(lhs: MpZ, rhs: MpZ): MpZ {
-    if (rhs.size > 2) {
-      throw new RangeError('Maximum MpZ size exceeded');
-    }
-    if (lhs.eqz()) return MpZ.ZERO;
-    if (rhs.eqz()) return lhs;
-    if (rhs.isNeg) return MpZ.shr_op(lhs, rhs.abs());
-    return lhs.isNeg ? lhs._ushl(rhs.toI64()).neg() : lhs._ushl(rhs.toI64());
+  static shl(lhs: MpZ, rhs: MpZ): MpZ {
+    if (rhs.isNeg) return MpZ.shr(lhs, rhs.abs());
+    return lhs._leftShift(rhs);
   }
 
   // @ts-ignore
   @operator('>>')
-  static shr_op(lhs: MpZ, rhs: MpZ): MpZ {
-    if (rhs.size > 2) return MpZ.ZERO;
-    if (lhs.eqz()) return MpZ.ZERO;
-    if (rhs.eqz()) return lhs;
-    if (rhs.isNeg) return MpZ.shl_op(lhs, rhs.abs());
+  static shr(lhs: MpZ, rhs: MpZ): MpZ {
+    if (rhs.isNeg) return lhs._leftShift(rhs.abs());
     return lhs.isNeg
-      ? lhs.add(1)._ushr(rhs.toI64()).add(1).neg()
-      : lhs._ushr(rhs.toI64());
+      ? lhs._usubU32(1)._rightShift(rhs)._uaddU32(1).neg()
+      : lhs._rightShift(rhs);
   }
-
-  static readonly A: MpZ = MpZ.from(48 / 17);
-  static readonly B: MpZ = MpZ.from(32 / 17);
 }

@@ -3,5 +3,5 @@ export function assertSame<A, B>(
   b: B,
   msg: string = 'Assert Same',
 ): void {
-  expect<string>(`${a}`).toBe(`${b}`);
+  expect<string>(`${a}`).toBe(`${b}`, msg);
 }
