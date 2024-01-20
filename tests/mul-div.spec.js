@@ -4,7 +4,7 @@ import fc from 'fast-check';
 
 fc.configureGlobal({ numRuns: 300 });
 
-t.test('multiplication', (t) => {
+t.test('multiplication', t => {
   fc.assert(
     fc.property(fc.bigIntN(4096), fc.bigIntN(4096), (n, m) => {
       t.equal(t_mul(n, m), n * m);
@@ -20,7 +20,7 @@ t.test('multiplication', (t) => {
         [0xffffffffn, 0xffffffffn],
         [
           0x2e75f2aa067132a276c13262e7268d7cecc8190a00000n,
-          0x35f29e388c20bfbac4964bfba000n,
+          0x35f29e388c20bfbac4964bfba000n
         ],
 
         // n<0, m<0
@@ -36,15 +36,15 @@ t.test('multiplication', (t) => {
         // n<0, m>0
         [-0x10n, 0x10n],
         [-0xffffn, 0xffffn],
-        [-0xffffffffn, 0xffffffffn],
-      ],
-    },
+        [-0xffffffffn, 0xffffffffn]
+      ]
+    }
   );
 
   t.end();
 });
 
-t.test('division', (t) => {
+t.test('division', t => {
   fc.assert(
     fc.property(fc.bigIntN(4096), fc.bigIntN(4096), (n, m) => {
       m = m || 1n;
@@ -99,16 +99,16 @@ t.test('division', (t) => {
         [0x100229888f0870594265f617feeb3bb879c7d35ecd04fn, 2n ** 89n - 1n], // Requires D6 correction step
         [
           0x3ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff80000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000003fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffn,
-          2n ** 521n - 1n,
-        ],
-      ],
-    },
+          2n ** 521n - 1n
+        ]
+      ]
+    }
   );
 
   t.end();
 });
 
-t.test('mul-div invariants', (t) => {
+t.test('mul-div invariants', t => {
   fc.assert(
     fc.property(fc.bigIntN(4096), fc.bigIntN(4096), (_n, _d) => {
       const n = mpz.from(_n);
@@ -118,7 +118,7 @@ t.test('mul-div invariants', (t) => {
       const m = mpz.rem(n, d);
       const r = mpz.add(mpz.mul(q, d), m);
       t.equal(mpz.toHex(r), mpz.toHex(n));
-    }),
+    })
   );
 
   t.end();

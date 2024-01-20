@@ -425,7 +425,7 @@ export class MpZ {
   protected _limbShiftLeft(n: u32): MpZ {
     assert(
       ASC_NO_ASSERT || n < MAX_LIMBS,
-      '_limbShiftLeft: n must be less than i32.MAX_VALUE',
+      '_limbShiftLeft: n must be less than i32.MAX_VALUE'
     );
     assert(ASC_NO_ASSERT || n >= 0, '_bitShiftRight: n must be > 0');
 
@@ -447,7 +447,7 @@ export class MpZ {
   protected _bitShiftLeft(n: u32): MpZ {
     assert(
       ASC_NO_ASSERT || n < LIMB_BITS,
-      '_bitShiftLeft: n must be less than LIMB_BITS',
+      '_bitShiftLeft: n must be less than LIMB_BITS'
     );
     assert(ASC_NO_ASSERT || n >= 0, '_bitShiftRight: n must be > 0');
 
@@ -457,7 +457,7 @@ export class MpZ {
   protected _bitShiftRight(n: u32): MpZ {
     assert(
       ASC_NO_ASSERT || n < LIMB_BITS,
-      '_bitShiftRight: n must be less than LIMB_BITS',
+      '_bitShiftRight: n must be less than LIMB_BITS'
     );
     assert(ASC_NO_ASSERT || n >= 0, '_bitShiftRight: n must be > 0');
 
@@ -486,7 +486,7 @@ export class MpZ {
   protected _umul_pow2(n: u64): MpZ {
     assert(
       ASC_NO_ASSERT || n < LIMB_BITS * MAX_LIMBS,
-      '_udiv_pow2: rhs must be < 32*MAX_LIMBS',
+      '_udiv_pow2: rhs must be < 32*MAX_LIMBS'
     );
     assert(ASC_NO_ASSERT || n >= 0, '_udiv_pow2: rhs must be > 0');
 
@@ -505,7 +505,7 @@ export class MpZ {
   protected _udiv_pow2(n: u64): MpZ {
     assert(
       ASC_NO_ASSERT || n < LIMB_BITS * MAX_LIMBS,
-      '_udiv_pow2: rhs must be < 32*MAX_LIMBS',
+      '_udiv_pow2: rhs must be < 32*MAX_LIMBS'
     );
     assert(ASC_NO_ASSERT || n >= 0, '_udiv_pow2: rhs must be > 0');
 

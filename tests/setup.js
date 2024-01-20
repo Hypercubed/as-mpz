@@ -21,8 +21,8 @@ export function toHex(a) {
   return '0x' + a;
 }
 
-export const from = (n) => mpz.from(String(n));
-export const to = (n) => BigInt(mpz.toString(n));
+export const from = n => mpz.from(String(n));
+export const to = n => BigInt(mpz.toString(n));
 export const t_add = (n, m) => to(mpz.add(from(n), from(m)));
 export const t_sub = (n, m) => to(mpz.sub(from(n), from(m)));
 export const t_mul = (n, m) => to(mpz.mul(from(n), from(m)));
@@ -39,7 +39,7 @@ export const t_shl = (n, m) => to(mpz.shl(from(n), from(m)));
 
 export const t_cmp = (n, m) => mpz.cmp(from(n), from(m));
 
-export const t_fact = (n) => to(mpz.fact(n));
+export const t_fact = n => to(mpz.fact(n));
 
 export const t_string = (n, base = 10) => mpz.toString(from(n), base);
-export const t_hex = (n) => mpz.toHex(from(n));
+export const t_hex = n => mpz.toHex(from(n));

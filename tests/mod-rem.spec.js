@@ -4,7 +4,7 @@ import fc from 'fast-check';
 
 fc.configureGlobal({ numRuns: 300 });
 
-t.test('rem', (t) => {
+t.test('rem', t => {
   fc.assert(
     fc.property(fc.bigIntN(4096), fc.bigIntN(4096), (n, m) => {
       m = m || 1n;
@@ -15,15 +15,15 @@ t.test('rem', (t) => {
         [10000n, 7n],
         [10000n, -7n],
         [-10000n, 7n],
-        [-10000n, -7n],
-      ],
-    },
+        [-10000n, -7n]
+      ]
+    }
   );
 
   t.end();
 });
 
-t.test('modulo', (t) => {
+t.test('modulo', t => {
   fc.assert(
     fc.property(fc.bigIntN(4096), fc.bigIntN(4096), (n, m) => {
       m = m || 1n;
@@ -34,9 +34,9 @@ t.test('modulo', (t) => {
         [10000n, 7n],
         [10000n, -7n],
         [-10000n, 7n],
-        [-10000n, -7n],
-      ],
-    },
+        [-10000n, -7n]
+      ]
+    }
   );
 
   t.end();

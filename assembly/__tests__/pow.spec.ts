@@ -14,12 +14,12 @@ describe('pow', () => {
     assertSame(MpZ.from(0xdeadbeef) ** MpZ.TWO, '13957162197951816481');
     assertSame(
       MpZ.from(0xdeadbeef) ** MpZ.from(3),
-      '52142960857923402497294780879',
+      '52142960857923402497294780879'
     );
 
     assertSame(
       MpZ.from(5).pow(4).pow(3).pow(2).pow(1),
-      MpZ.from('0xD3C21BCECCEDA1'),
+      MpZ.from('0xD3C21BCECCEDA1')
     );
   });
 
@@ -37,14 +37,14 @@ describe('pow', () => {
 
     assertSame(
       MpZ.from(-0xdeadbeef) ** MpZ.from(3),
-      '-52142960857923402497294780879',
+      '-52142960857923402497294780879'
     );
   });
 
   it('large powers', () => {
     assertSame(
       MpZ.from('2') ** MpZ.from('0xFF'),
-      '57896044618658097711785492504343953926634992332820282019728792003956564819968',
+      '57896044618658097711785492504343953926634992332820282019728792003956564819968'
     );
 
     const x = MpZ.from('2') ** MpZ.from('0xFFFF');

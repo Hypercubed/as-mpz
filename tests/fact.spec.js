@@ -13,14 +13,14 @@ function calculateFactorial(n) {
   return fact;
 }
 
-t.test('factorials', (t) => {
+t.test('factorials', t => {
   fc.assert(
-    fc.property(fc.integer({ min: 5, max: 1000 }), (n) => {
+    fc.property(fc.integer({ min: 5, max: 1000 }), n => {
       t.equal(t_fact(n), calculateFactorial(BigInt(n)));
     }),
     {
-      examples: [[1], [10], [100], [1000]],
-    },
+      examples: [[1], [10], [100], [1000]]
+    }
   );
 
   t.end();

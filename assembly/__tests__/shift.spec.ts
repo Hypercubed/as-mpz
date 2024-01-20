@@ -6,27 +6,27 @@ describe('mul pow2', () => {
     assertSame(MpZ.from('0x1').mul_pow2(1), 2);
     assertSame(
       MpZ.from('0x1234567890ABCDEF').mul_pow2(0),
-      MpZ.from('0x1234567890ABCDEF'),
+      MpZ.from('0x1234567890ABCDEF')
     );
     assertSame(
       MpZ.from('0x1234567890ABCDEF').mul_pow2(4),
-      MpZ.from('0x1234567890ABCDEF0'),
+      MpZ.from('0x1234567890ABCDEF0')
     );
     assertSame(
       MpZ.from('0x1234567890ABCDEF').mul_pow2(8),
-      MpZ.from('0x1234567890ABCDEF00'),
+      MpZ.from('0x1234567890ABCDEF00')
     );
     assertSame(
       MpZ.from('0x1234567890ABCDEF').mul_pow2(32),
-      MpZ.from('0x1234567890ABCDEF00000000'),
+      MpZ.from('0x1234567890ABCDEF00000000')
     );
     assertSame(
       MpZ.from('0x1234567890ABCDEF').mul_pow2(64),
-      MpZ.from('0x1234567890ABCDEF0000000000000000'),
+      MpZ.from('0x1234567890ABCDEF0000000000000000')
     );
     assertSame(
       MpZ.from('0x1234567890ABCDEF').mul_pow2(128),
-      MpZ.from('0x1234567890ABCDEF00000000000000000000000000000000'),
+      MpZ.from('0x1234567890ABCDEF00000000000000000000000000000000')
     );
   });
 
@@ -48,39 +48,39 @@ describe('div pow2', () => {
 
     assertSame(
       MpZ.from('0x1234567890ABCDEF00000000000000000000000000000000').div_pow2(
-        0,
+        0
       ),
-      MpZ.from('0x1234567890ABCDEF00000000000000000000000000000000'),
+      MpZ.from('0x1234567890ABCDEF00000000000000000000000000000000')
     );
     assertSame(
       MpZ.from('0x1234567890ABCDEF00000000000000000000000000000000').div_pow2(
-        4,
+        4
       ),
-      MpZ.from('0x1234567890ABCDEF0000000000000000000000000000000'),
+      MpZ.from('0x1234567890ABCDEF0000000000000000000000000000000')
     );
     assertSame(
       MpZ.from('0x1234567890ABCDEF00000000000000000000000000000000').div_pow2(
-        8,
+        8
       ),
-      MpZ.from('0x1234567890ABCDEF000000000000000000000000000000'),
+      MpZ.from('0x1234567890ABCDEF000000000000000000000000000000')
     );
     assertSame(
       MpZ.from('0x1234567890ABCDEF00000000000000000000000000000000').div_pow2(
-        32,
+        32
       ),
-      MpZ.from('0x1234567890ABCDEF000000000000000000000000'),
+      MpZ.from('0x1234567890ABCDEF000000000000000000000000')
     );
     assertSame(
       MpZ.from('0x1234567890ABCDEF00000000000000000000000000000000').div_pow2(
-        64,
+        64
       ),
-      MpZ.from('0x1234567890ABCDEF0000000000000000'),
+      MpZ.from('0x1234567890ABCDEF0000000000000000')
     );
     assertSame(
       MpZ.from('0x1234567890ABCDEF00000000000000000000000000000000').div_pow2(
-        128,
+        128
       ),
-      0x1234567890abcdef,
+      0x1234567890abcdef
     );
   });
 });

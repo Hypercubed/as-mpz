@@ -4,7 +4,7 @@ import fc from 'fast-check';
 
 fc.configureGlobal({ numRuns: 300 });
 
-t.test('addition', (t) => {
+t.test('addition', t => {
   fc.assert(
     fc.property(fc.bigIntN(4096), fc.bigIntN(4096), (n, m) => {
       t.equal(t_add(n, m), n + m);
@@ -27,15 +27,15 @@ t.test('addition', (t) => {
         // lhs<0, rhs<0
         [-8n, -3n],
         [-3n, -8n],
-        [-0xdead0000n, -0x0000beefn],
-      ],
-    },
+        [-0xdead0000n, -0x0000beefn]
+      ]
+    }
   );
 
   t.end();
 });
 
-t.test('subtraction', (t) => {
+t.test('subtraction', t => {
   fc.assert(
     fc.property(fc.bigIntN(4096), fc.bigIntN(4096), (n, m) => {
       t.equal(t_sub(n, m), n - m);
@@ -60,21 +60,21 @@ t.test('subtraction', (t) => {
         [-3n, -8n],
         [-0xdeadbeefn, -0x0000beefn],
         // rhs<lhs<0
-        [-3n, -8n],
-      ],
-    },
+        [-3n, -8n]
+      ]
+    }
   );
 
   t.end();
 });
 
-t.test('invariants', (t) => {
+t.test('invariants', t => {
   fc.assert(
     fc.property(fc.bigIntN(4096), fc.bigIntN(4096), (n, m) => {
       const r = mpz.add(mpz.from(n), mpz.from(m));
       const s = mpz.sub(r, mpz.from(m));
       t.equal(mpz.toHex(r), mpz.toHex(s));
-    }),
+    })
   );
 
   t.end();
