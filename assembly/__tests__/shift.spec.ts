@@ -1,7 +1,7 @@
 import { MpZ } from '..';
 import { assertSame } from './assertions';
 
-describe('shift', () => {
+describe('mul pow2', () => {
   it('mul pow2', () => {
     assertSame(MpZ.from('0x1').mul_pow2(1), 2);
     assertSame(
@@ -30,6 +30,14 @@ describe('shift', () => {
     );
   });
 
+  it('throws on overflow', () => {
+    expect(() => {
+      MpZ.from('1').mul_pow2(32 * u64(2 ** 32));
+    }).toThrow();
+  });
+});
+
+describe('div pow2', () => {
   it('div pow2', () => {
     assertSame(MpZ.from('0x2').div_pow2(0x1), 1);
     assertSame(MpZ.from('0x1234567890ABCDEF').div_pow2(0), 0x1234567890abcdef);

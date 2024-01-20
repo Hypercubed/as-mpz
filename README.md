@@ -1,6 +1,6 @@
 # as-mpz
 
-Arbitrary precision integer library for AssemblyScript.
+Immutable arbitrary precision integer library for AssemblyScript.
 
 ## Features
 
@@ -58,7 +58,7 @@ Create a new MpZ from a number or string.
 
 Returns true if the MpZ is negative.
 
-### Unary Operators
+### Unary Methods
 
 #### `#abs(): MpZ`
 
@@ -72,7 +72,7 @@ Returns the negated value of the MpZ.
 
 Returns true if the MpZ is zero.
 
-### Binary Operators
+### Binary Methods
 
 #### `#add(rhs: MpZ | i32 | u32 | i64 | u64 | string): MpZ`
 
@@ -125,6 +125,24 @@ Returns `true` if the MpZ is greater than rhs.
 #### `#gte(rhs: MpZ | i32 | u32 | i64 | u64 | string): boolean`
 
 Returns `true` if the MpZ is greater than or equal to rhs.
+
+### Operators
+
+#### `+`, `-`, `*`, `/`
+
+Same as the `#add`, `#sub`, `#mul`, `#div` methods.
+
+#### `%`
+
+Returns the remainder of the lhs and rhs.
+
+> Note: The `%` operator is not the same as the `#mod` method. The `%` operator returns the `#rem` of the division of the lhs and rhs, while the `#mod` method returns the modulo of the lhs and rhs.  Like JavaScript's built-in BigInt operator.
+
+#### `>>`, `<<`
+
+Returns the result of the right/left shift of the lhs by the rhs.
+
+> Note: The `>>`/`<<` operators are not the same as the `#shift` method. The operators return the result of the shift as if the lhs was a 2's complement signed integer.  Like JavaScript's built-in BigInt operators.
 
 ## License
 
