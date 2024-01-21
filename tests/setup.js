@@ -37,6 +37,11 @@ export const t_div_pow2 = (n, m) => to(mpz.div_pow2(from(n), m));
 export const t_shr = (n, m) => to(mpz.shr(from(n), from(m)));
 export const t_shl = (n, m) => to(mpz.shl(from(n), from(m)));
 
+export const t_and_op = (n, m) => to(mpz.and_op(from(n), from(m)));
+export const t_or_op = (n, m) => to(mpz.or_op(from(n), from(m)));
+export const t_xor_op = (n, m) => to(mpz.xor_op(from(n), from(m)));
+export const t_not = n => to(mpz.not(from(n)));
+
 export const t_cmp = (n, m) => mpz.cmp(from(n), from(m));
 
 export const t_fact = n => to(mpz.fact(n));

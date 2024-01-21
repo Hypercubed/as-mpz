@@ -44,13 +44,15 @@ const c = MpZ.from('0x583F99D51C76AB3DEAB75');
 const c = (a + b) * c;
 ```
 
+> Note: Arithmatic methods and operators can be used interchangably, with operators acting as shorthand for the methods. However, the bitwise operators (`&`, `|`, `^`, `>>`, `<<`) are not the same as the bitwise methods (`#and`, `#or`, `#xor`, `#shift`). The methods return the result of the bitwise operation on the sign-magnitute integer; treatsing the sign seperate from the magnitude. Conversely, the operators return the result of the bitwise operation as if the MpZ was a 2's complement signed integer matching JavaScripts BigInt operators. The difference is subtle, but important for negitive numbers. See the API section for more details.
+
 ## API
 
 ### Constructor
 
 #### `MpZ.from(value: i32 | u32 | i64 | u64 | string): MpZ`
 
-Create a new MpZ from a number or string.
+Create a new MpZ from a number or string. The MpZ class should not be instantiated directly (using `new`). Instead use the static `MpZ.from` method to create a new MpZ. The `MpZ.from` method accepts a number or string. The string can be in decimal or hexadecimal format (prefixed with `0x`). The string can also be prefixed with `-` to indicate a negative number.
 
 ### Properties
 
@@ -106,7 +108,7 @@ Returns the comparison of the MpZ and rhs. Returns a `1` if the MpZ is greater t
 
 Returns `true` if the MpZ and rhs are equal (same value).
 
-#### `#neq(rhs: MpZ | i32 | u32 | i64 | u64 | string): boolean`
+#### `#ne(rhs: MpZ | i32 | u32 | i64 | u64 | string): boolean`
 
 Returns `true` if the MpZ and rhs are not equal (not the same value).
 
@@ -114,7 +116,7 @@ Returns `true` if the MpZ and rhs are not equal (not the same value).
 
 Returns `true` if the MpZ is less than rhs.
 
-#### `#lte(rhs: MpZ | i32 | u32 | i64 | u64 | string): boolean`
+#### `#le(rhs: MpZ | i32 | u32 | i64 | u64 | string): boolean`
 
 Returns `true` if the MpZ is less than or equal to rhs.
 
@@ -122,9 +124,27 @@ Returns `true` if the MpZ is less than or equal to rhs.
 
 Returns `true` if the MpZ is greater than rhs.
 
-#### `#gte(rhs: MpZ | i32 | u32 | i64 | u64 | string): boolean`
+#### `#ge(rhs: MpZ | i32 | u32 | i64 | u64 | string): boolean`
 
 Returns `true` if the MpZ is greater than or equal to rhs.
+
+#### `#and(rhs: MpZ | i32 | u32 | i64 | u64 | string): MpZ`
+
+Returns the bitwise and of the MpZ and rhs magnitude and sign.
+
+> Note: The `#and` method is not the same as the `&` operator. The `#and` method returns the bitwise `and` of the unsigned magnitude of the MpZ and rhs. The signedness of the result is an `and` of the signedness of the MpZ and rhs. The `&` operator returns the result of the bitwise `and` as if the MpZ was a 2's complement signed integer; matching JavaScript's built-in BigInt operator.
+
+#### `#or(rhs: MpZ | i32 | u32 | i64 | u64 | string): MpZ`
+
+Returns the bitwise or of the MpZ and rhs magnitude and sign.
+
+> Note: The `#or` method is not the same as the `|` operator. The `#or` method returns the bitwise `or` of the unsigned magnitude of the MpZ and rhs. The signedness of the result is an `or` of the signedness of the MpZ and rhs. The `|` operator returns the result of the bitwise `or` as if the MpZ was a 2's complement signed integer; matching JavaScript's built-in BigInt operator.
+
+#### `#xor(rhs: MpZ | i32 | u32 | i64 | u64 | string): MpZ`
+
+Returns the bitwise xor of the MpZ and rhs magnitude and sign.
+
+> Note: The `#xor` method is not the same as the `^` operator. The `#xor` method returns the bitwise `xor` of the unsigned magnitude of the MpZ and rhs. The signedness of the result is an `xor` of the signedness of the MpZ and rhs. The `^` operator returns the result of the bitwise `xor` as if the MpZ was a 2's complement signed integer; matching JavaScript's built-in BigInt operator.
 
 ### Operators
 
@@ -136,13 +156,19 @@ Same as the `#add`, `#sub`, `#mul`, `#div` methods.
 
 Returns the remainder of the lhs and rhs.
 
-> Note: The `%` operator is not the same as the `#mod` method. The `%` operator returns the `#rem` of the division of the lhs and rhs, while the `#mod` method returns the modulo of the lhs and rhs. Like JavaScript's built-in BigInt operator.
+> Note: The `%` operator is not the same as the `#mod` method. The `%` operator returns the `#rem` of the division of the lhs and rhs, while the `#mod` method returns the modulo of the lhs and rhs; matching JavaScript's built-in BigInt operator.
 
-#### `>>`, `<<`
+#### `<<`, `>>`
 
-Returns the result of the right/left shift of the lhs by the rhs.
+Returns the result of the left/right shift of the lhs by the rhs.
 
-> Note: The `>>`/`<<` operators are not the same as the `#shift` method. The operators return the result of the shift as if the lhs was a 2's complement signed integer. Like JavaScript's built-in BigInt operators.
+> Note: The `<<`/`>>` operators are not the same as the `#shift` method. The operators return the result of the shift as if the lhs was a 2's complement signed integer; matching JavaScript's built-in BigInt operators.
+
+#### `&`, `|`, `^`
+
+Returns the result of the bitwise `and`/`or`/`xor` of the lhs and rhs.
+
+> Note: The `&`/`|`/`^` operators are not the same as the `#and`/`#or`/`#xor` methods. The operators return the result of the bitwise and/or/xor as if the values were 2's complement signed integers; matching JavaScript's built-in BigInt operators.
 
 ## License
 

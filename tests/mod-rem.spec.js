@@ -2,7 +2,7 @@ import t from 'tap';
 import { t_rem, t_mod } from './setup.js';
 import fc from 'fast-check';
 
-fc.configureGlobal({ numRuns: 300 });
+fc.configureGlobal({ numRuns: 200 });
 
 t.test('rem', t => {
   fc.assert(

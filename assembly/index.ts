@@ -1,5 +1,3 @@
-import { assertSame } from './__tests__/assertions';
-
 // @ts-ignore
 @inline
 const LOW_MASK: u32 = 0xffffffff;
@@ -133,13 +131,18 @@ export class DivRem<R> {
   rem!: R;
 }
 
+/**
+ * Immutable arbitrary-precision integers.
+ *
+ */
+
 // @ts-ignore
 @final
 export class MpZ {
   // Contains the size of the MpZ and the sign
   // The sign is stored as the negation of the size
   // This size excludes leading zero limbs (except for least significant limb)
-  protected readonly _size: i32;
+  protected readonly _sgn_size: i32;
 
   // Contains the limbs of the MpZ
   // The last limb is the most significant
@@ -150,6 +153,8 @@ export class MpZ {
   // Should not be used directly
   // Mutating _data will cause unexpected behavior
   constructor(data: StaticArray<u32>, neg: boolean = false) {
+    assert(ASC_NO_ASSERT || data.length > 0, 'MpZ must have at least 1 limb');
+
     let size = data.length;
 
     // Reduce size by leading zeros
@@ -159,23 +164,23 @@ export class MpZ {
 
     if (size === 0) {
       this._data = [0];
-      this._size = 1;
+      this._sgn_size = 1;
     } else {
       this._data = data;
-      this._size = neg ? -size : size;
+      this._sgn_size = neg ? -size : size;
     }
   }
 
   // @ts-ignore
   @inline
   get isNeg(): boolean {
-    return this._size < 0;
+    return this._sgn_size < 0;
   }
 
   // @ts-ignore
   @inline
   get size(): i32 {
-    return this.isNeg ? -this._size : this._size;
+    return this._sgn_size < 0 ? -this._sgn_size : this._sgn_size;
   }
 
   abs(): MpZ {
@@ -194,8 +199,8 @@ export class MpZ {
     if (this.isNeg && y.isNeg) return this._uadd(y).neg(); // -a + -b = -(a + b)
     if (this.isNeg) return y._usub(this); // -a + b = b - a
     if (y.isNeg) return this._usub(y); // a + -b = a - b
-    if (y.size === 1) return this._uaddU32(unchecked(y._data[0]));
-    if (this.size === 1) return y._uaddU32(unchecked(this._data[0]));
+    if (y._sgn_size === 1) return this._uaddU32(unchecked(y._data[0]));
+    if (this._sgn_size === 1) return y._uaddU32(unchecked(this._data[0]));
     return this._uadd(y);
   }
 
@@ -711,7 +716,7 @@ export class MpZ {
   // modulus
   mod<T>(rhs: T): MpZ {
     const r = this.rem(rhs);
-    return r.add(rhs).rem(rhs); // ((n % d) + d) % d
+    return r.add(rhs).rem(rhs); // modulo = ((n % d) + d) % d
   }
 
   // remainder
@@ -780,6 +785,88 @@ export class MpZ {
     }
 
     return z;
+  }
+
+  // *** Bitwise operators ***
+
+  // @ts-ignore
+  @operator.prefix('~')
+  protected not(): MpZ {
+    return this.isNeg ? this._usubU32(1) : this._uaddU32(1).neg();
+  }
+
+  and<T>(rhs: T): MpZ {
+    const y = MpZ.from(rhs);
+    const z = this._and(y);
+    return this.isNeg && y.isNeg ? z.neg() : z;
+  }
+
+  protected _and(rhs: MpZ): MpZ {
+    const p = this.size;
+    const q = rhs.size;
+    const z = new StaticArray<u32>(q > p ? q : p);
+
+    for (let i: i32 = 0; i < z.length; ++i) {
+      const lx = this.size > i ? unchecked(this._data[i]) : 0;
+      const ly = rhs.size > i ? unchecked(rhs._data[i]) : 0;
+      unchecked((z[i] = lx & ly));
+    }
+
+    return new MpZ(z);
+  }
+
+  protected _andNot(rhs: MpZ): MpZ {
+    const p = this.size;
+    const q = rhs.size;
+    const z = new StaticArray<u32>(q > p ? q : p);
+
+    for (let i: i32 = 0; i < z.length; ++i) {
+      const lx = this.size > i ? unchecked(this._data[i]) : 0;
+      const ly = rhs.size > i ? unchecked(rhs._data[i]) : 0;
+      unchecked((z[i] = ly === 0 ? lx : lx & ~ly));
+    }
+
+    return new MpZ(z);
+  }
+
+  or<T>(rhs: T): MpZ {
+    const y = MpZ.from(rhs);
+    const z = this._or(y);
+    return this.isNeg || y.isNeg ? z.neg() : z;
+  }
+
+  protected _or(rhs: MpZ): MpZ {
+    const p = this.size;
+    const q = rhs.size;
+    const z = new StaticArray<u32>(q > p ? q : p);
+
+    for (let i: i32 = 0; i < z.length; ++i) {
+      const lx = this.size > i ? unchecked(this._data[i]) : 0;
+      const ly = rhs.size > i ? unchecked(rhs._data[i]) : 0;
+      unchecked((z[i] = lx | ly));
+    }
+
+    return new MpZ(z);
+  }
+
+  xor<T>(rhs: T): MpZ {
+    const y = MpZ.from(rhs);
+    const z = this._xor(y);
+    return this.isNeg !== y.isNeg ? z.neg() : z;
+  }
+
+  protected _xor(rhs: MpZ): MpZ {
+    const p = this.size;
+    const q = rhs.size;
+    const z = new StaticArray<u32>(q > p ? q : p);
+
+    for (let i: i32 = 0; i < z.length; ++i) {
+      const lx = this.size > i ? unchecked(this._data[i]) : 0;
+      const ly = rhs.size > i ? unchecked(rhs._data[i]) : 0;
+      unchecked((z[i] = lx ^ ly));
+    }
+
+    return new MpZ(z);
   }
 
   isOdd(): boolean {
@@ -916,11 +1003,13 @@ export class MpZ {
   cmp<T>(rhs: T): i32 {
     const y = MpZ.from(rhs);
 
-    const sx = this.isNeg;
-    const sy = y.isNeg;
+    const q = this._sgn_size;
+    const p = y._sgn_size;
 
-    if (sx !== sy) return sx ? -1 : 1; // a < b
-    return sx ? -this._ucmp(y) : this._ucmp(y);
+    if (q > p) return 1;
+    if (p > q) return -1;
+    if (q < 0) return -this._ucmp(y);
+    return this._ucmp(y);
   }
 
   // unsigned compare
@@ -943,7 +1032,7 @@ export class MpZ {
     return this.cmp(MpZ.from(rhs)) === 0;
   }
 
-  neq<T>(rhs: T): boolean {
+  ne<T>(rhs: T): boolean {
     return this.cmp(MpZ.from(rhs)) !== 0;
   }
 
@@ -951,7 +1040,7 @@ export class MpZ {
     return this.cmp(MpZ.from(rhs)) > 0;
   }
 
-  gte<T>(rhs: T): boolean {
+  ge<T>(rhs: T): boolean {
     return this.cmp(MpZ.from(rhs)) >= 0;
   }
 
@@ -959,7 +1048,7 @@ export class MpZ {
     return this.cmp(MpZ.from(rhs)) < 0;
   }
 
-  lte<T>(rhs: T): boolean {
+  le<T>(rhs: T): boolean {
     return this.cmp(MpZ.from(rhs)) <= 0;
   }
 
@@ -979,76 +1068,92 @@ export class MpZ {
   static readonly TWO: MpZ = new MpZ([2]);
 
   // @ts-ignore
-  @inline @operator('*')
+  @inline
+  @operator('*')
   static mul(lhs: MpZ, rhs: MpZ): MpZ {
     return lhs.mul(rhs);
   }
 
   // @ts-ignore
-  @inline @operator('/')
+  @inline
+  @operator('/')
   static div(lhs: MpZ, rhs: MpZ): MpZ {
     return lhs.div(rhs);
   }
 
   // @ts-ignore
-  @inline @operator('+')
+  @inline
+  @operator('+')
   static add(lhs: MpZ, rhs: MpZ): MpZ {
     return lhs.add(rhs);
   }
 
   // @ts-ignore
-  @inline @operator('-')
+  @inline
+  @operator('-')
   static sub(lhs: MpZ, rhs: MpZ): MpZ {
     return lhs.sub(rhs);
   }
 
   // @ts-ignore
-  @inline @operator('==')
+  @inline
+  @operator('==')
   static eq(lhs: MpZ, rhs: MpZ): boolean {
     return lhs.eq(rhs);
   }
 
   // @ts-ignore
-  @inline @operator('>')
+  @inline
+  @operator('>')
   static gt(lhs: MpZ, rhs: MpZ): boolean {
     return lhs.gt(rhs);
   }
 
   // @ts-ignore
-  @inline @operator('>=')
-  static gte(lhs: MpZ, rhs: MpZ): boolean {
-    return lhs.gte(rhs);
+  @inline
+  @operator('>=')
+  static ge(lhs: MpZ, rhs: MpZ): boolean {
+    return lhs.ge(rhs);
   }
 
   // @ts-ignore
-  @inline @operator('<')
+  @inline
+  @operator('<')
   static lt(lhs: MpZ, rhs: MpZ): boolean {
     return lhs.lt(rhs);
   }
 
   // @ts-ignore
-  @inline @operator('<=')
-  static lte(lhs: MpZ, rhs: MpZ): boolean {
-    return lhs.lte(rhs);
+  @inline
+  @operator('<=')
+  static le(lhs: MpZ, rhs: MpZ): boolean {
+    return lhs.le(rhs);
   }
 
   // @ts-ignore
-  @inline @operator('!=')
-  static neq(lhs: MpZ, rhs: MpZ): boolean {
+  @inline
+  @operator('!=')
+  static ne(lhs: MpZ, rhs: MpZ): boolean {
     return !lhs.eq(rhs);
   }
 
+  // Note: Rem (%) operator is not the same as the modulo.  The % operator is a remainder (like JavaScripts's operators).
+
   // @ts-ignore
-  @inline @operator('%')
+  @inline
+  @operator('%')
   static mod(lhs: MpZ, rhs: MpZ): MpZ {
     return lhs.rem(rhs);
   }
 
   // @ts-ignore
-  @inline @operator('**')
+  @inline
+  @operator('**')
   static pow(lhs: MpZ, rhs: MpZ): MpZ {
     return lhs.pow(rhs);
   }
+
+  // Note: Shift operators behave as if they were represented in two's-complement notation (like JavaScripts's primitive integer types).
 
   // @ts-ignore
   @operator('<<')
@@ -1072,5 +1177,50 @@ export class MpZ {
     return lhs.isNeg
       ? lhs._usubU32(1)._rightShift(rhs)._uaddU32(1).neg()
       : lhs._rightShift(rhs);
+  }
+
+  // @ts-ignore
+  @operator('&')
+  static and(lhs: MpZ, rhs: MpZ): MpZ {
+    if (!lhs.isNeg && !rhs.isNeg) {
+      return lhs._and(rhs);
+    }
+    if (lhs.isNeg && rhs.isNeg) {
+      return lhs.not()._or(rhs.not()).not();
+    }
+    if (lhs.isNeg) {
+      return rhs._andNot(lhs.not());
+    }
+    return lhs._andNot(rhs.not());
+  }
+
+  // @ts-ignore
+  @operator('|')
+  static or(lhs: MpZ, rhs: MpZ): MpZ {
+    if (!lhs.isNeg && !rhs.isNeg) {
+      return lhs._or(rhs);
+    }
+    if (lhs.isNeg && rhs.isNeg) {
+      return lhs.not()._and(rhs.not()).not();
+    }
+    if (lhs.isNeg) {
+      return lhs.not()._andNot(rhs).not();
+    }
+    return rhs.not()._andNot(lhs).not();
+  }
+
+  // @ts-ignore
+  @operator('^')
+  static xor(lhs: MpZ, rhs: MpZ): MpZ {
+    if (!lhs.isNeg && !rhs.isNeg) {
+      return lhs._xor(rhs);
+    }
+    if (lhs.isNeg && rhs.isNeg) {
+      return lhs.not()._xor(rhs.not());
+    }
+    if (lhs.isNeg) {
+      return rhs._xor(lhs.not()).not();
+    }
+    return lhs._xor(rhs.not()).not();
   }
 }

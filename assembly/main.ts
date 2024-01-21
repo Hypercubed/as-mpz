@@ -37,6 +37,22 @@ export function shr(a: MpZ, b: MpZ): MpZ {
   return MpZ.shr(a, b);
 }
 
+export function and_op(a: MpZ, b: MpZ): MpZ {
+  return a & b;
+}
+
+export function or_op(a: MpZ, b: MpZ): MpZ {
+  return a | b;
+}
+
+export function xor_op(a: MpZ, b: MpZ): MpZ {
+  return a ^ b;
+}
+
+export function not(a: MpZ): MpZ {
+  return a.not();
+}
+
 export function add(a: MpZ, b: MpZ): MpZ {
   return a.add(b);
 }

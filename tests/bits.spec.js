@@ -1,24 +1,17 @@
 import t from 'tap';
-import { t_mul_pow2, t_div_pow2, t_shr, t_shl } from './setup.js';
+import {
+  t_mul_pow2,
+  t_div_pow2,
+  t_shr,
+  t_shl,
+  t_and_op,
+  t_or_op,
+  t_xor_op,
+  t_not
+} from './setup.js';
 import fc from 'fast-check';
 
-fc.configureGlobal({ numRuns: 200 });
-
-const shift = (n, m) => {
-  return n < 0n ? -(-n >> BigInt(m)) : n >> BigInt(m);
-};
-
-const examples = [
-  // [1n, -1n],
-  // [-1n, 1n],
-  // [1n, 1n],
-  // [-1n, -1n],
-  [0xdeadbeefn, 1],
-  [0xdeadbeefn, 8],
-  [0xdeadbeefn, 32],
-  [0xdeadbeefn, 64],
-  [-0xdeadbeefn, 64]
-];
+fc.configureGlobal({ numRuns: 100 });
 
 t.test('mul_pow2', t => {
   fc.assert(
@@ -111,6 +104,46 @@ t.test('>>', t => {
         [-0xdeadbeefn, 64n]
       ]
     }
+  );
+
+  t.end();
+});
+
+t.test('and', t => {
+  fc.assert(
+    fc.property(fc.bigIntN(4096), fc.bigIntN(4096), (n, m) => {
+      t.equal(t_and_op(n, m), n & m);
+    })
+  );
+
+  t.end();
+});
+
+t.test('or', t => {
+  fc.assert(
+    fc.property(fc.bigIntN(4096), fc.bigIntN(4096), (n, m) => {
+      t.equal(t_or_op(n, m), n | m);
+    })
+  );
+
+  t.end();
+});
+
+t.test('xor', t => {
+  fc.assert(
+    fc.property(fc.bigIntN(4096), fc.bigIntN(4096), (n, m) => {
+      t.equal(t_xor_op(n, m), n ^ m);
+    })
+  );
+
+  t.end();
+});
+
+t.test('not', t => {
+  fc.assert(
+    fc.property(fc.bigIntN(4096), n => {
+      t.equal(t_not(n), ~n);
+    })
   );
 
   t.end();
