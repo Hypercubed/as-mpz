@@ -21,6 +21,26 @@ export function toHex(a: MpZ): string {
   return a.toHex();
 }
 
+export function toValue(a: MpZ): number {
+  return a.toValue();
+}
+
+export function toU64(a: MpZ): u64 {
+  return a.toU64();
+}
+
+export function toI64(a: MpZ): i64 {
+  return a.toI64();
+}
+
+export function toU32(a: MpZ): u32 {
+  return a.toU32();
+}
+
+export function toI32(a: MpZ): i32 {
+  return a.toI32();
+}
+
 export function mul_pow2(a: MpZ, b: u64): MpZ {
   return a.mul_pow2(b);
 }

@@ -10,9 +10,13 @@ const LIMB_BITS: u32 = 32;
 @inline
 const BASE: u64 = 1 << LIMB_BITS;
 
+//  BigInteger must support values in this range
+//  -2**I32.MAX_VALUE (exclusive) - +2**I32.MAX_VALUE (exclusive)
+// However, realistically memory limits the maximum size of the MpZ
+
 // @ts-ignore
 @inline
-const MAX_LIMBS: u32 = I32.MAX_VALUE; // 2**31-1, experimental: ~2**27-1, realistic: ~2**25-1
+const MAX_LIMBS: u32 = I32.MAX_VALUE; // 2**31-1, experimental: ~2**27-1, realistic: ~< 2**25-1
 
 // @ts-ignore
 @inline
@@ -126,20 +130,30 @@ const TO_DECIMAL_M = 9;
 const TO_DECIMAL_N = 10 ** TO_DECIMAL_M;
 const TO_DECIMAL_P = '0'.repeat(TO_DECIMAL_M);
 
+/** @internal */
 export class DivRem<R> {
   div!: MpZ;
   rem!: R;
 }
 
 /**
- * Immutable arbitrary-precision integers.
+ * # `as-mpz`
+ * Immutable arbitrary precision integer library for AssemblyScript.
+ *
+ * Value is stored as a sign and magnitude.
+ *
+ * > Note: Arithmatic methods and operators can be used interchangably, with operators acting as shorthand for the methods.
+ * > However, the bitwise operators (`&`, `|`, `^`, `>>`, `<<`) are not the same as the bitwise methods (`#and`, `#or`, `#xor`, `#shift`).
+ * > The methods return the result of the bitwise operation on the sign-magnitute integer; treating the sign seperate from the magnitude.
+ * > Conversely, the operators return the result of the bitwise operation as if the MpZ was a 2's complement signed integer matching JavaScripts BigInt operators.
+ * > The difference is subtle, but important for negitive numbers.
  *
  */
 
 // @ts-ignore
 @final
 export class MpZ {
-  // Contains the size of the MpZ and the sign
+  // Contains the size and sign of the MpZ
   // The sign is stored as the negation of the size
   // This size excludes leading zero limbs (except for least significant limb)
   protected readonly _sgn_size: i32;
@@ -171,24 +185,58 @@ export class MpZ {
     }
   }
 
+  /**
+   * #### `MpZ.from(value: i32 | u32 | i64 | u64 | string): MpZ`
+   *
+   * Creates a new MpZ from a number or string.  The `MpZ.from` method accepts a number or string. The string can be in decimal or hexadecimal format (prefixed with `0x`). The string can also be prefixed with `-` to indicate a negative number.
+   *
+   * > Note: The MpZ class should not be instantiated directly (using `new`). Instead use the static `MpZ.from` method to create a new MpZ.
+   */
+  static from<T>(val: T): MpZ {
+    if (val instanceof MpZ) return val;
+    if (val instanceof i32) return fromI32(val as i32);
+    if (val instanceof u32) return fromU32(val as u32);
+    if (val instanceof i64) return fromI64(val as i64);
+    if (val instanceof u64) return fromU64(val as u64);
+    if (typeof val === 'string') return fromString(val);
+
+    throw new TypeError('Unsupported generic type ' + nameof<T>(val));
+  }
+
+  /**
+   * #### #isNeg(): boolean`
+   *
+   * Returns `true` if this MpZ is negative, otherwise `false`.
+   */
   // @ts-ignore
   @inline
   get isNeg(): boolean {
     return this._sgn_size < 0;
   }
 
+  // Returns the number of limbs in this MpZ (excluding leading zeros)
   // @ts-ignore
   @inline
   get size(): i32 {
     return this._sgn_size < 0 ? -this._sgn_size : this._sgn_size;
   }
 
+  /**
+   * #### `#abs(): MpZ`
+   *
+   * Returns the absolute value of this MpZ.
+   */
   abs(): MpZ {
     return this.isNeg ? new MpZ(this._data) : this;
   }
 
   // *** Addition ***
 
+  /**
+   * #### `add(rhs: i32 | u32 | i64 | u64 | MpZ): MpZ`
+   *
+   * Returns the sum of this MpZ and `rhs`.
+   */
   add<T>(rhs: T): MpZ {
     const y = MpZ.from(rhs);
 
@@ -249,6 +297,11 @@ export class MpZ {
 
   // *** Subtraction ***
 
+  /**
+   * #### `sub(rhs: i32 | u32 | i64 | u64 | MpZ): MpZ`
+   *
+   * Returns the difference of this MpZ and the `rhs`.
+   */
   sub<T>(rhs: T): MpZ {
     const y = MpZ.from(rhs);
 
@@ -307,6 +360,11 @@ export class MpZ {
 
   // *** Multiplication ***
 
+  /**
+   * #### `mul(rhs: i32 | u32 | i64 | u64 | MpZ): MpZ`
+   *
+   * Returns the product of this MpZ and the `rhs` (`this * rhs`).
+   */
   mul<T>(rhs: T): MpZ {
     const y = MpZ.from(rhs);
 
@@ -422,7 +480,7 @@ export class MpZ {
     return <u32>clz(d);
   }
 
-  // count bits
+  // returns the number of bits in the magnitude (not the 2's-complement representation) excluding leading zeros
   protected _bits(): u32 {
     return <u32>(this.size * LIMB_BITS - this._clz());
   }
@@ -527,6 +585,11 @@ export class MpZ {
     return z;
   }
 
+  /**
+   * #### `#mul_pow2(rhs: i32 | u32 | i64 | u64 | MpZ): MpZ`
+   *
+   * Returns the product of this MpZ multiplied and `2**rhs` (`this * 2 ** rhs`).
+   */
   // multiply by power of 2, using bit shifts
   mul_pow2<T>(rhs: T): MpZ {
     const y = MpZ.from(rhs);
@@ -535,6 +598,11 @@ export class MpZ {
     return this._leftShift(y);
   }
 
+  /**
+   * #### `#div_pow2(rhs: i32 | u32 | i64 | u64 | MpZ): MpZ`
+   *
+   * Returns the quotant of this MpZand `2**rhs` (`this / 2 ** rhs`) truncated towards zero.
+   */
   // divide by power of 2, using bit shifts
   div_pow2<T>(rhs: T): MpZ {
     const y = MpZ.from(rhs);
@@ -561,6 +629,14 @@ export class MpZ {
     return this.isNeg ? this._udiv_pow2(n).neg() : this._udiv_pow2(n);
   }
 
+  /**
+   * #### `#bitShift(rhs: i32 | u32 | i64 | u64 | MpZ): MpZ`
+   *
+   * Returns the value of this MpZ shifted by `rhs`.  Negative values shift right, positive values shift left.
+   *
+   * > Note: The `#bitShift` method is not the same as the `<<` and `>>` operators. The `#bitShift` method returns the bitwise shift of the unsigned magnitude of the MpZ and rhs. The signedness of the result is equal to signedness of the MpZ. The `<<` and `>>` operators return the result of the bitwise shift as if the MpZ was a 2's complement signed integer; matching JavaScript's built-in BigInt operator.
+   */
+
   bitShift<T>(rhs: T): MpZ {
     const y = MpZ.from(rhs);
     if (y.eqz()) return this;
@@ -572,7 +648,11 @@ export class MpZ {
 
   // *** Division ***
 
-  // floored division
+  /**
+   * #### `div(rhs: MpZ): MpZ`
+   *
+   * Returns the quotient of this MpZ divided by the `rhs` (`this / rhs`). truncated towards zero
+   */
   div<T>(rhs: T): MpZ {
     if (this.eqz()) return MpZ.ZERO;
 
@@ -713,13 +793,25 @@ export class MpZ {
 
   // *** Modulus ***
 
-  // modulus
+  /**
+   * #### `mod(rhs: MpZ): MpZ`
+   *
+   * Returns the modulus of this MpZ divided by the `rhs`.
+   *
+   * > Note: The `#mod` method is not the same as the `%` operator.  The `%` operator returns the `#rem` of the division of the lhs and rhs, while the `#mod` method returns the modulo of the lhs and rhs.
+   */
   mod<T>(rhs: T): MpZ {
     const r = this.rem(rhs);
     return r.add(rhs).rem(rhs); // modulo = ((n % d) + d) % d
   }
 
-  // remainder
+  /**
+   * #### `rem(rhs: MpZ): MpZ`
+   *
+   * Returns the remainder of this MpZ divided by the `rhs` (`this % rhs`).
+   *
+   * > Note: The `#rem` method is the same as the `%` operator.  The `%` operator returns the `#rem` of the division of the lhs and rhs, while the `#mod` method returns the modulo of the lhs and rhs.
+   */
   rem<T>(rhs: T): MpZ {
     const y = MpZ.from(rhs);
     const q = this.div(y);
@@ -728,6 +820,11 @@ export class MpZ {
 
   // *** Pow ***
 
+  /**
+   * #### `pow(rhs: i32 | u32 | i64 | u64 | MpZ): MpZ`
+   *
+   * Returns the value of this MpZ raised to the power of `rhs` (`this ** rhs`).
+   */
   pow<T>(rhs: T): MpZ {
     const y = MpZ.from(rhs);
     if (y.isNeg) return MpZ.ZERO;
@@ -789,12 +886,24 @@ export class MpZ {
 
   // *** Bitwise operators ***
 
+  /**
+   * #### `#not(): MpZ`
+   *
+   * Returns the bitwise NOT of this MpZ (`~this`).
+   */
   // @ts-ignore
   @operator.prefix('~')
   protected not(): MpZ {
     return this.isNeg ? this._usubU32(1) : this._uaddU32(1).neg();
   }
 
+  /**
+   * #### `and(rhs: MpZ): MpZ`
+   *
+   * Returns the bitwise AND of this MpZ and `rhs`.
+   *
+   * > Note: The `#and` method is not the same as the `&` operator. The `#and` method returns the bitwise `and` of the unsigned magnitude of the MpZ and rhs. The signedness of the result is an `and` of the signedness of the MpZ and rhs. The `&` operator returns the result of the bitwise `and` as if the MpZ was a 2's complement signed integer; matching JavaScript's built-in BigInt operator.
+   */
   and<T>(rhs: T): MpZ {
     const y = MpZ.from(rhs);
     const z = this._and(y);
@@ -829,6 +938,13 @@ export class MpZ {
     return new MpZ(z);
   }
 
+  /**
+   * #### `xor(rhs: MpZ): MpZ`
+   *
+   * Returns the bitwise OR of this MpZ and `rhs`.
+   *
+   * > Note: The `#or` method is not the same as the `|` operator. The `#or` method returns the bitwise `OR` of the unsigned magnitude of the MpZ and rhs. The signedness of the result is an `and` of the signedness of the MpZ and rhs. The `&` operator returns the result of the bitwise `OR` as if the MpZ was a 2's complement signed integer; matching JavaScript's built-in BigInt operator.
+   */
   or<T>(rhs: T): MpZ {
     const y = MpZ.from(rhs);
     const z = this._or(y);
@@ -849,6 +965,13 @@ export class MpZ {
     return new MpZ(z);
   }
 
+  /**
+   * #### `#xor(rhs: MpZ): MpZ`
+   *
+   * Returns the bitwise XOR of this MpZ and `rhs`.
+   *
+   * > Note: The `#xor` method is not the same as the `^` operator. The `#xor` method returns the bitwise `XOR` of the unsigned magnitude of the MpZ and rhs. The signedness of the result is an `XOR` of the signedness of the MpZ and rhs. The `^` operator returns the result of the bitwise `XOR` as if the MpZ was a 2's complement signed integer; matching JavaScript's built-in BigInt operator.
+   */
   xor<T>(rhs: T): MpZ {
     const y = MpZ.from(rhs);
     const z = this._xor(y);
@@ -869,14 +992,29 @@ export class MpZ {
     return new MpZ(z);
   }
 
+  /**
+   * #### `#isOdd(): MpZ`
+   *
+   * Returns `true` if this MpZ is odd, otherwise `false`.
+   */
   isOdd(): boolean {
     return (unchecked(this._data[0]) & 1) === 1;
   }
 
+  /**
+   * #### `#isEven(): boolean`
+   *
+   * Returns `true` if this MpZ is even, otherwise `false`.
+   */
   isEven(): boolean {
     return (unchecked(this._data[0]) & 1) === 0;
   }
 
+  /**
+   * #### `#neg(): MpZ`
+   *
+   * Returns the negation of this MpZ (`-this`).
+   */
   // @ts-ignore
   @operator.prefix('-')
   neg(): MpZ {
@@ -885,22 +1023,39 @@ export class MpZ {
   }
 
   // *** ToString ***
+
+  /**
+   * #### `#toString(radix: i32 = 10): string`
+   *
+   * Returns the value of this MpZ as a string. The radix can be from 2 and 36 (inclusive). The default radix is 10.
+   *
+   * Note: The resulting string is not prefixed with the radix (e.g. `0x` or `0b`) and therefore not compatible as input to `MpZ.from` (radix of 10 excluded).
+   */
   toString(radix: i32 = 10): string {
-    if (radix < -2) {
+    if (this.eqz()) return '0';
+
+    if (radix < -10) {
       return this.toString(-radix).toUpperCase();
     }
 
     if (radix === 10) {
       return this.toDecimal();
     } else if (radix === 16) {
-      return this.isNeg ? `-${this._uhex()}` : `${this._uhex()}`;
+      return this.isNeg ? `-${this._uhex()}` : this._uhex();
     } else if (radix >= 2 && radix <= 36) {
-      return this._uitoa(radix);
+      return this.isNeg ? `-${this._uitoa(radix)}` : this._uitoa(radix);
     } else {
       throw new Error('toString() radix argument must be between 2 and 36');
     }
   }
 
+  /**
+   * #### `#toHex(): string`
+   *
+   * Returns the value of this MpZ as a hexadecimal string.
+   *
+   * > Note: The resulting string is prefixed with `0x` and is therefore compatible as input to `MpZ.from`.
+   */
   toHex(): string {
     if (this.eqz()) return '0x0';
 
@@ -908,6 +1063,11 @@ export class MpZ {
     return this.isNeg ? `-0x${s}` : `0x${s}`;
   }
 
+  /**
+   * #### `#toDecimal(): string`
+   *
+   * Returns the value of this MpZ as a decimal string.
+   */
   toDecimal(): string {
     if (this.eqz()) return '0';
     return (this.isNeg ? `-` : '') + this.abs()._uitoaDecimal();
@@ -937,7 +1097,7 @@ export class MpZ {
     }
 
     if (!n.eqz()) {
-      s.unshift(n.toU32().toString(10));
+      s.unshift(n.abs().toU32().toString(10));
     }
 
     return s.join('');
@@ -954,52 +1114,101 @@ export class MpZ {
     }
 
     if (!n.eqz()) {
-      s.unshift(n.toU32().toString(base));
+      s.unshift(n.abs().toU32().toString(base));
     }
 
     return s.join('');
   }
 
   // *** ToValue ***
+
+  /**
+   * #### `#toValue(): number`
+   *
+   * Returns the value of this MpZ as a `number`.
+   */
   toValue(): number {
     const q = this.size;
     const l1: u64 = unchecked(this._data[q - 1]);
     const z0 = f64(l1) * f64(BASE) ** (q - 1);
     const l2: u64 = q > 1 ? unchecked(this._data[q - 2]) : 0;
     const z1 = f64(l2) * f64(BASE) ** (q - 2);
-    return z0 + z1;
+    const z = z0 + z1;
+    return this.isNeg ? -z : z;
   }
 
+  /**
+   * #### `#toU32Array(): u32[]`
+   *
+   * Returns the value of this MpZ as an unsigned 32-bit integer array.  Ther sign of the MpZ is ignored.
+   */
   toArray(): u32[] {
     return this._data.slice<u32[]>(0, this.size);
   }
 
+  /**
+   * #### `#toU32(): u32`
+   *
+   * Returns the value of this MpZ as an unsigned 32-bit integer.  If this MpZ is too big to fit in an int32, only the low-order 32 bits are returned.
+   * If this MpZ is negative, the returned value is the 2's complement representation of the MpZ.
+   */
   toU32(): u32 {
-    return unchecked(this._data[0]);
+    const z = unchecked(this._data[0]);
+    return this.isNeg ? -z : z;
   }
 
+  /**
+   * #### `#toI32(): i32`
+   *
+   * Returns the value of this MpZ as a signed 32-bit integer.  If this MpZ is too big to fit in an int32, only the low-order 32 bits are returned.
+   */
   toI32(): i32 {
-    return this.isNeg ? -unchecked(this._data[0]) : unchecked(this._data[0]);
+    const z = unchecked(this._data[0]);
+    return this.isNeg ? -z : z;
   }
 
+  /**
+   * #### `#toU64(): u64`
+   *
+   * Returns the value of this MpZ as an unsigned 64-bit integer.  If this MpZ is too big to fit in an int64, only the low-order 64 bits are returned.
+   */
   toU64(): u64 {
-    return this.size === 1
-      ? u64(unchecked(this._data[0]))
-      : (u64(unchecked(this._data[1])) << 32) + u64(unchecked(this._data[0]));
+    const z =
+      this.size === 1
+        ? u64(unchecked(this._data[0]))
+        : (u64(unchecked(this._data[1])) << 32) + u64(unchecked(this._data[0]));
+    return this.isNeg ? -z : z;
   }
 
+  /**
+   * #### `#toI64(): i64`
+   *
+   * Returns the value as a signed 64-bit integer.  If this MpZ is too big to fit in an int64, only the low-order 64 bits are returned (the sign is ignored).
+   */
   toI64(): i64 {
-    return this.isNeg ? -this.toU64() : this.toU64();
+    const z =
+      this.size === 1
+        ? u64(unchecked(this._data[0]))
+        : (u64(unchecked(this._data[1])) << 32) + u64(unchecked(this._data[0]));
+    return this.isNeg ? -z : z;
   }
 
   // *** Comparison ***
 
-  // equal to zero
+  /**
+   * #### `#eqz(): boolean`
+   *
+   * Returns `true` if this MpZ is equal to zero.
+   */
   eqz(): boolean {
     return this.size === 1 && unchecked(this._data[0]) === 0;
   }
 
-  // compare
+  /**
+   * #### `#cmp(rhs: MpZ | i32 | u32 | i64 | u64 | string): i32`
+   *
+   * Returns `-1` if this MpZ is less than the rhs, `0` if this MpZ is equal to the rhs, or `1` if this MpZ is greater than the rhs.
+   */
   cmp<T>(rhs: T): i32 {
     const y = MpZ.from(rhs);
 
@@ -1028,44 +1237,71 @@ export class MpZ {
     return 0;
   }
 
+  /**
+   * #### `#eq(rhs: MpZ | i32 | u32 | i64 | u64 | string): boolean`
+   *
+   * Returns `true` if this MpZ is equal to the rhs.
+   */
   eq<T>(rhs: T): boolean {
     return this.cmp(MpZ.from(rhs)) === 0;
   }
 
+  /**
+   * #### `#ne(rhs: MpZ | i32 | u32 | i64 | u64 | string): boolean`
+   *
+   * Returns `true` if this MpZ is not equal to the rhs.
+   */
   ne<T>(rhs: T): boolean {
     return this.cmp(MpZ.from(rhs)) !== 0;
   }
 
+  /**
+   * #### `#gt(rhs: MpZ | i32 | u32 | i64 | u64 | string): boolean`
+   *
+   * Returns `true` if this MpZ is greater than the rhs.
+   */
   gt<T>(rhs: T): boolean {
     return this.cmp(MpZ.from(rhs)) > 0;
   }
 
+  /**
+   * #### `#ge(rhs: MpZ | i32 | u32 | i64 | u64 | string): boolean`
+   *
+   * Returns `true` if this MpZ is greater than or equal to the rhs.
+   */
   ge<T>(rhs: T): boolean {
     return this.cmp(MpZ.from(rhs)) >= 0;
   }
 
+  /**
+   * #### `#lt(rhs: MpZ | i32 | u32 | i64 | u64 | string): boolean`
+   *
+   * Returns `true` if this MpZ is less than the rhs.
+   */
   lt<T>(rhs: T): boolean {
     return this.cmp(MpZ.from(rhs)) < 0;
   }
 
+  /**
+   * #### `#le(rhs: MpZ | i32 | u32 | i64 | u64 | string): boolean`
+   *
+   * Returns `true` if this MpZ is less than or equal to the rhs.
+   */
   le<T>(rhs: T): boolean {
     return this.cmp(MpZ.from(rhs)) <= 0;
-  }
-
-  static from<T>(val: T): MpZ {
-    if (val instanceof MpZ) return val;
-    if (val instanceof i32) return fromI32(val as i32);
-    if (val instanceof u32) return fromU32(val as u32);
-    if (val instanceof i64) return fromI64(val as i64);
-    if (val instanceof u64) return fromU64(val as u64);
-    if (typeof val === 'string') return fromString(val);
-
-    throw new TypeError('Unsupported generic type ' + nameof<T>(val));
   }
 
   static readonly ZERO: MpZ = new MpZ([0]);
   static readonly ONE: MpZ = new MpZ([1]);
   static readonly TWO: MpZ = new MpZ([2]);
+
+  /**
+   * ### Arithmatioc Operators
+   *
+   * #### `+`, `-`, `*`, `/`
+   *
+   * Same as the `#add`, `#sub`, `#mul`, `#div` methods.
+   */
 
   // @ts-ignore
   @inline
@@ -1094,6 +1330,14 @@ export class MpZ {
   static sub(lhs: MpZ, rhs: MpZ): MpZ {
     return lhs.sub(rhs);
   }
+
+  /**
+   * ### Comparison Operators
+   *
+   * #### `==`, `>`, `>=`, `<`, `<=`, `!=`
+   *
+   * Same as the `#eq`, `#gt`, `#ge`, `#lt`, `#le`, `#ne` methods.
+   */
 
   // @ts-ignore
   @inline
@@ -1137,8 +1381,13 @@ export class MpZ {
     return !lhs.eq(rhs);
   }
 
-  // Note: Rem (%) operator is not the same as the modulo.  The % operator is a remainder (like JavaScripts's operators).
-
+  /**
+   * #### `%` operator
+   *
+   * Returns the remainder of the lhs and rhs.
+   *
+   * > Note: The `%` operator is not the same as the `#mod` method. The `%` operator returns the `#rem` of the division of the lhs and rhs; matching JavaScript's built-in BigInt operator.
+   */
   // @ts-ignore
   @inline
   @operator('%')
@@ -1146,6 +1395,11 @@ export class MpZ {
     return lhs.rem(rhs);
   }
 
+  /**
+   * #### `**` operator
+   *
+   * Returns the power of the lhs to the rhs.
+   */
   // @ts-ignore
   @inline
   @operator('**')
@@ -1153,8 +1407,13 @@ export class MpZ {
     return lhs.pow(rhs);
   }
 
-  // Note: Shift operators behave as if they were represented in two's-complement notation (like JavaScripts's primitive integer types).
-
+  /**
+   * #### `<<` operator
+   *
+   * Returns the result of the left shift of the lhs by the rhs.  Negitive rhs values will result in a right shift.
+   *
+   * > Shift operators behave as if they were represented in two's-complement notation (like JavaScripts's primitive integer types).
+   */
   // @ts-ignore
   @operator('<<')
   static shl(lhs: MpZ, rhs: MpZ): MpZ {
@@ -1166,6 +1425,13 @@ export class MpZ {
     return lhs._leftShift(rhs);
   }
 
+  /**
+   * #### `>>` operator
+   *
+   * Returns the result of the right shift of the lhs by the rhs.  Negitive rhs values will result in a left shift.
+   *
+   * > Shift operators behave as if they were represented in two's-complement notation (like JavaScripts's primitive integer types).
+   */
   // @ts-ignore
   @operator('>>')
   static shr(lhs: MpZ, rhs: MpZ): MpZ {
@@ -1174,11 +1440,16 @@ export class MpZ {
     if (rhs.eqz()) return lhs;
     if (lhs.eqz()) return MpZ.ZERO;
 
-    return lhs.isNeg
-      ? lhs._usubU32(1)._rightShift(rhs)._uaddU32(1).neg()
-      : lhs._rightShift(rhs);
+    return lhs.isNeg ? lhs.not()._rightShift(rhs).not() : lhs._rightShift(rhs);
   }
 
+  /**
+   * ### `&` operator
+   *
+   * Returns the bitwise `AND` operation on the two operands.
+   *
+   * > This operator returns the result of the bitwise `AND` as if the values were 2's complement signed integers; matching JavaScript's built-in BigInt operators.
+   */
   // @ts-ignore
   @operator('&')
   static and(lhs: MpZ, rhs: MpZ): MpZ {
@@ -1194,6 +1465,13 @@ export class MpZ {
     return lhs._andNot(rhs.not());
   }
 
+  /**
+   * ### `|` operator
+   *
+   * Returns the bitwise `OR` operation on the two operands.
+   *
+   * > This operator returns the result of the bitwise `OR` as if the values were 2's complement signed integers; matching JavaScript's built-in BigInt operators.
+   */
   // @ts-ignore
   @operator('|')
   static or(lhs: MpZ, rhs: MpZ): MpZ {
@@ -1209,6 +1487,13 @@ export class MpZ {
     return rhs.not()._andNot(lhs).not();
   }
 
+  /**
+   * ### `^` operator
+   *
+   * Returns the bitwise `XOR` operation on the two operands.
+   *
+   * > This operator returns the result of the bitwise `XOR` as if the values were 2's complement signed integers; matching JavaScript's built-in BigInt operators.
+   */
   // @ts-ignore
   @operator('^')
   static xor(lhs: MpZ, rhs: MpZ): MpZ {

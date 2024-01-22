@@ -48,3 +48,9 @@ export const t_fact = n => to(mpz.fact(n));
 
 export const t_string = (n, base = 10) => mpz.toString(from(n), base);
 export const t_hex = n => mpz.toHex(from(n));
+
+export const t_value = n => mpz.toValue(from(n));
+export const t_u32 = n => BigInt(mpz.toU32(from(n)));
+export const t_i32 = n => BigInt(mpz.toI32(from(n)));
+export const t_u64 = n => BigInt(mpz.toU64(from(n)));
+export const t_i64 = n => BigInt(mpz.toI64(from(n)));
