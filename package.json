@@ -38,6 +38,7 @@
     "as-bigint": "^0.5.3",
     "assemblyscript": "^0.27.22",
     "assemblyscript-prettier": "^3.0.1",
+    "chg": "^0.4.0",
     "fast-check": "^3.15.0",
     "npm-run-all": "^4.1.5",
     "parse-comments": "^0.4.3",

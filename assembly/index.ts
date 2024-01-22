@@ -1041,9 +1041,9 @@ export class MpZ {
     if (radix === 10) {
       return this.toDecimal();
     } else if (radix === 16) {
-      return this.isNeg ? `-${this._uhex()}` : this._uhex();
+      return this.isNeg ? `-${this.abs()._uhex()}` : this._uhex();
     } else if (radix >= 2 && radix <= 36) {
-      return this.isNeg ? `-${this._uitoa(radix)}` : this._uitoa(radix);
+      return this.isNeg ? `-${this.abs()._uitoa(radix)}` : this._uitoa(radix);
     } else {
       throw new Error('toString() radix argument must be between 2 and 36');
     }
@@ -1085,6 +1085,11 @@ export class MpZ {
   }
 
   protected _uitoaDecimal(): string {
+    assert(
+      ASC_NO_ASSERT || this.isNeg === false,
+      '_uitoaDecimal: this must be positive'
+    );
+
     const s = new Array<string>();
 
     let n: MpZ = this;
@@ -1097,13 +1102,20 @@ export class MpZ {
     }
 
     if (!n.eqz()) {
-      s.unshift(n.abs().toU32().toString(10));
+      s.unshift(n.toU32().toString(10));
     }
 
     return s.join('');
   }
 
   protected _uitoa(base: u32): string {
+    assert(ASC_NO_ASSERT || base >= 2, '_uitoa: base must be >= 2');
+    assert(ASC_NO_ASSERT || base <= 36, '_uitoa: base must be <= 36');
+    assert(
+      ASC_NO_ASSERT || this.isNeg === false,
+      '_uitoa: this must be positive'
+    );
+
     const s = new Array<string>();
 
     let n: MpZ = this;
@@ -1114,7 +1126,7 @@ export class MpZ {
     }
 
     if (!n.eqz()) {
-      s.unshift(n.abs().toU32().toString(base));
+      s.unshift(n.toU32().toString(base));
     }
 
     return s.join('');
