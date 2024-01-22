@@ -143,7 +143,7 @@ export class DivRem<R> {
  * Value is stored as a sign and magnitude.
  *
  * > Note: Arithmatic methods and operators can be used interchangably, with operators acting as shorthand for the methods.
- * > However, the bitwise operators (`&`, `|`, `^`, `>>`, `<<`) are not the same as the bitwise methods (`#and`, `#or`, `#xor`, `#shift`).
+ * > However, the bitwise operators (`&`, `|`, `^`, `>>`, `<<`) are not the same as the bitwise methods (`#and`, `#or`, `#xor`, `#bitShift`).
  * > The methods return the result of the bitwise operation on the sign-magnitute integer; treating the sign seperate from the magnitude.
  * > Conversely, the operators return the result of the bitwise operation as if the MpZ was a 2's complement signed integer matching JavaScripts BigInt operators.
  * > The difference is subtle, but important for negitive numbers.
@@ -204,7 +204,7 @@ export class MpZ {
   }
 
   /**
-   * #### #isNeg(): boolean`
+   * #### `#isNeg(): boolean`
    *
    * Returns `true` if this MpZ is negative, otherwise `false`.
    */
@@ -233,7 +233,7 @@ export class MpZ {
   // *** Addition ***
 
   /**
-   * #### `add(rhs: i32 | u32 | i64 | u64 | MpZ): MpZ`
+   * #### `#add(rhs: i32 | u32 | i64 | u64 | MpZ): MpZ`
    *
    * Returns the sum of this MpZ and `rhs`.
    */
@@ -298,7 +298,7 @@ export class MpZ {
   // *** Subtraction ***
 
   /**
-   * #### `sub(rhs: i32 | u32 | i64 | u64 | MpZ): MpZ`
+   * #### `#sub(rhs: i32 | u32 | i64 | u64 | MpZ): MpZ`
    *
    * Returns the difference of this MpZ and the `rhs`.
    */
@@ -361,7 +361,7 @@ export class MpZ {
   // *** Multiplication ***
 
   /**
-   * #### `mul(rhs: i32 | u32 | i64 | u64 | MpZ): MpZ`
+   * #### `#mul(rhs: i32 | u32 | i64 | u64 | MpZ): MpZ`
    *
    * Returns the product of this MpZ and the `rhs` (`this * rhs`).
    */
@@ -649,7 +649,7 @@ export class MpZ {
   // *** Division ***
 
   /**
-   * #### `div(rhs: MpZ): MpZ`
+   * #### `#div(rhs: MpZ): MpZ`
    *
    * Returns the quotient of this MpZ divided by the `rhs` (`this / rhs`). truncated towards zero
    */
@@ -794,7 +794,7 @@ export class MpZ {
   // *** Modulus ***
 
   /**
-   * #### `mod(rhs: MpZ): MpZ`
+   * #### `#mod(rhs: MpZ): MpZ`
    *
    * Returns the modulus of this MpZ divided by the `rhs`.
    *
@@ -806,7 +806,7 @@ export class MpZ {
   }
 
   /**
-   * #### `rem(rhs: MpZ): MpZ`
+   * #### `#rem(rhs: MpZ): MpZ`
    *
    * Returns the remainder of this MpZ divided by the `rhs` (`this % rhs`).
    *
@@ -821,7 +821,7 @@ export class MpZ {
   // *** Pow ***
 
   /**
-   * #### `pow(rhs: i32 | u32 | i64 | u64 | MpZ): MpZ`
+   * #### `#pow(rhs: i32 | u32 | i64 | u64 | MpZ): MpZ`
    *
    * Returns the value of this MpZ raised to the power of `rhs` (`this ** rhs`).
    */
@@ -898,7 +898,7 @@ export class MpZ {
   }
 
   /**
-   * #### `and(rhs: MpZ): MpZ`
+   * #### `#and(rhs: MpZ): MpZ`
    *
    * Returns the bitwise AND of this MpZ and `rhs`.
    *
@@ -939,7 +939,7 @@ export class MpZ {
   }
 
   /**
-   * #### `xor(rhs: MpZ): MpZ`
+   * #### `#or(rhs: MpZ): MpZ`
    *
    * Returns the bitwise OR of this MpZ and `rhs`.
    *
@@ -1195,7 +1195,7 @@ export class MpZ {
   /**
    * #### `#toI64(): i64`
    *
-   * Returns the value as a signed 64-bit integer.  If this MpZ is too big to fit in an int64, only the low-order 64 bits are returned (the sign is ignored).
+   * Returns the value as a signed 64-bit integer.  If this MpZ is too big to fit in an int64, only the low-order 64 bits are returned.
    */
   toI64(): i64 {
     const z =
@@ -1396,7 +1396,7 @@ export class MpZ {
   /**
    * #### `%` operator
    *
-   * Returns the remainder of the lhs and rhs.
+   * Returns the remainder of the lhs and rhs (`lhs % rhs`).
    *
    * > Note: The `%` operator is not the same as the `#mod` method. The `%` operator returns the `#rem` of the division of the lhs and rhs; matching JavaScript's built-in BigInt operator.
    */
@@ -1410,7 +1410,7 @@ export class MpZ {
   /**
    * #### `**` operator
    *
-   * Returns the power of the lhs to the rhs.
+   * Returns the power of the lhs to the rhs (`lhs ** rhs`).
    */
   // @ts-ignore
   @inline
