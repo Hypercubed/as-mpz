@@ -1,4 +1,5 @@
-# CHANGELOG
+CHANGELOG
+=========
 
 ## HEAD (Unreleased)
 
@@ -10,4 +11,4 @@
 - Feature: Implement bitwise methods (`#and`, `#or`, `#xor`, `#not`) and operators (`&`, `|`, `^`, `~`) as "2-complement" like.
 - Bugfix: Fix `toString` for negitive numbers when radix not equal to 10 or 16.
 
----
+--------------------
