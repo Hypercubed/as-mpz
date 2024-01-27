@@ -4,9 +4,9 @@ import {
   t_div_pow2,
   t_shr,
   t_shl,
-  t_and_op,
-  t_or_op,
-  t_xor_op,
+  t_and,
+  t_or,
+  t_xor,
   t_not
 } from './setup.js';
 import fc from 'fast-check';
@@ -112,7 +112,7 @@ t.test('>>', t => {
 t.test('and', t => {
   fc.assert(
     fc.property(fc.bigIntN(4096), fc.bigIntN(4096), (n, m) => {
-      t.equal(t_and_op(n, m), n & m);
+      t.equal(t_and(n, m), n & m);
     })
   );
 
@@ -122,7 +122,7 @@ t.test('and', t => {
 t.test('or', t => {
   fc.assert(
     fc.property(fc.bigIntN(4096), fc.bigIntN(4096), (n, m) => {
-      t.equal(t_or_op(n, m), n | m);
+      t.equal(t_or(n, m), n | m);
     })
   );
 
@@ -132,7 +132,7 @@ t.test('or', t => {
 t.test('xor', t => {
   fc.assert(
     fc.property(fc.bigIntN(4096), fc.bigIntN(4096), (n, m) => {
-      t.equal(t_xor_op(n, m), n ^ m);
+      t.equal(t_xor(n, m), n ^ m);
     })
   );
 

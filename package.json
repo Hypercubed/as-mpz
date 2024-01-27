@@ -36,7 +36,7 @@
     "@as-tral/cli": "^3.0.2",
     "@assemblyscript/wasi-shim": "^0.1.0",
     "as-bigint": "^0.5.3",
-    "assemblyscript": "^0.27.22",
+    "assemblyscript": "^0.27.23",
     "assemblyscript-prettier": "^3.0.1",
     "chg": "^0.4.0",
     "fast-check": "^3.15.0",

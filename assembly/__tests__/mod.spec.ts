@@ -53,3 +53,14 @@ describe('mod', () => {
   assertSame(MpZ.from(-10000).mod(-7), -4);
   assertSame(MpZ.from(10000).mod(-7), -3);
 });
+
+describe('operators', () => {
+  it('supports operators', () => {
+    assertSame(MpZ.from(5) % MpZ.from(3), 2);
+
+    let x = MpZ.from(5);
+    assertSame(x, 5);
+    x %= MpZ.from(3);
+    assertSame(x, 2);
+  });
+});

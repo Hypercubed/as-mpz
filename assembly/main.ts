@@ -21,8 +21,8 @@ export function toHex(a: MpZ): string {
   return a.toHex();
 }
 
-export function toValue(a: MpZ): number {
-  return a.toValue();
+export function valueOf(a: MpZ): number {
+  return a.valueOf();
 }
 
 export function toU64(a: MpZ): u64 {
@@ -50,39 +50,39 @@ export function div_pow2(a: MpZ, b: u64): MpZ {
 }
 
 export function shl(a: MpZ, b: MpZ): MpZ {
-  return MpZ.shl(a, b);
+  return a << b;
 }
 
 export function shr(a: MpZ, b: MpZ): MpZ {
-  return MpZ.shr(a, b);
+  return a >> b;
 }
 
-export function and_op(a: MpZ, b: MpZ): MpZ {
+export function and(a: MpZ, b: MpZ): MpZ {
   return a & b;
 }
 
-export function or_op(a: MpZ, b: MpZ): MpZ {
+export function or(a: MpZ, b: MpZ): MpZ {
   return a | b;
 }
 
-export function xor_op(a: MpZ, b: MpZ): MpZ {
+export function xor(a: MpZ, b: MpZ): MpZ {
   return a ^ b;
 }
 
 export function not(a: MpZ): MpZ {
-  return a.not();
+  return ~a;
 }
 
 export function add(a: MpZ, b: MpZ): MpZ {
-  return a.add(b);
+  return a + b;
 }
 
 export function mul(a: MpZ, b: MpZ): MpZ {
-  return a.mul(b);
+  return a * b;
 }
 
 export function div(a: MpZ, b: MpZ): MpZ {
-  return a.div(b);
+  return a / b;
 }
 
 export function mod(a: MpZ, b: MpZ): MpZ {
@@ -90,23 +90,23 @@ export function mod(a: MpZ, b: MpZ): MpZ {
 }
 
 export function rem(a: MpZ, b: MpZ): MpZ {
-  return a.rem(b);
+  return a % b;
 }
 
 export function pow(a: MpZ, b: MpZ): MpZ {
-  return a.pow(b);
+  return a ** b;
 }
 
 export function sub(a: MpZ, b: MpZ): MpZ {
-  return a.sub(b);
+  return a - b;
 }
 
 export function eqz(a: MpZ): boolean {
   return a.eqz();
 }
 
-export function cmp(a: MpZ, b: MpZ): i32 {
-  return a.cmp(b);
+export function compareTo(a: MpZ, b: MpZ): i32 {
+  return a.compareTo(b);
 }
 
 export function fact(n: u32): MpZ {

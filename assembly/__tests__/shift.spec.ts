@@ -84,3 +84,8 @@ describe('div pow2', () => {
     );
   });
 });
+
+it('supports operators', () => {
+  assertSame(MpZ.from(5) << MpZ.from(3), 40);
+  assertSame(MpZ.from(15) >> MpZ.from(2), 3);
+});

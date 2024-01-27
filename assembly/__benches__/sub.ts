@@ -29,9 +29,9 @@ const mpzC = blackbox(MpZ.from(c));
 const bigIntC = blackbox(BigInt.from(c));
 
 suite('sub small', () => {
-  bench('MpZ#_usubU32 (small)', () => {
+  bench('MpZ#_usubFromU32 (small)', () => {
     // @ts-ignore
-    blackbox(mpzA._usubU32(c));
+    blackbox(mpzA._usubFromU32(c));
   });
 
   bench('MpZ#__usub (small)', () => {

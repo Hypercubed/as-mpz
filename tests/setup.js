@@ -37,19 +37,19 @@ export const t_div_pow2 = (n, m) => to(mpz.div_pow2(from(n), m));
 export const t_shr = (n, m) => to(mpz.shr(from(n), from(m)));
 export const t_shl = (n, m) => to(mpz.shl(from(n), from(m)));
 
-export const t_and_op = (n, m) => to(mpz.and_op(from(n), from(m)));
-export const t_or_op = (n, m) => to(mpz.or_op(from(n), from(m)));
-export const t_xor_op = (n, m) => to(mpz.xor_op(from(n), from(m)));
+export const t_and = (n, m) => to(mpz.and(from(n), from(m)));
+export const t_or = (n, m) => to(mpz.or(from(n), from(m)));
+export const t_xor = (n, m) => to(mpz.xor(from(n), from(m)));
 export const t_not = n => to(mpz.not(from(n)));
 
-export const t_cmp = (n, m) => mpz.cmp(from(n), from(m));
+export const t_cmp = (n, m) => mpz.compareTo(from(n), from(m));
 
 export const t_fact = n => to(mpz.fact(n));
 
 export const t_string = (n, base = 10) => mpz.toString(from(n), base);
 export const t_hex = n => mpz.toHex(from(n));
 
-export const t_value = n => mpz.toValue(from(n));
+export const t_value = n => mpz.valueOf(from(n));
 export const t_u32 = n => BigInt(mpz.toU32(from(n)));
 export const t_i32 = n => BigInt(mpz.toI32(from(n)));
 export const t_u64 = n => BigInt(mpz.toU64(from(n)));

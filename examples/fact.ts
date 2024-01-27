@@ -18,6 +18,6 @@ while (n <= 20) {
 
 n = 25;
 while (n <= 150) {
-  console.log(`${n}\t${fact(n).toValue()}`);
+  console.log(`${n}\t${fact(n).valueOf()}`);
   n += 25;
 }
