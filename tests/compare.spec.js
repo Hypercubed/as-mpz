@@ -3,10 +3,11 @@ import { t_cmp } from './setup.js';
 import fc from 'fast-check';
 
 fc.configureGlobal({ numRuns: 300 });
+const N = 2 ** 12; // 2**31-1 max
 
 t.test('compareTo', async t => {
   fc.assert(
-    fc.property(fc.bigIntN(4096), fc.bigIntN(4096), (n, m) => {
+    fc.property(fc.bigIntN(N), fc.bigIntN(N), (n, m) => {
       t.equal(t_cmp(n, m), n > m ? 1 : n < m ? -1 : 0);
     }),
     {

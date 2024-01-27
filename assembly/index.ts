@@ -960,16 +960,10 @@ export class MpZ {
    */
   and<T>(rhs: T): MpZ {
     const y = MpZ.from(rhs);
-    if (!this.isNeg && !y.isNeg) {
-      return this._and(y);
-    }
-    if (this.isNeg && y.isNeg) {
-      return this.not()._or(y.not()).not();
-    }
-    if (this.isNeg) {
-      return y._andNot(this.not());
-    }
-    return this._andNot(y.not());
+    if (!this.isNeg && !y.isNeg) return this._and(y);
+    if (this.isNeg && y.isNeg) return this.not()._or(y.not()).not(); // x & y = ~(~x | ~y)
+    if (this.isNeg) return y._andNot(this.not()); // x & y = y & ~~x
+    return this._andNot(y.not()); // x & y = x & ~~y
   }
 
   protected _and(rhs: MpZ): MpZ {
@@ -1009,16 +1003,10 @@ export class MpZ {
    */
   or<T>(rhs: T): MpZ {
     const y = MpZ.from(rhs);
-    if (!this.isNeg && !y.isNeg) {
-      return this._or(y);
-    }
-    if (this.isNeg && y.isNeg) {
-      return this.not()._and(y.not()).not();
-    }
-    if (this.isNeg) {
-      return this.not()._andNot(y).not();
-    }
-    return y.not()._andNot(this).not();
+    if (!this.isNeg && !y.isNeg) return this._or(y);
+    if (this.isNeg && y.isNeg) return this.not()._and(y.not()).not(); // x | y = ~(~x & ~y)
+    if (this.isNeg) return this.not()._andNot(y).not(); // x | y = ~(~x & ~y)
+    return y.not()._andNot(this).not(); // x | y = ~(~y & ~x)
   }
 
   protected _or(rhs: MpZ): MpZ {
@@ -1044,16 +1032,10 @@ export class MpZ {
    */
   xor<T>(rhs: T): MpZ {
     const y = MpZ.from(rhs);
-    if (!this.isNeg && !y.isNeg) {
-      return this._xor(y);
-    }
-    if (this.isNeg && y.isNeg) {
-      return this.not()._xor(y.not());
-    }
-    if (this.isNeg) {
-      return y._xor(this.not()).not();
-    }
-    return this._xor(y.not()).not();
+    if (!this.isNeg && !y.isNeg) return this._xor(y);
+    if (this.isNeg && y.isNeg) return this.not()._xor(y.not()); // x ^ y = ~x ^ ~y
+    if (this.isNeg) return y._xor(this.not()).not(); // x ^ y = ~(y ^ ~x)
+    return this._xor(y.not()).not(); // x ^ y = ~(x ^ ~y)
   }
 
   protected _xor(rhs: MpZ): MpZ {

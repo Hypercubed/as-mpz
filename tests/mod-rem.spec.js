@@ -3,10 +3,11 @@ import { t_rem, t_mod } from './setup.js';
 import fc from 'fast-check';
 
 fc.configureGlobal({ numRuns: 200 });
+const N = 2 ** 12; // 2**31-1 max
 
 t.test('rem', t => {
   fc.assert(
-    fc.property(fc.bigIntN(4096), fc.bigIntN(4096), (n, m) => {
+    fc.property(fc.bigIntN(N), fc.bigIntN(N), (n, m) => {
       m = m || 1n;
       t.equal(t_rem(n, m), n % m);
     }),
@@ -25,7 +26,7 @@ t.test('rem', t => {
 
 t.test('modulo', t => {
   fc.assert(
-    fc.property(fc.bigIntN(4096), fc.bigIntN(4096), (n, m) => {
+    fc.property(fc.bigIntN(N), fc.bigIntN(N), (n, m) => {
       m = m || 1n;
       t.equal(t_mod(n, m), mod(n, m));
     }),

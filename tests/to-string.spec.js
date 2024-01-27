@@ -3,6 +3,7 @@ import { t_string, t_hex } from './setup.js';
 import fc from 'fast-check';
 
 fc.configureGlobal({ numRuns: 100 });
+const N = 2 ** 12; // 2**31-1 max
 
 t.test('toString', t => {
   t.test('toString(10)', t => {
@@ -11,7 +12,7 @@ t.test('toString', t => {
     t.equal(t_string('0xdeadbeef'), '3735928559');
 
     fc.assert(
-      fc.property(fc.bigIntN(4096), n => {
+      fc.property(fc.bigIntN(N), n => {
         t.equal(t_string(n), n.toString());
       })
     );
@@ -25,7 +26,7 @@ t.test('toString', t => {
     t.equal(t_string('0xdeadbeef', 16), 'deadbeef');
 
     fc.assert(
-      fc.property(fc.bigIntN(4096), n => {
+      fc.property(fc.bigIntN(N), n => {
         t.equal(t_string(n, 16), n.toString(16));
       })
     );
@@ -39,7 +40,7 @@ t.test('toString', t => {
     t.equal(t_string('0xdeadbeef', -16), 'DEADBEEF');
 
     fc.assert(
-      fc.property(fc.bigIntN(4096), n => {
+      fc.property(fc.bigIntN(N), n => {
         t.equal(t_string(n, -16), n.toString(16).toUpperCase());
       })
     );
@@ -54,7 +55,7 @@ t.test('toString', t => {
     t.equal(t_string('-0xdeadbeef', 2), '-11011110101011011011111011101111');
 
     fc.assert(
-      fc.property(fc.bigIntN(4096), n => {
+      fc.property(fc.bigIntN(N), n => {
         t.equal(t_string(n, 2), n.toString(2));
       })
     );
@@ -92,7 +93,7 @@ t.test('toHex', t => {
   );
 
   fc.assert(
-    fc.property(fc.bigIntN(4096), n => {
+    fc.property(fc.bigIntN(N), n => {
       t.equal(
         t_hex(n, 2),
         n < 0 ? `-0x${(-n).toString(16)}` : `0x${n.toString(16)}`

@@ -247,7 +247,7 @@ Returns `true` if this MpZ is less than or equal to the rhs.
 
 Returns the negation of this MpZ (`-this`).
 
-#### `+`, `-`, `*`, `/`
+#### Binary `+`, `-`, `*`, `/` operators
 
 Same as the `#add`, `#sub`, `#mul`, `#div` methods.
 

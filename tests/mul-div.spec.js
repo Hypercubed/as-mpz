@@ -4,9 +4,11 @@ import fc from 'fast-check';
 
 fc.configureGlobal({ numRuns: 300 });
 
+const N = 2 ** 12; // 2**31-1 max
+
 t.test('multiplication', t => {
   fc.assert(
-    fc.property(fc.bigIntN(4096), fc.bigIntN(4096), (n, m) => {
+    fc.property(fc.bigIntN(N), fc.bigIntN(N), (n, m) => {
       t.equal(t_mul(n, m), n * m);
     }),
     {
@@ -46,7 +48,7 @@ t.test('multiplication', t => {
 
 t.test('division', t => {
   fc.assert(
-    fc.property(fc.bigIntN(4096), fc.bigIntN(4096), (n, m) => {
+    fc.property(fc.bigIntN(N), fc.bigIntN(N), (n, m) => {
       m = m || 1n;
       t.equal(t_div(n, m), n / m);
     }),
@@ -110,7 +112,7 @@ t.test('division', t => {
 
 t.test('mul-div invariants', t => {
   fc.assert(
-    fc.property(fc.bigIntN(4096), fc.bigIntN(4096), (_n, _d) => {
+    fc.property(fc.bigIntN(N), fc.bigIntN(N), (_n, _d) => {
       const n = mpz.from(_n);
       const d = mpz.from(_d || 1n);
 

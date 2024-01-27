@@ -4,9 +4,11 @@ import fc from 'fast-check';
 
 fc.configureGlobal({ numRuns: 300 });
 
+const N = 2 ** 12; // 2**32-1 max
+
 t.test('addition', t => {
   fc.assert(
-    fc.property(fc.bigIntN(4096), fc.bigIntN(4096), (n, m) => {
+    fc.property(fc.bigIntN(N), fc.bigIntN(N), (n, m) => {
       t.equal(t_add(n, m), n + m);
     }),
     {
@@ -37,7 +39,7 @@ t.test('addition', t => {
 
 t.test('subtraction', t => {
   fc.assert(
-    fc.property(fc.bigIntN(4096), fc.bigIntN(4096), (n, m) => {
+    fc.property(fc.bigIntN(N), fc.bigIntN(N), (n, m) => {
       t.equal(t_sub(n, m), n - m);
     }),
     {
@@ -70,7 +72,7 @@ t.test('subtraction', t => {
 
 t.test('invariants', t => {
   fc.assert(
-    fc.property(fc.bigIntN(4096), fc.bigIntN(4096), (n, m) => {
+    fc.property(fc.bigIntN(N), fc.bigIntN(N), (n, m) => {
       const r = mpz.add(mpz.from(n), mpz.from(m));
       const s = mpz.sub(r, mpz.from(m));
       t.equal(mpz.toHex(r), mpz.toHex(s));
