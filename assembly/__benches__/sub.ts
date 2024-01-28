@@ -3,11 +3,11 @@ import { BigInt } from 'as-bigint/assembly/BigInt';
 
 const a = '0xFEEBDAEDFEEBDAEDFEEBDAEDFEEBDAEDFEEBDAEDFEEBDAEDFEEBDAEDFEEBDAED';
 const b = '0xDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEFDEADBEEF';
-const mpzA = blackbox(MpZ.from(a));
-const mpzB = blackbox(MpZ.from(b));
+const mpzA = MpZ.from(a);
+const mpzB = MpZ.from(b);
 
-const bigIntA = blackbox(BigInt.from(a));
-const bigIntB = blackbox(BigInt.from(b));
+const bigIntA = BigInt.from(a);
+const bigIntB = BigInt.from(b);
 
 suite('sub large', () => {
   bench('MpZ#__usub (large)', () => {
@@ -25,8 +25,8 @@ suite('sub large', () => {
 });
 
 const c = 0xdead;
-const mpzC = blackbox(MpZ.from(c));
-const bigIntC = blackbox(BigInt.from(c));
+const mpzC = MpZ.from(c);
+const bigIntC = BigInt.from(c);
 
 suite('sub small', () => {
   bench('MpZ#_usubFromU32 (small)', () => {

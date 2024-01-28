@@ -7,7 +7,7 @@
 - [ ] `#modPow2` (left bit trim)
 - [ ] `MpZ.asUintN`/`MpZ.asIntN`
 - [ ] `#gcd`/`#lcm`
-- [ ] `#inc`/`#dec`
+- [ ] Optimized `#inc`/`#dec`
 - [ ] `max`/`min`
-- [ ] `++`/`--`
 - [ ] `MpZ.asIntN`/`MpZ.asUintN`
+- [ ] `#modPow`

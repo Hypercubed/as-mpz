@@ -162,6 +162,7 @@ t.test('identities', t => {
       t.equal(to(mpz.not(mpz.not(X))), x); // ~~x = x
       t.equal(to(mpz.not(mpz.and(X, Y))), ~x | ~y); // ~(x & y) = ~x | ~y
       t.equal(to(mpz.not(mpz.or(X, Y))), ~x & ~y); // ~(x | y) = ~x & ~y
+      // identity x^y == x|y &~ x&y
     })
   );
 

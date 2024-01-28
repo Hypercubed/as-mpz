@@ -4,11 +4,11 @@ import { BigInt } from 'as-bigint/assembly/BigInt';
 const a = '542101086242752217003726400434970855712890625'; // 5^4^3
 const m = '100000000000000000000';
 
-const mpzA = blackbox(MpZ.from(a));
-const mpzM = blackbox(MpZ.from(m));
+const mpzA = MpZ.from(a);
+const mpzM = MpZ.from(m);
 
-const bigIntA = blackbox(BigInt.from(a));
-const bigIntM = blackbox(BigInt.from(m));
+const bigIntA = BigInt.from(a);
+const bigIntM = BigInt.from(m);
 
 suite('mod large', () => {
   bench('MpZ#rem (large)', () => {
@@ -25,8 +25,8 @@ suite('mod large', () => {
 });
 
 const c = '100';
-const mpzC = blackbox(MpZ.from(c));
-const bigIntC = blackbox(BigInt.from(c));
+const mpzC = MpZ.from(c);
+const bigIntC = BigInt.from(c);
 
 suite('mod (small)', () => {
   bench('MpZ#rem (small)', () => {

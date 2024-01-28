@@ -4,9 +4,9 @@ import { BigInt } from 'as-bigint/assembly/BigInt';
 const a = 5;
 const b = 3 ** 2;
 
-const mpzA = blackbox(MpZ.from(a));
-const mpzB = blackbox(MpZ.from(b));
-const bigIntA = blackbox(BigInt.from(a));
+const mpzA = MpZ.from(a);
+const mpzB = MpZ.from(b);
+const bigIntA = BigInt.from(a);
 
 suite('pow', () => {
   bench('MpZ#_upowU32', () => {

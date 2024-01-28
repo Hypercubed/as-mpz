@@ -3,8 +3,8 @@ import { BigInt } from 'as-bigint/assembly/BigInt';
 
 const a =
   '0xFEEBDAEDFEEBDAEDFEEBDAEDFEEBDAEDFEEBDAEDFEEBDAEDFEEBDAEDFEEBDAEDFEEBDAEDFEEBDAEDFEEBDAEDFEEBDAEDFEEBDAEDFEEBDAEDFEEBDAEDFEEBDAED';
-const mpzA = blackbox(MpZ.from(a));
-const bigIntA = blackbox(BigInt.from(a));
+const mpzA = MpZ.from(a);
+const bigIntA = BigInt.from(a);
 
 suite('sqr', () => {
   bench('MpZ#mul', () => {
