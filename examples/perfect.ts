@@ -14,7 +14,7 @@ function isPrime32(p: i32): boolean {
 }
 
 // Lucas-Lehmer primality test for Mersenne numbers
-function lucasLehmer(p: i32, Mp: MpZ = MpZ.ONE.mul_pow2(p).sub(1)): boolean {
+function lucasLehmer(p: i32, Mp: MpZ = MpZ.ONE.mul_pow2(p).dec()): boolean {
   let s = MpZ.from(4).rem(Mp);
 
   for (let i = 1; i < p - 1; i++) {
@@ -32,7 +32,7 @@ for (let p = 2; p < 1500; p++) {
   u = u.mul_pow2(1);
   if (!isPrime32(p)) continue;
 
-  const Mp = u.sub(1);
+  const Mp = u.dec();
   if (p === 2 || lucasLehmer(p, Mp)) {
     const perfect = Mp.mul(u.div_pow2(1));
     console.log(`${p} : ${trim(Mp)} : ${trim(perfect)}`);

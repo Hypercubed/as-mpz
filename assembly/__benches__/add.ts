@@ -26,26 +26,26 @@ suite('add large', () => {
   });
 });
 
-// const c = 0xbeef;
-// const mpzC = blackbox(MpZ.from(c));
-// const bigIntC = blackbox(BigInt.from(c));
+const c = 0xbeef;
+const mpzC = blackbox(MpZ.from(c));
+const bigIntC = blackbox(BigInt.from(c));
 
-// suite('add small', () => {
-//   bench('MpZ#_uaddToU32 (small)', () => {
-//     // @ts-ignore
-//     blackbox(mpzA._uaddToU32(c));
-//   });
+suite('add small', () => {
+  bench('MpZ#_uaddToU32 (small)', () => {
+    // @ts-ignore
+    blackbox(mpzA._uaddToU32(c));
+  });
 
-//   bench('MpZ#__uadd (small)', () => {
-//     // @ts-ignore
-//     blackbox(mpzA.__uadd(mpzC));
-//   });
+  bench('MpZ#__uadd (small)', () => {
+    // @ts-ignore
+    blackbox(mpzA.__uadd(mpzC));
+  });
 
-//   bench('MpZ#add (small)', () => {
-//     blackbox(mpzA.add(mpzC));
-//   });
+  bench('MpZ#add (small)', () => {
+    blackbox(mpzA.add(mpzC));
+  });
 
-//   bench('BigInt#add (small)', () => {
-//     blackbox(bigIntA.add(bigIntC));
-//   });
-// });
+  bench('BigInt#add (small)', () => {
+    blackbox(bigIntA.add(bigIntC));
+  });
+});

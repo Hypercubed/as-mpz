@@ -86,7 +86,7 @@ describe('operators', () => {
 
     let x = MpZ.from(5);
     assertSame(x, 5);
-    x += MpZ.from(1);
+    x += MpZ.ONE;
     assertSame(x, 6);
     assertSame(x++, 6);
     assertSame(x, 7);
@@ -97,7 +97,39 @@ describe('operators', () => {
     assertSame(x, 7);
     assertSame(--x, 6);
     assertSame(x, 6);
-    x -= MpZ.from(1);
+    x -= MpZ.ONE;
     assertSame(x, 5);
+  });
+
+  it('operators on negative values', () => {
+    assertSame(MpZ.from(-0x5) + MpZ.from(-0x3), -8);
+    assertSame(MpZ.from(-0x5) - MpZ.from(-0x3), -2);
+
+    let x = MpZ.from(-5);
+    assertSame(x, -5);
+    x += MpZ.from(-1);
+    assertSame(x, -6);
+    assertSame(x++, -6);
+    assertSame(x, -5);
+    assertSame(++x, -4);
+    assertSame(x, -4);
+
+    assertSame(x--, -4);
+    assertSame(x, -5);
+    assertSame(--x, -6);
+    assertSame(x, -6);
+    x -= MpZ.from(-1);
+    assertSame(x, -5);
+  });
+
+  it('operators on zero', () => {
+    let x = MpZ.from(0);
+    x++;
+    assertSame(x, 1);
+
+    x--;
+    assertSame(x, 0);
+    x--;
+    assertSame(x, -1);
   });
 });

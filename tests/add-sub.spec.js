@@ -1,5 +1,5 @@
 import t from 'tap';
-import { mpz, t_add, t_sub } from './setup.js';
+import { mpz, t_add, t_sub, t_inc, t_dec } from './setup.js';
 import fc from 'fast-check';
 
 fc.configureGlobal({ numRuns: 300 });
@@ -37,6 +37,19 @@ t.test('addition', t => {
   t.end();
 });
 
+t.test('inc', t => {
+  fc.assert(
+    fc.property(fc.bigIntN(N), n => {
+      t.equal(t_inc(n), n + 1n);
+    }),
+    {
+      examples: [[0n], [-1n], [1n]]
+    }
+  );
+
+  t.end();
+});
+
 t.test('subtraction', t => {
   fc.assert(
     fc.property(fc.bigIntN(N), fc.bigIntN(N), (n, m) => {
@@ -64,6 +77,19 @@ t.test('subtraction', t => {
         // rhs<lhs<0
         [-3n, -8n]
       ]
+    }
+  );
+
+  t.end();
+});
+
+t.test('dec', t => {
+  fc.assert(
+    fc.property(fc.bigIntN(N), n => {
+      t.equal(t_dec(n), n - 1n);
+    }),
+    {
+      examples: [[0n], [-1n], [1n]]
     }
   );
 

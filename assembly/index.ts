@@ -302,15 +302,14 @@ export class MpZ {
     const q = this.size;
     const z = new StaticArray<u32>(q + 1);
 
-    let k: u64 = 0;
+    let k: bool = 0;
     for (let i: i32 = 0; i < q; ++i) {
       const lx = unchecked(this._data[i]);
       const ly = rhs.size > i ? unchecked(rhs._data[i]) : 0;
-      k += u64(lx) + u64(ly);
-      unchecked((z[i] = LOW(k)));
-      k = HIGH(k);
+      unchecked((z[i] = lx + ly + k));
+      k = z[i] < lx || (k && z[i] === lx);
     }
-    unchecked((z[q] = LOW(k)));
+    unchecked((z[q] = k));
 
     return new MpZ(z);
   }
@@ -325,6 +324,31 @@ export class MpZ {
     for (let i: i32 = 0; i < q; ++i) {
       unchecked((z[i] = k + this._data[i]));
       k = unchecked(z[i] < this._data[i]) ? 1 : 0;
+    }
+    unchecked((z[q] = k));
+    return new MpZ(z);
+  }
+
+  /**
+   * #### `#inc(): MpZ`
+   *
+   * Returns the increment of this MpZ (`this + 1`).
+   */
+  @operator.prefix('++')
+  @operator.postfix('++')
+  inc(): MpZ {
+    if (this.isNeg) return this._udec().negate(); // -a + 1 = -(a - 1)
+    return this._uinc();
+  }
+
+  protected _uinc(): MpZ {
+    const q = this.size;
+    const z = new StaticArray<u32>(q + 1);
+
+    let k: bool = 1;
+    for (let i: i32 = 0; i < q; ++i) {
+      unchecked((z[i] = k + this._data[i]));
+      k = unchecked(z[i] < this._data[i]);
     }
     unchecked((z[q] = k));
     return new MpZ(z);
@@ -383,6 +407,34 @@ export class MpZ {
     const z = new StaticArray<u32>(q);
 
     let k: u32 = rhs;
+    for (let i: i32 = 0; i < q; ++i) {
+      const lx = unchecked(this._data[i]);
+
+      unchecked((z[i] = lx - k));
+      k = k > lx ? 1 : 0;
+    }
+
+    return new MpZ(z);
+  }
+
+  /**
+   * #### `#dec(): MpZ`
+   *
+   * Returns the decrement of this MpZ (`this - 1`).
+   */
+  @operator.prefix('--')
+  @operator.postfix('--')
+  dec(): MpZ {
+    if (this.isNeg) return this._uinc().negate(); // -a - 1 = -(a + 1)
+    if (this.eqz()) return MpZ.ONE.negate();
+    return this._udec();
+  }
+
+  protected _udec(): MpZ {
+    const q = this.size;
+    const z = new StaticArray<u32>(q);
+
+    let k: bool = 1;
     for (let i: i32 = 0; i < q; ++i) {
       const lx = unchecked(this._data[i]);
 
@@ -948,7 +1000,7 @@ export class MpZ {
    */
   // @ts-ignore
   protected not(): MpZ {
-    return this.isNeg ? this._usubU32(1) : this._uaddU32(1).negate();
+    return this.isNeg ? this._udec() : this._uinc().negate();
   }
 
   /**
@@ -1383,20 +1435,6 @@ export class MpZ {
   @operator('-')
   static sub(lhs: MpZ, rhs: MpZ): MpZ {
     return lhs.sub(rhs);
-  }
-
-
-  @operator.prefix('++')
-  @operator.postfix('++')
-  protected inc(): MpZ {
-    return this._uaddU32(1);
-  }
-
-
-  @operator.prefix('--')
-  @operator.postfix('--')
-  protected dec(): MpZ {
-    return this._usubU32(1);
   }
 
   /**

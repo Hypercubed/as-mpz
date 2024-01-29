@@ -6,6 +6,11 @@ _(none)_
 
 ---
 
+## 2.1.0 (2024-01-28)
+* *Feature*: Implement `#inc` and `#dec`.
+* *Improvement*: Improve `#add` performance.
+* *bugfix*: Fix `++` and `--` operators for negative numbers.
+
 ## 2.0.0 (2024-01-27)
 * *Breaking*: Renamed `#cmp` to `#compareTo`.
 * *Breaking*: Renamed `#neg` to `#negate`.

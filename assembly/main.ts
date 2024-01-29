@@ -77,6 +77,10 @@ export function add(a: MpZ, b: MpZ): MpZ {
   return a + b;
 }
 
+export function inc(a: MpZ): MpZ {
+  return ++a;
+}
+
 export function mul(a: MpZ, b: MpZ): MpZ {
   return a * b;
 }
@@ -99,6 +103,10 @@ export function pow(a: MpZ, b: MpZ): MpZ {
 
 export function sub(a: MpZ, b: MpZ): MpZ {
   return a - b;
+}
+
+export function dec(a: MpZ): MpZ {
+  return --a;
 }
 
 export function eqz(a: MpZ): boolean {

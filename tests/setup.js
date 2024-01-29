@@ -24,7 +24,9 @@ export function toHex(a) {
 export const from = n => mpz.from(String(n));
 export const to = n => BigInt(mpz.toString(n));
 export const t_add = (n, m) => to(mpz.add(from(n), from(m)));
+export const t_inc = n => to(mpz.inc(from(n)));
 export const t_sub = (n, m) => to(mpz.sub(from(n), from(m)));
+export const t_dec = n => to(mpz.dec(from(n)));
 export const t_mul = (n, m) => to(mpz.mul(from(n), from(m)));
 export const t_div = (n, m) => to(mpz.div(from(n), from(m)));
 export const t_pow = (n, m) => to(mpz.pow(from(n), from(m)));

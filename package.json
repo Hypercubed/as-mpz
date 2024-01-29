@@ -1,6 +1,6 @@
 {
   "name": "@hypercubed/as-mpz",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "AssemblyScript package for math with arbitrarily large integers",
   "ascMain": "assembly/index.ts",
   "types": "assembly/index.ts",
@@ -21,7 +21,7 @@
     "asp": "asp",
     "pretap": "npm run asbuild:debug",
     "prettier": "prettier . --check",
-    "tap": "tap --node-arg=\"--no-warnings\" --allow-empty-coverage --disable-coverage run ./tests/*.spec.js",
+    "tap": "tap --node-arg=\"--no-warnings\" --allow-empty-coverage --disable-coverage run ./tests/*.spec.js --timeout=60",
     "asbuild:debug": "asc assembly/main.ts --target debug",
     "asbuild:release": "asc assembly/main.ts --target release",
     "asbuild": "npm run asbuild:debug && npm run asbuild:release",

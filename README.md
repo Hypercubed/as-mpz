@@ -94,9 +94,17 @@ Returns the negation of this MpZ (`-this`).
 
 Returns the sum of this MpZ and `rhs`.
 
+#### `#inc(): MpZ`
+
+Returns the increment of this MpZ (`this + 1`).
+
 #### `#sub(rhs: i32 | u32 | i64 | u64 | MpZ): MpZ`
 
 Returns the difference of this MpZ and the `rhs`.
+
+#### `#dec(): MpZ`
+
+Returns the decrement of this MpZ (`this - 1`).
 
 #### `#mul(rhs: i32 | u32 | i64 | u64 | MpZ): MpZ`
 
