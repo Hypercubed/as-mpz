@@ -740,8 +740,11 @@ export class MpZ {
    * > Note: The `#mod` method is not the same as the `%` operator.  The `%` operator returns the `#rem` of the division of the lhs and rhs, while the `#mod` method returns the modulo of the lhs and rhs.
    */
   mod<T>(rhs: T): MpZ {
-    const r = this.rem(rhs);
-    return r.add(rhs).rem(rhs); // modulo = ((n % d) + d) % d
+    const y = MpZ.from(rhs);
+    const r = this._rem(y);
+    if (this.isNeg === y.isNeg) return r;
+    if (r.eqz()) return MpZ.ZERO;
+    return r.add(y);
   }
 
   /**
@@ -753,8 +756,12 @@ export class MpZ {
    */
   rem<T>(rhs: T): MpZ {
     const y = MpZ.from(rhs);
-    const q = this.div(y);
-    return this.sub(y.mul(q));
+    return this._rem(y);
+  }
+
+  protected _rem(rhs: MpZ): MpZ {
+    const q = this.div(rhs);
+    return this.sub(rhs.mul(q));
   }
 
   // *** Pow ***
@@ -998,8 +1005,7 @@ export class MpZ {
    *
    * > The `#not` method returns the result as if the MpZ was a 2's complement signed integer (yeilding `-(x + 1)`); matching JavaScript's BigInt `~` operator.
    */
-  // @ts-ignore
-  protected not(): MpZ {
+  not(): MpZ {
     return this.isNeg ? this._udec() : this._uinc().negate();
   }
 
@@ -1498,7 +1504,7 @@ export class MpZ {
   @inline
   @operator('%')
   static mod(lhs: MpZ, rhs: MpZ): MpZ {
-    return lhs.rem(rhs);
+    return lhs._rem(rhs);
   }
 
   /**

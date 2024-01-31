@@ -1,8 +1,16 @@
 import t from 'tap';
-import { t_value, t_u32, t_i32, t_u64, t_i64 } from './setup.js';
+import {
+  t_value,
+  t_u32,
+  t_i32,
+  t_u64,
+  t_i64,
+  t_asIntN,
+  t_asUintN
+} from './setup.js';
 import fc from 'fast-check';
 
-fc.configureGlobal({ numRuns: 100 });
+fc.configureGlobal({ numRuns: 200 });
 const N = 2 ** 12; // 2**31-1 max
 
 t.test('toValue', t => {
@@ -73,6 +81,32 @@ t.test('toI64', t => {
     fc.property(fc.bigIntN(N), n => {
       t.equal(t_i64(n), BigInt.asIntN(64, n));
     })
+  );
+
+  t.end();
+});
+
+t.test('asUintN', t => {
+  fc.assert(
+    fc.property(fc.bigIntN(N), fc.integer({ min: 0, max: N }), (n, m) => {
+      t.equal(t_asUintN(m, n), BigInt.asUintN(m, n));
+    }),
+    {
+      examples: [[0n, 0]]
+    }
+  );
+
+  t.end();
+});
+
+t.test('asIntN', t => {
+  fc.assert(
+    fc.property(fc.bigIntN(N), fc.integer({ min: 0, max: N }), (n, m) => {
+      t.equal(t_asIntN(m, n), BigInt.asIntN(m, n));
+    }),
+    {
+      examples: [[0n, 0]]
+    }
   );
 
   t.end();

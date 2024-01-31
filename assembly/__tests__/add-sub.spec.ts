@@ -124,12 +124,11 @@ describe('operators', () => {
 
   it('operators on zero', () => {
     let x = MpZ.from(0);
+    assertSame(++x, 1);
+    assertSame(--x, 0);
+    expect(x.eqz()).toBe(true);
+    assertSame(--x, -1);
     x++;
-    assertSame(x, 1);
-
-    x--;
-    assertSame(x, 0);
-    x--;
-    assertSame(x, -1);
+    expect(x.eqz()).toBe(true);
   });
 });

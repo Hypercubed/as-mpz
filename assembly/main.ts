@@ -124,3 +124,18 @@ export function fact(n: u32): MpZ {
   }
   return a;
 }
+
+export function asIntN(bits: u32, a: MpZ): MpZ {
+  if (bits === 0) return MpZ.ZERO;
+  const N = MpZ.ONE.mul_pow2(bits - 1);
+  const isNeg = !!N.and(a); // Implement #getBit
+  return isNeg ? asUintN(bits, a.not()).not() : asUintN(bits, a);
+}
+
+export function asUintN(bits: u32, a: MpZ): MpZ {
+  if (bits === 0) return MpZ.ZERO;
+  const M = MpZ.ONE.mul_pow2(bits).dec();
+  return a.and(M); // TODO: implement optomized #modPow2/#andPow2/#bitSlice
+}
+
+// x % 2n == x & (2n - 1)

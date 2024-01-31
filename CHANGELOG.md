@@ -2,7 +2,8 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
-_(none)_
+* *Improvement*: Improve `#mod` performance.
+* *Bugfix*: Make `#not` public
 
 ---
 

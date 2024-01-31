@@ -56,3 +56,6 @@ export const t_u32 = n => BigInt(mpz.toU32(from(n)));
 export const t_i32 = n => BigInt(mpz.toI32(from(n)));
 export const t_u64 = n => BigInt(mpz.toU64(from(n)));
 export const t_i64 = n => BigInt(mpz.toI64(from(n)));
+
+export const t_asIntN = (n, m) => to(mpz.asIntN(n, from(m)));
+export const t_asUintN = (n, m) => to(mpz.asUintN(n, from(m)));

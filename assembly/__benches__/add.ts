@@ -31,10 +31,10 @@ const mpzC = blackbox(MpZ.from(c));
 const bigIntC = blackbox(BigInt.from(c));
 
 suite('add small', () => {
-  bench('MpZ#_uaddToU32 (small)', () => {
-    // @ts-ignore
-    blackbox(mpzA._uaddToU32(c));
-  });
+  // bench('MpZ#_uaddToU32 (small)', () => {
+  //   // @ts-ignore
+  //   blackbox(mpzA._uaddToU32(c));
+  // });
 
   bench('MpZ#__uadd (small)', () => {
     // @ts-ignore
