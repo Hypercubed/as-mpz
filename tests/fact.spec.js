@@ -19,7 +19,7 @@ t.test('factorials', t => {
       t.equal(t_fact(n), calculateFactorial(BigInt(n)));
     }),
     {
-      examples: [[1], [10], [100], [1000]]
+      examples: [[0], [1], [10], [100], [1000]]
     }
   );
 

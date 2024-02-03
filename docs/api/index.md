@@ -108,6 +108,12 @@ Returns the remainder of this MpZ divided by the `rhs` (`this % rhs`).
 Returns the value of this MpZ raised to the power of `rhs` (`this ** rhs`).
 
 
+#### `#fact(): MpZ`
+
+Returns the factorial of this MpZ (`this!`).
+Throws RangeError if this is negative or too large (greater than MAX_INTEGER)
+
+
 #### `#shiftLeft(rhs: i32 | u32 | i64 | u64 | MpZ): MpZ`
 
 Returns the value of this MpZ left shifted by `rhs` (`this << rhs`).

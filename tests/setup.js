@@ -46,7 +46,7 @@ export const t_not = n => to(mpz.not(from(n)));
 
 export const t_cmp = (n, m) => mpz.compareTo(from(n), from(m));
 
-export const t_fact = n => to(mpz.fact(n));
+export const t_fact = n => to(mpz.fact(from(n)));
 
 export const t_string = (n, base = 10) => mpz.toString(from(n), base);
 export const t_hex = n => mpz.toHex(from(n));

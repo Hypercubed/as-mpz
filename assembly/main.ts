@@ -117,12 +117,8 @@ export function compareTo(a: MpZ, b: MpZ): i32 {
   return a.compareTo(b);
 }
 
-export function fact(n: u32): MpZ {
-  let a = MpZ.from(1);
-  for (let i: u32 = 1; i <= n; ++i) {
-    a = MpZ.from(i).mul(a);
-  }
-  return a;
+export function fact(a: MpZ): MpZ {
+  return a.fact();
 }
 
 export function asIntN(bits: u32, a: MpZ): MpZ {

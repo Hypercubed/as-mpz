@@ -1,13 +1,5 @@
 import { MpZ } from '..';
 
-function fact(n: u32): MpZ {
-  let a = MpZ.from(1);
-  for (let i: u32 = 1; i <= n; ++i) {
-    a *= MpZ.from(i);
-  }
-  return a;
-}
-
 describe('MpZ', () => {
   it('.toDecimal()', () => {
     expect(MpZ.from('0xDEADBEEF').toDecimal()).toBe('3735928559');
@@ -15,7 +7,7 @@ describe('MpZ', () => {
 
     // expect(MpZ.from(10).pow(10).toDecimal()).toBe('10000000000');
 
-    const f = fact(100).toDecimal();
+    const f = MpZ.from(100).fact().toDecimal();
     expect(f.slice(0, 10)).toBe('9332621544');
     expect(f.slice(-10)).toBe('0000000000');
   });

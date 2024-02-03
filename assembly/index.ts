@@ -829,6 +829,28 @@ export class MpZ {
     return z;
   }
 
+  /**
+   * #### `#fact(): MpZ`
+   *
+   * Returns the factorial of this MpZ (`this!`).
+   * Throws RangeError if this is negative or too large (greater than MAX_INTEGER)
+   */
+  fact(): MpZ {
+    if (this.isNeg) throw new RangeError('Factorial of negative number');
+    if (this.eqz()) return MpZ.ONE;
+    if (this.size > 1) throw new RangeError('Factorial of large number');
+    return this._fact();
+  }
+
+  protected _fact(): MpZ {
+    let x = this.toU32();
+    let z = MpZ.ONE;
+    while (x > 1) {
+      z = z.mul(x--);
+    }
+    return z;
+  }
+
   // *** Shifts ***
 
   // Gets the value of the bit at the specified position (2's complement)
