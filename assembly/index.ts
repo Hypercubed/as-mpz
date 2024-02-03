@@ -832,6 +832,18 @@ export class MpZ {
 
   // *** Shifts ***
 
+  // Gets the value of the bit at the specified position (2's complement)
+  protected _getBit(n: u64): bool {
+    const limb = <i32>(n / LIMB_BITS);
+    if (limb >= this.size) return this.isNeg;
+
+    const x = this.isNeg ? this.not() : this;
+
+    const mask = 1 << u32(n % LIMB_BITS);
+    const b = unchecked(x._data[limb]) & mask;
+    return this.isNeg === !b ? 1 : 0;
+  }
+
   // count leading zeros
   protected _clz(): u32 {
     const d = unchecked(this._data[this.size - 1]);
@@ -1038,6 +1050,7 @@ export class MpZ {
     return new MpZ(z);
   }
 
+  // Exponse this?
   protected _andNot(rhs: MpZ): MpZ {
     const p = this.size;
     const q = rhs.size;
@@ -1291,6 +1304,31 @@ export class MpZ {
         ? u64(unchecked(this._data[0]))
         : (u64(unchecked(this._data[1])) << 32) + u64(unchecked(this._data[0]));
     return this.isNeg ? -z : z;
+  }
+
+  // aka mod_power_of_two
+  // bitwise_modulo_power_of_two
+  protected _truncateToNBits(bits: u64): MpZ {
+    if (bits === 0) return MpZ.ZERO;
+
+    const isNeg = this.isNeg;
+    const limbs = <i32>(bits / LIMB_BITS);
+    if (!isNeg && limbs >= this.size) return this;
+
+    const x = isNeg ? this.not() : this;
+
+    let q: i32 = limbs + 1;
+    const z = new StaticArray<u32>(q);
+
+    for (let i: i32 = 0; i < q; ++i) {
+      const lx = x.size > i ? unchecked(x._data[i]) : 0;
+      unchecked((z[i] = isNeg ? ~lx : lx));
+    }
+
+    const n = <u32>(bits % LIMB_BITS);
+    z[limbs] &= (1 << n) - 1;
+
+    return new MpZ(z);
   }
 
   // *** Comparison ***
@@ -1583,5 +1621,31 @@ export class MpZ {
   @operator.prefix('!')
   static logicalNot(lhs: MpZ): boolean {
     return lhs.eqz();
+  }
+
+  /**
+   * ### `MpZ.asIntN(bits: u32, a: MpZ): MpZ`
+   *
+   * Returns a BigInt value truncated to the given number of least significant bits and returns that value as a signed integer.
+   * If the leading bit of the remaining number is 1, the result is negative.
+   *
+   */
+  static asIntN(bits: u32, a: MpZ): MpZ {
+    if (bits === 0) return MpZ.ZERO;
+    const isNeg = a._getBit(bits - 1);
+    return isNeg
+      ? a.negate()._truncateToNBits(bits).negate()
+      : a._truncateToNBits(bits);
+  }
+
+  /**
+   * ### `MpZ.asUintN(bits: u32, a: MpZ): MpZ`
+   *
+   * Returns a BigInt value truncated to the given number of least significant bits and returns that value as an unsigned integer.
+   * Results are always non-negative and two's complement in binary.
+   *
+   */
+  static asUintN(bits: u32, a: MpZ): MpZ {
+    return a._truncateToNBits(bits);
   }
 }

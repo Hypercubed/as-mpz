@@ -31,6 +31,43 @@ describe('XOR', () => {
   });
 });
 
+describe('getBit', () => {
+  it('return correct results', () => {
+    const getBit = (n: i64, i: u32): bool => {
+      return (n & (1 << i)) !== 0;
+    };
+
+    for (let n: i64 = -i64(2 ** 11); n < i64(2 ** 11); n++) {
+      for (let i: u32 = 0; n < 30; n++) {
+        // @ts-ignore
+        assertSame(MpZ.from(n)._getBit(i), getBit(n, i), `n: ${n}, i: ${i}`);
+      }
+    }
+
+    // @ts-ignore
+    assertSame(MpZ.from('0b00')._getBit(0), false);
+    // @ts-ignore
+    assertSame(MpZ.from('0b01')._getBit(0), true);
+    // @ts-ignore
+    assertSame(MpZ.from('-0b01')._getBit(0), true); // -0b01 = 0b11111111
+    // @ts-ignore
+    assertSame(MpZ.from('0b10')._getBit(0), false);
+    // @ts-ignore
+    assertSame(MpZ.from('-0b10')._getBit(0), false); // -0b10 = 0b11111110
+
+    // @ts-ignore
+    assertSame(MpZ.from('0b00')._getBit(1), false);
+    // @ts-ignore
+    assertSame(MpZ.from('0b01')._getBit(1), false);
+    // @ts-ignore
+    assertSame(MpZ.from('-0b01')._getBit(1), true); // -0b01 = 0b11111111
+    // @ts-ignore
+    assertSame(MpZ.from('0b10')._getBit(1), true);
+    // @ts-ignore
+    assertSame(MpZ.from('-0b10')._getBit(1), true); // -0b10 = 0b11111110
+  });
+});
+
 describe('operators', () => {
   it('return correct results', () => {
     assertSame(MpZ.from(0xf0ff) & MpZ.from(0xff0f), 0xf00f);

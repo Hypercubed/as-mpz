@@ -31,11 +31,11 @@ t.test('rem', t => {
 t.test('modulo', t => {
   fc.assert(
     fc.property(fc.bigIntN(N), fc.bigIntN(N), (n, m) => {
-      const a = t_mod(n, m);
-      const b = mod(n, m);
-      if (a !== b) {
-        console.log({ n, m, a, b });
-      }
+      // const a = t_mod(n, m);
+      // const b = mod(n, m);
+      // if (a !== b) {
+      //   console.log({ n, m, a, b });
+      // }
       m = m || 1n;
       t.equal(t_mod(n, m), mod(n, m));
     }),
