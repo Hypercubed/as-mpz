@@ -1,6 +1,12 @@
-# as-mpz
+<!-- ⚠️ This README has been generated from the file(s) "blueprint.md" ⚠️-->
+
+[](#-pkgname-)
+
+# @hypercubed/as-mpz
 
 Immutable arbitrary precision integer library for AssemblyScript.
+
+[](#features)
 
 ## Features
 
@@ -10,15 +16,21 @@ Immutable arbitrary precision integer library for AssemblyScript.
 - For use in AssemblyScript projects
 - No dependencies
 
+[](#-disclaimer)
+
 ## \* Disclaimer
 
 > While `as-mpz`` has undergone rigorous testing and benchmarking to ensure its reliability and performance, the developers would like to emphasize that the library is provided "as is," and they assume no responsibility for any issues that may arise from its use.
+
+[](#installations)
 
 ## Installations
 
 ```sh
 npm install @hypercubed/as-mpz
 ```
+
+[](#quick-start)
 
 ## Quick Start
 
@@ -47,9 +59,9 @@ const c = (a + b) * c;
 > Note: Arithmatic methods and operators can be used interchangably, with operators acting as shorthand for the methods.
 > However, unlike instance methods, the operators do not coerce inputs to an MpZ.
 
-## `as-mpz` API
+[](#as-mpz-api)
 
-Immutable arbitrary precision integer library for AssemblyScript.
+## `as-mpz` API
 
 Value is stored as a sign and magnitude.
 
@@ -295,8 +307,21 @@ Returns the bitwise `AND`, `OR`, `XOR` operation on the two operands.
 
 Returns the logical NOT of this MpZ (`!this`). This is equivalent to `#eqz()`.
 
+### `MpZ.asIntN(bits: u32, a: MpZ): MpZ`
+
+Returns a BigInt value truncated to the given number of least significant bits and returns that value as a signed integer.
+If the leading bit of the remaining number is 1, the result is negative.
+
+### `MpZ.asUintN(bits: u32, a: MpZ): MpZ`
+
+Returns a BigInt value truncated to the given number of least significant bits and returns that value as an unsigned integer.
+Results are always non-negative and two's complement in binary.
+
+[](#license)
+
 ## License
 
+Licensed under [MIT](https://opensource.org/licenses/MIT).
 MIT License
 
 Copyright (c) 2024 Jayson Harshbarger

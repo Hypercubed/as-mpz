@@ -1,7 +1,7 @@
 {
   "name": "@hypercubed/as-mpz",
   "version": "2.1.0",
-  "description": "AssemblyScript package for math with arbitrarily large integers",
+  "description": "Immutable arbitrary precision integer library for AssemblyScript.",
   "ascMain": "assembly/index.ts",
   "types": "assembly/index.ts",
   "source": "assembly/main.ts",
@@ -21,17 +21,21 @@
     "asp": "asp",
     "pretap": "npm run asbuild:debug",
     "prettier": "prettier . --check",
-    "tap": "tap --node-arg=\"--no-warnings\" --allow-empty-coverage --disable-coverage run ./tests/to-value.spec.js --timeout=60",
+    "tap": "tap --node-arg=\"--no-warnings\" --allow-empty-coverage --disable-coverage run ./tests/*.spec.js --timeout=60",
     "asbuild:debug": "asc assembly/main.ts --target debug",
     "asbuild:release": "asc assembly/main.ts --target release",
     "asbuild": "npm run asbuild:debug && npm run asbuild:release",
     "bench": "astral --uncheckedBehavior always --noAssert",
     "fix": "prettier . --write",
-    "docs": "node ./scripts/generate-docs.cjs"
+    "docs": "npm-run-all --serial docs:*",
+    "docs:api": "node ./scripts/generate-docs.cjs",
+    "docs:readme": "readme generate",
+    "postdocs": "prettier README.md --write"
   },
   "author": "J. Harshbarger",
   "license": "MIT",
   "devDependencies": {
+    "@appnest/readme": "^1.2.7",
     "@as-pect/cli": "^8.1.0",
     "@as-tral/cli": "^3.0.2",
     "@assemblyscript/wasi-shim": "^0.1.0",

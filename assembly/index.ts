@@ -132,7 +132,6 @@ export class DivRem<R> {
 
 /**
  * ## `as-mpz` API
- * Immutable arbitrary precision integer library for AssemblyScript.
  *
  * Value is stored as a sign and magnitude.
  *
