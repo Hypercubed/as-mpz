@@ -1669,4 +1669,25 @@ export class MpZ {
   static asUintN(bits: u32, a: MpZ): MpZ {
     return a._truncateToNBits(bits);
   }
+
+  /**
+   * ### `MpZ.random(bits: u64): MpZ`
+   *
+   * Returns a random MpZ value with the specified maximum number of bits.
+   */
+  static random(bits: u64): MpZ {
+    const b = u32(bits % 32);
+    const limbs = <u32>(bits / LIMB_BITS) + <bool>(b > 0);
+    if (limbs > MAX_LIMBS) throw new RangeError('Maximum MpZ size exceeded');
+
+    const n = new StaticArray<u32>(limbs);
+    for (let i: u32 = 0; i < limbs; ++i) {
+      n[i] = u32(Math.random() * u32.MAX_VALUE);
+    }
+    if (b > 0) {
+      const m = (1 << b) - 1;
+      n[n.length - 1] &= m;
+    }
+    return new MpZ(n);
+  }
 }

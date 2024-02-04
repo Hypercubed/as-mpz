@@ -4,8 +4,6 @@ function isPrime32(p: i32): boolean {
   if (p === 2 || p === 3) return true;
   if (p < 1 || p % 2 === 0 || p % 3 === 0) return false;
 
-  // const max = u32(Math.floor(Math.sqrt(p)));
-
   for (let i = 5; i * i < p; i += 6) {
     if (p % i === 0 || p % (i + 2) === 0) return false;
   }
@@ -27,21 +25,26 @@ function lucasLehmer(p: i32, Mp: MpZ = MpZ.ONE.mul_pow2(p).dec()): boolean {
 // Mp is a Mersenne number M = 2**p - 1
 // If Mp is prime, then (2**p-1) * 2**(p-1) is perfect.
 
+const MAX = 1280; // 1279, 2281, 3217
+
 let u = MpZ.ONE.mul_pow2(1);
-for (let p = 2; p < 1500; p++) {
+for (let p = 2; p < MAX; p++) {
+  process.stdout.write(`${p}\r`);
+
   u = u.mul_pow2(1);
   if (!isPrime32(p)) continue;
 
   const Mp = u.dec();
   if (p === 2 || lucasLehmer(p, Mp)) {
     const perfect = Mp.mul(u.div_pow2(1));
-    console.log(`${p} : ${trim(Mp)} : ${trim(perfect)}`);
+    console.log(`${p}\t${trim(Mp)}\t${trim(perfect)}`);
   }
 }
 
 // Outputs perfect primes < 100: https://en.wikipedia.org/wiki/List_of_Mersenne_primes_and_perfect_numbers
 
-function trim(m: MpZ): string {
+function trim<T>(m: T): string {
   const s = m.toString();
-  return s.length > 12 ? s.slice(0, 6) + '...' + s.slice(-6) : s;
+  if (s.length <= 12) return s + ' '.repeat(15 - s.length);
+  return s.slice(0, 6) + '...' + s.slice(-6);
 }

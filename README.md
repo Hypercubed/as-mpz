@@ -322,6 +322,10 @@ If the leading bit of the remaining number is 1, the result is negative.
 Returns a BigInt value truncated to the given number of least significant bits and returns that value as an unsigned integer.
 Results are always non-negative and two's complement in binary.
 
+### `MpZ.random(bits: u64): MpZ`
+
+Returns a random MpZ value with the specified maximum number of bits.
+
 [](#license)
 
 ## License

@@ -4,8 +4,9 @@ CHANGELOG
 ## HEAD (Unreleased)
 * *Feature*: Implement `MpZ.asIntN` and `MpZ.asUintN`.
 * *Feature*: Implement `#fact`.
+* *Feature*: Implement `MpZ.random`.
 * *Improvement*: Improve `#mod` performance.
-* *Bugfix*: Make `#not` public
+* *Bugfix*: Make `#not` public.
 
 ---
 
