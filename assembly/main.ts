@@ -121,6 +121,14 @@ export function fact(a: MpZ): MpZ {
   return a.fact();
 }
 
+export function isqrt(a: MpZ): MpZ {
+  return a.isqrt();
+}
+
+export function iroot(a: MpZ, b: u32): MpZ {
+  return a.iroot(b);
+}
+
 export function asIntN(bits: u32, a: MpZ): MpZ {
   return MpZ.asIntN(bits, a);
 }

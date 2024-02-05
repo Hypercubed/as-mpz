@@ -1,5 +1,5 @@
 import t from 'tap';
-import { mpz, to, from, t_pow } from './setup.js';
+import { mpz, to, from, t_pow, t_sqrt, t_root } from './setup.js';
 import fc from 'fast-check';
 
 fc.configureGlobal({ numRuns: 300 });

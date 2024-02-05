@@ -830,6 +830,68 @@ export class MpZ {
   }
 
   /**
+   * #### `#sqrt(): MpZ`
+   *
+   * Returns the greatest integer less than or equal to the square root of `this`
+   */
+  isqrt(): MpZ {
+    if (this.isNeg) {
+      throw new RangeError(
+        'Square root of negative number is not a real number'
+      );
+    }
+    if (this.lt(2)) return this;
+
+    let x0 = this._bitShiftRight(1);
+    let x1 = x0._uadd(this.div(x0))._bitShiftRight(1);
+
+    while (x1 < x0) {
+      x0 = x1;
+      x1 = x0._uadd(this.div(x0))._bitShiftRight(1);
+    }
+
+    return x0;
+  }
+
+  /**
+   * #### `#iroot(n: u32): MpZ`
+   *
+   * Returns the greatest integer less than or equal to the nth root of `this`
+   */
+  // TODO: support negative numbers
+  iroot(k: u32): MpZ {
+    if (k === 0) throw new RangeError('Root must be greater than 0');
+
+    if (this.isNeg) {
+      if (k % 2 === 0) {
+        throw new RangeError('Root of negative number is not a real number');
+      }
+      return this.abs()._uiroot(k).negate();
+    }
+
+    return this._uiroot(k);
+  }
+
+  protected _uiroot(k: u32): MpZ {
+    if (this.lt(2)) return this;
+
+    const n1 = MpZ.from(k - 1);
+
+    let d = this._uaddU32(1);
+    let e: MpZ = this;
+
+    while (e < d) {
+      d = e;
+      e = e
+        ._umul(n1)
+        ._uadd(this.div(e._upow(n1)))
+        ._udivU32(k);
+    }
+
+    return d;
+  }
+
+  /**
    * #### `#fact(): MpZ`
    *
    * Returns the factorial of this MpZ (`this!`).

@@ -5,6 +5,7 @@ CHANGELOG
 * *Feature*: Implement `MpZ.asIntN` and `MpZ.asUintN`.
 * *Feature*: Implement `#fact`.
 * *Feature*: Implement `MpZ.random`.
+* *Feature*: Implement `#isqrt` and `#iroot`.
 * *Improvement*: Improve `#mod` performance.
 * *Bugfix*: Make `#not` public.
 

@@ -87,6 +87,14 @@ Returns the remainder of this MpZ divided by the `rhs` (`this % rhs`).
 
 Returns the value of this MpZ raised to the power of `rhs` (`this ** rhs`).
 
+#### `#sqrt(): MpZ`
+
+Returns the greatest integer less than or equal to the square root of `this`
+
+#### `#iroot(n: u32): MpZ`
+
+Returns the greatest integer less than or equal to the nth root of `this`
+
 #### `#fact(): MpZ`
 
 Returns the factorial of this MpZ (`this!`).
