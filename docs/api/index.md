@@ -95,6 +95,10 @@ Returns the greatest integer less than or equal to the square root of `this`
 
 Returns the greatest integer less than or equal to the nth root of `this`
 
+#### `#log2(): MpZ`
+
+Returns the base 2 logarithm of `this`
+
 #### `#fact(): MpZ`
 
 Returns the factorial of this MpZ (`this!`).

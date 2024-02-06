@@ -56,6 +56,8 @@ t.test('modulo', t => {
   t.end();
 });
 
+t.end();
+
 // identity ((x/y))*y + x%y - x == 0
 
 function mod(n, m) {

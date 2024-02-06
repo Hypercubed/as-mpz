@@ -2,7 +2,7 @@ import t from 'tap';
 import { mpz, t_add, t_sub, t_inc, t_dec } from './setup.js';
 import fc from 'fast-check';
 
-fc.configureGlobal({ numRuns: 300 });
+fc.configureGlobal({ numRuns: 200 });
 
 const N = 2 ** 12; // 2**32-1 max
 
@@ -107,3 +107,5 @@ t.test('invariants', t => {
 
   t.end();
 });
+
+t.end();

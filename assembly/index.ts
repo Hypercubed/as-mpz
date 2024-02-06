@@ -892,6 +892,20 @@ export class MpZ {
   }
 
   /**
+   * #### `#log2(): MpZ`
+   *
+   * Returns the base 2 logarithm of `this`
+   *
+   */
+  log2(): MpZ {
+    if (this.isNeg) throw new RangeError('Logarithm of negative number');
+    if (this.eqz()) throw new RangeError('Logarithm of zero');
+    if (this.lt(2)) return MpZ.ZERO;
+
+    return MpZ.from(this.size * 32 - this._clz() - 1);
+  }
+
+  /**
    * #### `#fact(): MpZ`
    *
    * Returns the factorial of this MpZ (`this!`).
