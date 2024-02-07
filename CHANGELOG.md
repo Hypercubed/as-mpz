@@ -7,6 +7,7 @@ CHANGELOG
 * *Feature*: Implement `MpZ.random`.
 * *Feature*: Implement `#isqrt` and `#iroot`.
 * *Feature*: Implement `#log2`.
+* *Feature*: Implement `#gcd` and `#lcm`.
 * *Improvement*: Improve `#mod` performance.
 * *Bugfix*: Make `#not` public.
 

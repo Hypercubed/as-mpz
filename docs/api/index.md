@@ -104,6 +104,14 @@ Returns the base 2 logarithm of `this`
 Returns the factorial of this MpZ (`this!`).
 Throws RangeError if this is negative or too large (greater than MAX_INTEGER)
 
+#### `#gcd(rhs: i32 | u32 | i64 | u64 | MpZ): MpZ`
+
+Returns the greatest common divisor of this MpZ and `rhs`.
+
+#### `#lcm(rhs: i32 | u32 | i64 | u64 | MpZ): MpZ`
+
+Returns the least common multiple of this MpZ and `rhs`.
+
 #### `#shiftLeft(rhs: i32 | u32 | i64 | u64 | MpZ): MpZ`
 
 Returns the value of this MpZ left shifted by `rhs` (`this << rhs`).

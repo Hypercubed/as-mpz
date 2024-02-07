@@ -927,6 +927,60 @@ export class MpZ {
     return z;
   }
 
+  /**
+   * #### `#gcd(rhs: i32 | u32 | i64 | u64 | MpZ): MpZ`
+   *
+   * Returns the greatest common divisor of this MpZ and `rhs`.
+   */
+  gcd<T>(rhs: T): MpZ {
+    const y = MpZ.from(rhs);
+    if (this.eqz()) return y.abs();
+    const x = this.abs();
+    if (y.eqz()) return x;
+
+    return x._gcd(y.abs());
+  }
+
+  protected _gcd(rhs: MpZ): MpZ {
+    let x: MpZ = this;
+    let y = rhs;
+
+    const i = x._ctz();
+    x = x._udiv_pow2(i);
+
+    const j = y._ctz();
+    y = y._udiv_pow2(j);
+
+    const k = min(i, j);
+
+    while (true) {
+      if (y > x) {
+        const t = x;
+        x = y;
+        y = t;
+      }
+
+      x = x._usub(y);
+      if (x.eqz()) return y._umul_pow2(k);
+
+      x = x._udiv_pow2(x._ctz());
+    }
+  }
+
+  /**
+   * #### `#lcm(rhs: i32 | u32 | i64 | u64 | MpZ): MpZ`
+   *
+   * Returns the least common multiple of this MpZ and `rhs`.
+   */
+  lcm<T>(rhs: T): MpZ {
+    let y = MpZ.from(rhs);
+    if (this.eqz() || y.eqz()) return MpZ.ZERO;
+
+    const x = this.abs();
+    y = y.abs();
+    return x.mul(y).div(x._gcd(y));
+  }
+
   // *** Shifts ***
 
   // Gets the value of the bit at the specified position (2's complement)
@@ -945,6 +999,16 @@ export class MpZ {
   protected _clz(): u32 {
     const d = unchecked(this._data[this.size - 1]);
     return <u32>clz(d);
+  }
+
+  protected _ctz(): u64 {
+    if (this.eqz()) return 0;
+
+    let l: u32 = 0;
+    while (unchecked(this._data[l]) === 0) {
+      l++;
+    }
+    return l * LIMB_BITS + ctz(unchecked(this._data[l]));
   }
 
   // returns the number of bits in the magnitude (not the 2's-complement representation) excluding leading zeros

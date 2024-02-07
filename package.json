@@ -17,7 +17,7 @@
     "asconfig.json"
   ],
   "scripts": {
-    "test": "npm-run-all --serial prettier tap asp",
+    "test": "npm-run-all --serial prettier asp tap",
     "asp": "asp",
     "pretap": "npm run asbuild:debug",
     "prettier": "prettier . --check",
