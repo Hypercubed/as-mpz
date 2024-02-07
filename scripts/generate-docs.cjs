@@ -16,8 +16,15 @@ files
   })
   .join('\n');
 
-function process(file, comments) {
-  return comments.map(c => `${c.comment.content}\n`).join('\n');
+function processContent(content) {
+  return (
+    content.replaceAll('@returns', 'Returns').replaceAll('@throws', 'Throws') +
+    '\n'
+  );
+}
+
+function process(_, comments) {
+  return comments.map(c => processContent(c.comment.content)).join('\n');
 }
 
 function read(fp) {
