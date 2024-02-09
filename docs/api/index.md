@@ -105,6 +105,11 @@ Throws RangeError if `n` is zero or `this` is negative and `n` is even.
 Returns the base 2 logarithm of `this`.
 Throws RangeError if `this` is negative or zero.
 
+#### `#log10(): MpZ`
+
+Returns the base 10 logarithm of `this`.
+Throws RangeError if `this` is negative or zero.
+
 #### `#fact(): MpZ`
 
 Returns the factorial of `this` MpZ (`this!`).
@@ -237,6 +242,7 @@ The following static values are provided for convenience:
 - `MpZ.ZERO` - The MpZ value `0`.
 - `MpZ.ONE` - The MpZ value `1`.
 - `MpZ.TWO` - The MpZ value `2`.
+- `MpZ.TEN` - The MpZ value `10`.
 
 ### Operators
 

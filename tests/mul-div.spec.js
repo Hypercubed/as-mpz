@@ -4,7 +4,7 @@ import fc from 'fast-check';
 
 fc.configureGlobal({ numRuns: 300 });
 
-const N = 2 ** 12; // 2**31-1 max
+const N = 4096; // 2**31-1 max
 
 t.test('multiplication', t => {
   fc.assert(

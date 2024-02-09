@@ -4,6 +4,8 @@ import fc from 'fast-check';
 
 fc.configureGlobal({ numRuns: 100 });
 
+const N = 4096;
+
 function gcd(a, b) {
   if (a < 0n) a = -a;
   if (b < 0n) b = -b;
@@ -22,7 +24,7 @@ function lcm(a, b) {
 
 t.test('gcd', t => {
   fc.assert(
-    fc.property(fc.bigIntN(4096), fc.bigIntN(4096), (n, m) => {
+    fc.property(fc.bigIntN(N), fc.bigIntN(N), (n, m) => {
       t.equal(t_gcd(n, m), gcd(n, m));
     })
   );
@@ -32,7 +34,7 @@ t.test('gcd', t => {
 
 t.test('lcm', t => {
   fc.assert(
-    fc.property(fc.bigIntN(4096), fc.bigIntN(4096), (n, m) => {
+    fc.property(fc.bigIntN(N), fc.bigIntN(N), (n, m) => {
       t.equal(t_lcm(n, m), lcm(n, m));
     })
   );

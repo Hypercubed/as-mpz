@@ -129,6 +129,10 @@ export function log2(a: MpZ): MpZ {
   return a.log2();
 }
 
+export function log10(a: MpZ): MpZ {
+  return a.log10();
+}
+
 export function iroot(a: MpZ, b: u32): MpZ {
   return a.iroot(b);
 }

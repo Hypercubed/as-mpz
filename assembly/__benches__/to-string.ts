@@ -7,23 +7,23 @@ const bigInt = BigInt.from(s);
 
 assert(`${mpz}` === `${bigInt}`);
 
-suite('to string', () => {
-  bench('MpZ#toHex', () => {
-    blackbox(mpz.toHex());
-  });
+// suite('to string', () => {
+//   bench('MpZ#toHex', () => {
+//     blackbox(mpz.toHex());
+//   });
 
-  bench('MpZ#toDecimal', () => {
-    blackbox(mpz.toDecimal());
-  });
+//   bench('MpZ#toDecimal', () => {
+//     blackbox(mpz.toDecimal());
+//   });
 
-  bench('BigInt#toString()', () => {
-    blackbox(bigInt.toString());
-  });
+//   bench('BigInt#toString()', () => {
+//     blackbox(bigInt.toString());
+//   });
 
-  bench('BigInt#toString(16)', () => {
-    blackbox(bigInt.toString(16));
-  });
-});
+//   bench('BigInt#toString(16)', () => {
+//     blackbox(bigInt.toString(16));
+//   });
+// });
 
 function fact<T>(one: T, n: T): T {
   let a = one;

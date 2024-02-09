@@ -30,7 +30,7 @@
     "docs": "npm-run-all --serial docs:*",
     "docs:api": "node ./scripts/generate-docs.cjs",
     "docs:readme": "readme generate",
-    "postdocs": "prettier README.md --write"
+    "postdocs": "prettier ./**/*.md --write"
   },
   "author": "J. Harshbarger",
   "license": "MIT",

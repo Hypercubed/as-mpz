@@ -4,6 +4,8 @@ import fc from 'fast-check';
 
 fc.configureGlobal({ numRuns: 100 });
 
+const N = 4096;
+
 function calculateFactorial(n) {
   if (n < 2n) return 1n;
   var fact = 1n;
@@ -15,7 +17,7 @@ function calculateFactorial(n) {
 
 t.test('factorials', t => {
   fc.assert(
-    fc.property(fc.integer({ min: 5, max: 1000 }), n => {
+    fc.property(fc.integer({ min: 5, max: N }), n => {
       t.equal(t_fact(n), calculateFactorial(BigInt(n)));
     }),
     {

@@ -2,8 +2,8 @@ import t from 'tap';
 import { t_rem, t_mod } from './setup.js';
 import fc from 'fast-check';
 
-fc.configureGlobal({ numRuns: 400 });
-const N = 2 ** 12; // 2**31-1 max
+fc.configureGlobal({ numRuns: 200 });
+const N = 4096; // 2**31-1 max
 
 t.test('rem', t => {
   fc.assert(

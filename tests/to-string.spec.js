@@ -2,8 +2,8 @@ import t from 'tap';
 import { t_string, t_hex } from './setup.js';
 import fc from 'fast-check';
 
-fc.configureGlobal({ numRuns: 100 });
-const N = 2 ** 12; // 2**31-1 max
+fc.configureGlobal({ numRuns: 200 });
+const N = 4096; // 2**31-1 max
 
 t.test('toString', t => {
   t.test('toString(10)', t => {

@@ -111,18 +111,18 @@ function fromString(value: string): MpZ {
   return neg ? r.negate() : r;
 }
 
-function u32ToHex(value: u32, pad: boolean = true): string {
-  let r = value.toString(16);
-  if (!pad) return r;
-  return ('00000000' + r).substr(r.length);
-}
+// @ts-ignore
+@lazy
+const LOG2_10: f64 = Math.log2(10);
 
 // Constants for decimal conversion
 // @ts-ignore
 @inline
-const TO_DECIMAL_M = 9;
-const TO_DECIMAL_N = 10 ** TO_DECIMAL_M;
-const TO_DECIMAL_P = '0'.repeat(TO_DECIMAL_M);
+const DIGITS_PER_LIMB = 9;
+
+// @ts-ignore
+@inline
+const TO_DECIMAL_N = 1000000000; // 10 ** 9;
 
 /** @internal */
 export class DivRem<R> {
@@ -908,7 +908,51 @@ export class MpZ {
     if (this.eqz()) throw new RangeError('Logarithm of zero');
     if (this.lt(2)) return MpZ.ZERO;
 
-    return MpZ.from(this.size * 32 - this._clz() - 1);
+    return MpZ.from(this._bits() - 1);
+  }
+
+  // Returns the ceiling of the base 10 logarithm of `this`
+  // Assumes x > 1
+  protected _ceilLog10(): u64 {
+    if (this.lt(10)) return 1;
+
+    const k = f64(this._bits() - 1);
+    const z = u64(k / LOG2_10); // ~log2(x)/log2(10) < 2.1*10^10
+    return z + 1;
+  }
+
+  /**
+   * #### `#log10(): MpZ`
+   *
+   * @returns the base 10 logarithm of `this`.
+   * @throws RangeError if `this` is negative or zero.
+   */
+  log10(): MpZ {
+    if (this.isNeg) throw new RangeError('Logarithm of negative number');
+    if (this.eqz()) throw new RangeError('Logarithm of zero');
+    if (this.lt(10)) return MpZ.ZERO;
+
+    assert(
+      ASC_NO_ASSERT || this.log2().size < 3,
+      'log10: internal assumption failed'
+    );
+
+    // Correcting ceilLog10
+    const x = this.abs();
+    const z = x._ceilLog10();
+    const t = MpZ.TEN.pow(z);
+    return x.ge(t) ? MpZ.from(z) : MpZ.from(z - 1);
+
+    // Direct implementation
+    // let x = this.abs();
+    // let k: u64 = 0;
+
+    // while (!x.eqz()) {
+    //   x = x.div(10);
+    //   k++;
+    // }
+
+    // return MpZ.from(k - 1);
   }
 
   /**
@@ -1020,8 +1064,8 @@ export class MpZ {
 
   // returns the number of bits in the magnitude excluding leading zeros
   // doesn't count sign bit, treats value as unsigned
-  protected _bits(): u32 {
-    return <u32>(this.size * LIMB_BITS - this._clz());
+  protected _bits(): u64 {
+    return u64(this.size) * LIMB_BITS - this._clz();
   }
 
   protected _limbShiftLeft(n: u32): MpZ {
@@ -1347,14 +1391,21 @@ export class MpZ {
   }
 
   protected _uhex(): string {
-    let s = '';
+    const s = new StaticArray<string>(2 * this.size - 1);
 
-    const q = this.size;
-    for (let i: i32 = q - 1; i >= 0; --i) {
-      s += u32ToHex(unchecked(this._data[i]), i !== q - 1);
+    let q = this.size;
+    let i = 0;
+
+    // MSB is not padded
+    s[i++] = unchecked(this._data[--q]).toString(16);
+
+    while (q > 0) {
+      const x = unchecked(this._data[--q]).toString(16);
+      s[i++] = '0'.repeat(8 - x.length); // padding
+      s[i++] = x;
     }
 
-    return s;
+    return s.join('');
   }
 
   protected _uitoaDecimal(): string {
@@ -1363,19 +1414,24 @@ export class MpZ {
       '_uitoaDecimal: this must be positive'
     );
 
-    const s = new Array<string>();
+    if (this.size === 1) return this.toU32().toString(10);
 
     let n: MpZ = this;
+    const k = (f64(this.size) / LOG2_10 / 9) * LIMB_BITS;
+    let i = 2 * u32(k) + 1;
+    const s = new StaticArray<string>(i);
+
     while (n.compareTo(TO_DECIMAL_N) === 1) {
       const d = n._udivRemU32(TO_DECIMAL_N);
       n = d.div;
 
-      const t = TO_DECIMAL_P + d.rem.toString(10);
-      s.unshift(t.slice(-TO_DECIMAL_M));
+      const x = d.rem.toString(10);
+      s[--i] = x;
+      s[--i] = '0'.repeat(DIGITS_PER_LIMB - x.length);
     }
 
     if (!n.eqz()) {
-      s.unshift(n.toU32().toString(10));
+      s[--i] = n.toU32().toString(10);
     }
 
     return s.join('');
@@ -1463,6 +1519,13 @@ export class MpZ {
         ? u64(unchecked(this._data[0]))
         : (u64(unchecked(this._data[1])) << 32) + u64(unchecked(this._data[0]));
     return this.isNeg ? -z : z;
+  }
+
+  protected _toU64_safe(): u64 {
+    if (this.size > 3) {
+      throw new RangeError('MpZ too large to fit in u64');
+    }
+    return this.toU64();
   }
 
   /**
@@ -1608,10 +1671,12 @@ export class MpZ {
    * - `MpZ.ZERO` - The MpZ value `0`.
    * - `MpZ.ONE` - The MpZ value `1`.
    * - `MpZ.TWO` - The MpZ value `2`.
+   * - `MpZ.TEN` - The MpZ value `10`.
    */
   static readonly ZERO: MpZ = new MpZ([0]);
   static readonly ONE: MpZ = new MpZ([1]);
   static readonly TWO: MpZ = new MpZ([2]);
+  static readonly TEN: MpZ = new MpZ([10]);
 
   /**
    * ### Operators

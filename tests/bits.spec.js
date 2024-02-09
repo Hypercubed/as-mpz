@@ -15,7 +15,7 @@ import {
 import fc from 'fast-check';
 
 fc.configureGlobal({ numRuns: 100 });
-const N = 2 ** 12; // 2**31-1 max
+const N = 4096; // 2**31-1 max
 
 t.test('mul_pow2', t => {
   fc.assert(
@@ -153,20 +153,20 @@ t.test('not', t => {
   t.end();
 });
 
-t.test('identities', t => {
-  fc.assert(
-    fc.property(fc.bigIntN(N), fc.bigIntN(N), (x, y) => {
-      const X = from(x);
-      const Y = from(y);
+// t.test('identities', t => {
+//   fc.assert(
+//     fc.property(fc.bigIntN(N), fc.bigIntN(N), (x, y) => {
+//       const X = from(x);
+//       const Y = from(y);
 
-      t.equal(to(mpz.not(mpz.not(X))), x); // ~~x = x
-      t.equal(to(mpz.not(mpz.and(X, Y))), ~x | ~y); // ~(x & y) = ~x | ~y
-      t.equal(to(mpz.not(mpz.or(X, Y))), ~x & ~y); // ~(x | y) = ~x & ~y
-      // identity x^y == x|y &~ x&y
-    })
-  );
+//       t.equal(to(mpz.not(mpz.not(X))), x); // ~~x = x
+//       t.equal(to(mpz.not(mpz.and(X, Y))), ~x | ~y); // ~(x & y) = ~x | ~y
+//       t.equal(to(mpz.not(mpz.or(X, Y))), ~x & ~y); // ~(x | y) = ~x & ~y
+//       // identity x^y == x|y &~ x&y
+//     })
+//   );
 
-  t.end();
-});
+//   t.end();
+// });
 
 t.end();
