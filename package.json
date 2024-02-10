@@ -1,7 +1,7 @@
 {
   "name": "@hypercubed/as-mpz",
-  "version": "2.1.0",
-  "description": "Immutable arbitrary precision integer library for AssemblyScript.",
+  "version": "2.2.0",
+  "description": "Immutable multiple precision integer library for AssemblyScript.",
   "ascMain": "assembly/index.ts",
   "types": "assembly/index.ts",
   "source": "assembly/main.ts",

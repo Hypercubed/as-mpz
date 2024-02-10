@@ -4,13 +4,13 @@
 
 # @hypercubed/as-mpz
 
-Immutable arbitrary precision integer library for AssemblyScript.
+Immutable multiple precision integer library for AssemblyScript.
 
 [](#features)
 
 ## Features
 
-- Arbitrary precision integers (theoretically limited by memory)
+- Multiple precision integers (theoretically limited by memory)
 - Fast (extensivly benchmarked)
 - Accurate\* (tested against JavaScript BigInt)
 - For use in AssemblyScript projects

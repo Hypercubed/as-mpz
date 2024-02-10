@@ -2,6 +2,11 @@ CHANGELOG
 =========
 
 ## HEAD (Unreleased)
+_(none)_
+
+---
+
+## v2.2.0 (2024-02-10)
 * *Feature*: Implement `MpZ.asIntN` and `MpZ.asUintN`.
 * *Feature*: Implement `#fact`.
 * *Feature*: Implement `MpZ.random`.
@@ -12,8 +17,6 @@ CHANGELOG
 * *Improvement*: Improve `#toHex`, `#toDecimal` performance.
 * *Improvement*: Improve `#add` and `#sub` performance.
 * *Bugfix*: Make `#not` public.
-
----
 
 ## 2.1.0 (2024-01-28)
 * *Feature*: Implement `#inc` and `#dec`.

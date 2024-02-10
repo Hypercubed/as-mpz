@@ -4,7 +4,7 @@
 
 ## Features
 
-- Arbitrary precision integers (theoretically limited by memory)
+- Multiple precision integers (theoretically limited by memory)
 - Fast (extensivly benchmarked)
 - Accurate\* (tested against JavaScript BigInt)
 - For use in AssemblyScript projects
