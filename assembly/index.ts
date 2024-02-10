@@ -281,32 +281,40 @@ export class MpZ {
     if (this.isNeg && y.isNeg) return this._uadd(y).negate(); // -a + -b = -(a + b)
     if (this.isNeg) return y._usub(this); // -a + b = b - a
     if (y.isNeg) return this._usub(y); // a + -b = a - b
-    if (y._sgn_size === 1) return this._uaddU32(unchecked(y._data[0]));
-    if (this._sgn_size === 1) return y._uaddU32(unchecked(this._data[0]));
     return this._uadd(y);
   }
 
   // unsigned addition
   // treats values as unsigned
   protected _uadd(rhs: MpZ): MpZ {
-    return this.size < rhs.size ? rhs.__uadd(this) : this.__uadd(rhs); // a + b = b + a
+    if (this.size < rhs.size) return rhs._uadd(this); // a + b = b + a
+    if (rhs.size === 1) return this._uaddU32(unchecked(rhs._data[0]));
+    return this.__uadd(rhs);
   }
 
   // unsigned addition
   // ordered such that Size(lhs) > Size(rhs)
   // treats values as unsigned
   protected __uadd(rhs: MpZ): MpZ {
-    assert(ASC_NO_ASSERT || this.size >= rhs.size, '_uadd: lhs must be >= rhs');
-
     const q = this.size;
+    const p = rhs.size;
+
+    assert(ASC_NO_ASSERT || q >= p, '_uadd: Size(lhs) must be >= Size(rhs)');
+
     const z = new StaticArray<u32>(q + 1);
 
     let k: bool = 0;
-    for (let i: i32 = 0; i < q; ++i) {
+    let i: i32 = 0;
+    for (; i < p; ++i) {
       const lx = unchecked(this._data[i]);
-      const ly = rhs.size > i ? unchecked(rhs._data[i]) : 0;
+      const ly = unchecked(rhs._data[i]);
       unchecked((z[i] = lx + ly + k));
-      k = z[i] < lx || (k && z[i] === lx);
+      k = unchecked(z[i] < lx) || unchecked(k && z[i] === lx);
+    }
+    for (; i < q; ++i) {
+      const lx = unchecked(this._data[i]);
+      unchecked((z[i] = lx + k));
+      k = unchecked(z[i] < lx);
     }
     unchecked((z[q] = k));
 
@@ -386,14 +394,26 @@ export class MpZ {
   // treats values as unsigned
   protected __usub(rhs: MpZ): MpZ {
     const q = this.size;
+    const p = rhs.size;
+
+    assert(ASC_NO_ASSERT || q >= p, '_uadd: Size(lhs) must be >= Size(rhs)');
+
     const z = new StaticArray<u32>(q);
 
     let k: i64 = 0;
-    for (let i: i32 = 0; i < q; ++i) {
+    let i: i32 = 0;
+    for (; i < p; ++i) {
       const lx = unchecked(this._data[i]);
-      const ly = rhs.size > i ? unchecked(rhs._data[i]) : 0;
+      const ly = unchecked(rhs._data[i]);
 
       k = i64(lx) - i64(ly) - k;
+      unchecked((z[i] = LOW(k)));
+      k = k < 0 ? 1 : 0;
+    }
+    for (; i < q; ++i) {
+      const lx = unchecked(this._data[i]);
+
+      k = i64(lx) - k;
       unchecked((z[i] = LOW(k)));
       k = k < 0 ? 1 : 0;
     }
@@ -1257,8 +1277,8 @@ export class MpZ {
     const z = new StaticArray<u32>(q > p ? q : p);
 
     for (let i: i32 = 0; i < z.length; ++i) {
-      const lx = this.size > i ? unchecked(this._data[i]) : 0;
-      const ly = rhs.size > i ? unchecked(rhs._data[i]) : 0;
+      const lx = p > i ? unchecked(this._data[i]) : 0;
+      const ly = q > i ? unchecked(rhs._data[i]) : 0;
       unchecked((z[i] = lx & ly));
     }
 
@@ -1272,8 +1292,8 @@ export class MpZ {
     const z = new StaticArray<u32>(q > p ? q : p);
 
     for (let i: i32 = 0; i < z.length; ++i) {
-      const lx = this.size > i ? unchecked(this._data[i]) : 0;
-      const ly = rhs.size > i ? unchecked(rhs._data[i]) : 0;
+      const lx = p > i ? unchecked(this._data[i]) : 0;
+      const ly = q > i ? unchecked(rhs._data[i]) : 0;
       unchecked((z[i] = ly === 0 ? lx : lx & ~ly));
     }
 
@@ -1301,8 +1321,8 @@ export class MpZ {
     const z = new StaticArray<u32>(q > p ? q : p);
 
     for (let i: i32 = 0; i < z.length; ++i) {
-      const lx = this.size > i ? unchecked(this._data[i]) : 0;
-      const ly = rhs.size > i ? unchecked(rhs._data[i]) : 0;
+      const lx = p > i ? unchecked(this._data[i]) : 0;
+      const ly = q > i ? unchecked(rhs._data[i]) : 0;
       unchecked((z[i] = lx | ly));
     }
 
@@ -1330,8 +1350,8 @@ export class MpZ {
     const z = new StaticArray<u32>(q > p ? q : p);
 
     for (let i: i32 = 0; i < z.length; ++i) {
-      const lx = this.size > i ? unchecked(this._data[i]) : 0;
-      const ly = rhs.size > i ? unchecked(rhs._data[i]) : 0;
+      const lx = p > i ? unchecked(this._data[i]) : 0;
+      const ly = q > i ? unchecked(rhs._data[i]) : 0;
       unchecked((z[i] = lx ^ ly));
     }
 
@@ -1552,11 +1572,12 @@ export class MpZ {
 
     const x = isNeg ? this.not() : this;
 
+    const p = x.size;
     let q: i32 = limbs + 1;
     const z = new StaticArray<u32>(q);
 
     for (let i: i32 = 0; i < q; ++i) {
-      const lx = x.size > i ? unchecked(x._data[i]) : 0;
+      const lx = p > i ? unchecked(x._data[i]) : 0;
       unchecked((z[i] = isNeg ? ~lx : lx));
     }
 

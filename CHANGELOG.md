@@ -10,6 +10,7 @@ CHANGELOG
 * *Feature*: Implement `#gcd` and `#lcm`.
 * *Improvement*: Improve `#mod` performance.
 * *Improvement*: Improve `#toHex`, `#toDecimal` performance.
+* *Improvement*: Improve `#add` and `#sub` performance.
 * *Bugfix*: Make `#not` public.
 
 ---
