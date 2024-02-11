@@ -11,7 +11,7 @@ function nextCatalan(): void {
     .div(n + 1);
 }
 
-console.log('na(n)');
+console.log('n\ta(n)');
 console.log(`${n}\t${cn}`);
 
 while (n < 30) {
