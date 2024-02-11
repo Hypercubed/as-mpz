@@ -17,6 +17,10 @@ export function toString(a: MpZ, base: u32 = 10): string {
   return a.toString(base);
 }
 
+export function toExponential(a: MpZ, fractionDigits: u32 = 0): string {
+  return a.toExponential(fractionDigits);
+}
+
 export function toHex(a: MpZ): string {
   return a.toHex();
 }

@@ -33,4 +33,22 @@ describe('MpZ', () => {
   it('toString(36)', () => {
     expect(MpZ.from(0xff).toString(36)).toBe('73');
   });
+
+  it('.toExponential()', () => {
+    expect(MpZ.from(1).toExponential(0)).toBe('1e+0');
+    expect(MpZ.from(1).toExponential(2)).toBe('1.00e+0');
+    expect(MpZ.from(1).toExponential(5)).toBe('1.00000e+0');
+
+    expect(MpZ.from(0xff).toExponential(0)).toBe('3e+2');
+    expect(MpZ.from(0xff).toExponential(2)).toBe('2.55e+2');
+    expect(MpZ.from(0xff).toExponential(5)).toBe('2.55000e+2');
+
+    expect(MpZ.from(-2).toExponential(0)).toBe('-2e+0');
+    expect(MpZ.from(-2).toExponential(2)).toBe('-2.00e+0');
+    expect(MpZ.from(-2).toExponential(5)).toBe('-2.00000e+0');
+
+    expect(MpZ.from(-0xffff).toExponential(0)).toBe('-7e+4');
+    expect(MpZ.from(-0xffff).toExponential(2)).toBe('-6.55e+4');
+    expect(MpZ.from(-0xffff).toExponential(5)).toBe('-6.55350e+4');
+  });
 });

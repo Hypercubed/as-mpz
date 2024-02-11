@@ -1499,6 +1499,48 @@ export class MpZ {
   }
 
   /**
+   * #### `#toExponential(fractionDigits: u32): string`
+   *
+   * @returns the value of `this` MpZ as a string in exponential notation.
+   * If `this` MpZ has more digits than requested, the number is rounded to the nearest number represented by fractionDigits digits.
+   */
+  toExponential(fractionDigits: u32 = 0): string {
+    if (fractionDigits > 100) {
+      throw new RangeError(
+        'toExponential() argument must be between 0 and 100'
+      );
+    }
+
+    if (this.eqz()) {
+      const s = fractionDigits === 0 ? '0' : '0.' + '0'.repeat(fractionDigits);
+      return `${s}e+0`;
+    }
+
+    const sgn = this.isNeg ? '-' : '';
+
+    let x = this.abs();
+    let e = x.log10().toU32();
+
+    if (e > fractionDigits) {
+      // Handle rounding
+      const m = MpZ.TEN.pow(e - fractionDigits - 1);
+      x = x.div(m);
+      x = x.add(5).div(10);
+      if (x.log10().toU32() > fractionDigits) e++;  // Rounding caused a carry
+    } else {
+      // Padding with zeros
+      x = x.mul(MpZ.TEN.pow(fractionDigits - e));
+    }
+
+    const z = x.toDecimal();
+    const ip = z.charAt(0);
+    if (fractionDigits === 0) return `${sgn}${ip}e+${e}`;
+
+    const fp = z.slice(1, fractionDigits + 1);
+    return `${sgn}${ip}.${fp}e+${e}`;
+  }
+
+  /**
    * #### `#toU32Array(): u32[]`
    *
    * @returns the value of `this` MpZ as an unsigned 32-bit integer array.  Ther sign of the MpZ is ignored.

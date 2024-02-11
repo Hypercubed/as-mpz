@@ -55,6 +55,7 @@ export const t_gcd = (n, m) => to(mpz.gcd(from(n), from(m)));
 export const t_lcm = (n, m) => to(mpz.lcm(from(n), from(m)));
 
 export const t_string = (n, base = 10) => mpz.toString(from(n), base);
+export const t_exponential = (n, m) => mpz.toExponential(from(n), m);
 export const t_hex = n => mpz.toHex(from(n));
 
 export const t_value = n => mpz.valueOf(from(n));

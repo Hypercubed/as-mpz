@@ -1,8 +1,8 @@
 import t from 'tap';
-import { t_string, t_hex } from './setup.js';
+import { t_string, t_hex, t_exponential } from './setup.js';
 import fc from 'fast-check';
 
-fc.configureGlobal({ numRuns: 200 });
+fc.configureGlobal({ numRuns: 300 });
 const N = 4096; // 2**31-1 max
 
 t.test('toString', t => {
@@ -99,6 +99,25 @@ t.test('toHex', t => {
         n < 0 ? `-0x${(-n).toString(16)}` : `0x${n.toString(16)}`
       );
     })
+  );
+
+  t.end();
+});
+
+t.test('toExponential', t => {
+  fc.assert(
+    fc.property(fc.integer(), fc.integer({ min: 0, max: 100 }), (n, m) => {
+      t.equal(t_exponential(n, m), n.toExponential(m));
+    }),
+    {
+      examples: [
+        [0, 0],
+        [38831928, 8], // causes rounding error if converted to a float
+        [-474130365, 7], // causes rounding difference when fp === 0.5
+        [474130365, 7], // causes rounding difference when fp === 0.5
+        [995163856, 1] // causes carry after rounding
+      ]
+    }
   );
 
   t.end();
