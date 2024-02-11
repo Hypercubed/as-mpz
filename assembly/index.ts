@@ -1526,7 +1526,7 @@ export class MpZ {
       const m = MpZ.TEN.pow(e - fractionDigits - 1);
       x = x.div(m);
       x = x.add(5).div(10);
-      if (x.log10().toU32() > fractionDigits) e++;  // Rounding caused a carry
+      if (x.log10().toU32() > fractionDigits) e++; // Rounding caused a carry
     } else {
       // Padding with zeros
       x = x.mul(MpZ.TEN.pow(fractionDigits - e));
