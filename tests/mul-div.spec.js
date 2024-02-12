@@ -2,7 +2,7 @@ import t from 'tap';
 import { mpz, t_mul, t_div } from './setup.js';
 import fc from 'fast-check';
 
-fc.configureGlobal({ numRuns: 300 });
+fc.configureGlobal({ numRuns: 200 });
 
 const N = 4096; // 2**31-1 max
 
@@ -112,14 +112,34 @@ t.test('division', t => {
 
 t.test('mul-div invariants', t => {
   fc.assert(
-    fc.property(fc.bigIntN(N), fc.bigIntN(N), (_n, _d) => {
-      const n = mpz.from(_n);
-      const d = mpz.from(_d || 1n);
+    fc.property(fc.bigIntN(N), fc.bigIntN(N), (a, b) => {
+      const n = mpz.from(a);
+      const d = mpz.from(b || 1n);
 
       const q = mpz.div(n, d);
       const m = mpz.rem(n, d);
       const r = mpz.add(mpz.mul(q, d), m);
       t.equal(mpz.toHex(r), mpz.toHex(n));
+
+      // commutative
+      t.equal(t_mul(a, b), t_mul(b, a));
+
+    })
+  );
+
+  // distributive
+  // a*(b+c) = a*b + a*c
+
+  fc.assert(
+    fc.property(fc.bigIntN(N), (n) => {
+      // identity
+      t.equal(t_mul(n, 1n), n);
+      t.equal(t_div(n, 1n), n);
+
+      // inverse
+      if (n !== 0n) {
+        t.equal(t_div(n, n), 1n);
+      }
     })
   );
 

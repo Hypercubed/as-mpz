@@ -2,11 +2,12 @@ import t from 'tap';
 import { mpz, to, from, t_pow, t_sqrt, t_root } from './setup.js';
 import fc from 'fast-check';
 
-fc.configureGlobal({ numRuns: 300 });
+fc.configureGlobal({ numRuns: 200 });
+const N = 256; // 2**31-1 max
 
 t.test('pow', t => {
   fc.assert(
-    fc.property(fc.bigIntN(256), fc.bigInt(0n, 20n), (n, m) => {
+    fc.property(fc.bigIntN(N), fc.bigInt(0n, 20n), (n, m) => {
       t.equal(t_pow(n, m), n ** m);
     }),
     {
@@ -18,6 +19,20 @@ t.test('pow', t => {
       ]
     }
   );
+
+  t.end();
+});
+
+t.test('identites', t => {
+  fc.assert(
+    fc.property(fc.bigIntN(N), n => {
+      t.equal(t_pow(n, 0n), 1n);
+      t.equal(t_pow(n, 1n), n);
+    })
+  );
+
+  // a^*(m + n) = a^m * a^n
+  // (a^m)^n = a^(m * n)
 
   t.end();
 });

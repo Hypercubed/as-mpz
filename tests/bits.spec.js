@@ -153,20 +153,34 @@ t.test('not', t => {
   t.end();
 });
 
-// t.test('identities', t => {
-//   fc.assert(
-//     fc.property(fc.bigIntN(N), fc.bigIntN(N), (x, y) => {
-//       const X = from(x);
-//       const Y = from(y);
+t.test('identities', t => {
+  fc.assert(
+    fc.property(fc.bigIntN(N), fc.bigIntN(N), (x, y) => {
+      const X = from(x);
+      const Y = from(y);
 
-//       t.equal(to(mpz.not(mpz.not(X))), x); // ~~x = x
-//       t.equal(to(mpz.not(mpz.and(X, Y))), ~x | ~y); // ~(x & y) = ~x | ~y
-//       t.equal(to(mpz.not(mpz.or(X, Y))), ~x & ~y); // ~(x | y) = ~x & ~y
-//       // identity x^y == x|y &~ x&y
-//     })
-//   );
+      t.equal(to(mpz.not(mpz.and(X, Y))), ~x | ~y); // ~(x & y) = ~x | ~y
+      t.equal(to(mpz.not(mpz.or(X, Y))), ~x & ~y); // ~(x | y) = ~x & ~y
+      // identity x^y == x|y &~ x&y
 
-//   t.end();
-// });
+      // a << b >> b = a
+    })
+  );
+
+  fc.assert(
+    fc.property(fc.bigIntN(N), n => {
+      // identity ~(~x) = x
+      t.equal(to(mpz.not(mpz.not(from(n)))), n);
+
+      // ~(~x) = x
+
+      t.equal(t_and(n, n), n);
+      t.equal(t_or(n, n), n);
+      t.equal(t_xor(n, n), 0n);
+    })
+  );
+
+  t.end();
+});
 
 t.end();

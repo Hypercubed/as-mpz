@@ -102,6 +102,26 @@ t.test('invariants', t => {
       const r = mpz.add(mpz.from(n), mpz.from(m));
       const s = mpz.sub(r, mpz.from(m));
       t.equal(mpz.toHex(r), mpz.toHex(s));
+
+      // commutative
+      t.equal(t_add(n, m), t_add(m, n));
+      t.equal(t_sub(n, m), t_add(n, -m));
+
+    })
+  );
+
+  // associative
+  // (a+b)+c = a+(b+c)
+
+  fc.assert(
+    fc.property(fc.bigIntN(N), n => {
+      // -(-a) = a
+
+      // identity
+      t.equal(t_add(n, 0n), n);
+      t.equal(t_add(0n, n), n);
+      t.equal(t_sub(n, 0n), n);
+      t.equal(t_sub(0n, n), -n);
     })
   );
 
