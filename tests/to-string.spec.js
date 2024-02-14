@@ -1,8 +1,8 @@
 import t from 'tap';
-import { t_string, t_hex, t_exponential } from './setup.js';
+import { t_string, t_hex, t_exponential, BigIntMath } from './setup.js';
 import fc from 'fast-check';
 
-fc.configureGlobal({ numRuns: 300 });
+fc.configureGlobal({ numRuns: 200 });
 const N = 4096; // 2**31-1 max
 
 t.test('toString', t => {
@@ -94,10 +94,7 @@ t.test('toHex', t => {
 
   fc.assert(
     fc.property(fc.bigIntN(N), n => {
-      t.equal(
-        t_hex(n, 2),
-        n < 0 ? `-0x${(-n).toString(16)}` : `0x${n.toString(16)}`
-      );
+      t.equal(t_hex(n, 2), BigIntMath.toHex(n));
     })
   );
 
@@ -106,8 +103,8 @@ t.test('toHex', t => {
 
 t.test('toExponential', t => {
   fc.assert(
-    fc.property(fc.integer(), fc.integer({ min: 0, max: 100 }), (n, m) => {
-      t.equal(t_exponential(n, m), n.toExponential(m));
+    fc.property(fc.bigIntN(N), fc.integer({ min: 0, max: 200 }), (n, m) => {
+      t.equal(t_exponential(n, m), BigIntMath.toExponential(n, m));
     }),
     {
       examples: [

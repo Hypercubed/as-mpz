@@ -1,31 +1,15 @@
 import t from 'tap';
-import { t_gcd, t_lcm } from './setup.js';
+import { t_gcd, t_lcm, BigIntMath } from './setup.js';
 import fc from 'fast-check';
 
 fc.configureGlobal({ numRuns: 100 });
 
 const N = 4096;
 
-function gcd(a, b) {
-  if (a < 0n) a = -a;
-  if (b < 0n) b = -b;
-
-  if (!b) return a;
-  return gcd(b, a % b);
-}
-
-function lcm(a, b) {
-  if (a === 0n || b === 0n) return 0n;
-  if (a < 0n) a = -a;
-  if (b < 0n) b = -b;
-
-  return (a * b) / gcd(a, b);
-}
-
 t.test('gcd', t => {
   fc.assert(
     fc.property(fc.bigIntN(N), fc.bigIntN(N), (n, m) => {
-      t.equal(t_gcd(n, m), gcd(n, m));
+      t.equal(t_gcd(n, m), BigIntMath.gcd(n, m));
     })
   );
 
@@ -35,7 +19,7 @@ t.test('gcd', t => {
 t.test('lcm', t => {
   fc.assert(
     fc.property(fc.bigIntN(N), fc.bigIntN(N), (n, m) => {
-      t.equal(t_lcm(n, m), lcm(n, m));
+      t.equal(t_lcm(n, m), BigIntMath.lcm(n, m));
     })
   );
 

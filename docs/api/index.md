@@ -182,10 +182,10 @@ Returns the value of `this` MpZ as a decimal string.
 
 Returns the value of `this` MpZ as a `number`.
 
-#### `#toExponential(fractionDigits: u32): string`
+#### `#toExponential(n: u32): string`
 
 Returns the value of `this` MpZ as a string in exponential notation.
-If `this` MpZ has more digits than requested, the number is rounded to the nearest number represented by fractionDigits digits.
+If `this` MpZ has more digits than requested, the number is rounded to the nearest number represented by `n` digits.
 
 #### `#toU32Array(): u32[]`
 

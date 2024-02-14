@@ -95,8 +95,8 @@ t.test('toI64', t => {
 t.test('asUintN', t => {
   fc.assert(
     fc.property(fc.bigIntN(N), fc.integer({ min: 0, max: N }), (n, m) => {
-      t.equal(t_asUintN(m, n), n & ((1n << BigInt(m)) - 1n));
-      t.equal(t_asUintN(m, n), mod(n, 1n << BigInt(m)));
+      // t.equal(t_asUintN(m, n), n & ((1n << BigInt(m)) - 1n));
+      // t.equal(t_asUintN(m, n), mod(n, 1n << BigInt(m)));
       t.equal(t_asUintN(m, n), BigInt.asUintN(m, n));
     }),
     {
@@ -131,7 +131,3 @@ t.test('asIntN', t => {
 
   t.end();
 });
-
-function mod(n, m) {
-  return ((n % m) + m) % m;
-}

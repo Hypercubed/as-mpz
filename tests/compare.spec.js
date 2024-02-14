@@ -1,5 +1,5 @@
 import t from 'tap';
-import { t_cmp } from './setup.js';
+import { t_cmp, BigIntMath } from './setup.js';
 import fc from 'fast-check';
 
 fc.configureGlobal({ numRuns: 300 });
@@ -8,7 +8,7 @@ const N = 4096; // 2**31-1 max
 t.test('compareTo', async t => {
   fc.assert(
     fc.property(fc.bigIntN(N), fc.bigIntN(N), (n, m) => {
-      t.equal(t_cmp(n, m), n > m ? 1 : n < m ? -1 : 0);
+      t.equal(t_cmp(n, m), BigIntMath.cmp(n, m));
     }),
     {
       examples: [

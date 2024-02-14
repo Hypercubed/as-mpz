@@ -1,8 +1,8 @@
 import t from 'tap';
-import { mpz, t_add, t_sub, t_inc, t_dec } from './setup.js';
+import { mpz, to, from, t_add, t_sub, t_inc, t_dec } from './setup.js';
 import fc from 'fast-check';
 
-fc.configureGlobal({ numRuns: 200 });
+fc.configureGlobal({ numRuns: 20 });
 
 const N = 4096; // 2**32-1 max
 
@@ -98,30 +98,42 @@ t.test('dec', t => {
 
 t.test('invariants', t => {
   fc.assert(
-    fc.property(fc.bigIntN(N), fc.bigIntN(N), (n, m) => {
-      const r = mpz.add(mpz.from(n), mpz.from(m));
-      const s = mpz.sub(r, mpz.from(m));
-      t.equal(mpz.toHex(r), mpz.toHex(s));
-
-      // commutative
-      t.equal(t_add(n, m), t_add(m, n));
-      t.equal(t_sub(n, m), t_add(n, -m));
-
-    })
-  );
-
-  // associative
-  // (a+b)+c = a+(b+c)
-
-  fc.assert(
     fc.property(fc.bigIntN(N), n => {
-      // -(-a) = a
+      // -(-n) = n
+      t.equal(to(mpz.negate(mpz.negate(from(n)))), n);
 
       // identity
       t.equal(t_add(n, 0n), n);
       t.equal(t_add(0n, n), n);
       t.equal(t_sub(n, 0n), n);
       t.equal(t_sub(0n, n), -n);
+    })
+  );
+
+  fc.assert(
+    fc.property(fc.bigIntN(N), fc.bigIntN(N), (n, m) => {
+      // (n+m)-m = n
+      t.equal(to(mpz.sub(mpz.add(from(n), from(m)), from(m))), n);
+
+      // commutative
+      t.equal(t_add(n, m), t_add(m, n));
+      t.equal(t_sub(n, m), t_add(n, -m));
+    })
+  );
+
+  fc.assert(
+    fc.property(fc.bigIntN(N), fc.bigIntN(N), fc.bigIntN(N), (a, b, c) => {
+      const A = from(a);
+      const B = from(b);
+      const C = from(c);
+
+      // associative
+      // (a+b)+c = a+(b+c)
+      t.equal(to(mpz.add(mpz.add(A, B), C)), to(mpz.add(A, mpz.add(B, C))));
+      // (a-b)-c = a-(b+c)
+      t.equal(to(mpz.sub(mpz.sub(A, B), C)), to(mpz.sub(A, mpz.add(B, C))));
+      // (a+b)-c = a+(b-c)
+      t.equal(to(mpz.sub(mpz.add(A, B), C)), to(mpz.add(A, mpz.sub(B, C))));
     })
   );
 

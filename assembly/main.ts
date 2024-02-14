@@ -157,4 +157,8 @@ export function asUintN(bits: u32, a: MpZ): MpZ {
   return MpZ.asUintN(bits, a);
 }
 
+export function negate(a: MpZ): MpZ {
+  return a.negate();
+}
+
 // x % 2n == x & (2n - 1)

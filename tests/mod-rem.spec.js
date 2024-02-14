@@ -1,5 +1,5 @@
 import t from 'tap';
-import { t_rem, t_mod } from './setup.js';
+import { t_rem, t_mod, BigIntMath } from './setup.js';
 import fc from 'fast-check';
 
 fc.configureGlobal({ numRuns: 200 });
@@ -37,7 +37,7 @@ t.test('modulo', t => {
       //   console.log({ n, m, a, b });
       // }
       m = m || 1n;
-      t.equal(t_mod(n, m), mod(n, m));
+      t.equal(t_mod(n, m), BigIntMath.mod(n, m));
     }),
     {
       examples: [
@@ -59,7 +59,3 @@ t.test('modulo', t => {
 t.end();
 
 // identity ((x/y))*y + x%y == x
-
-function mod(n, m) {
-  return ((n % m) + m) % m;
-}

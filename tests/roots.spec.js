@@ -1,5 +1,5 @@
 import t from 'tap';
-import { t_sqrt, t_root } from './setup.js';
+import { t_sqrt, t_root, BigIntMath } from './setup.js';
 import fc from 'fast-check';
 
 fc.configureGlobal({ numRuns: 300 });
@@ -7,7 +7,7 @@ fc.configureGlobal({ numRuns: 300 });
 t.test('isqrt', t => {
   fc.assert(
     fc.property(fc.integer({ min: 1 }), n => {
-      t.equal(t_sqrt(n), BigInt(Math.pow(n, 1 / 2) | 0));
+      t.equal(t_sqrt(n), BigIntMath.sqrt(n));
     })
   );
 
@@ -25,10 +25,7 @@ t.test('root', t => {
   fc.assert(
     fc.property(fc.integer(), fc.integer({ min: 1, max: 25 }), (n, m) => {
       if (n < 0 && m % 2 === 0) return;
-      t.equal(
-        t_root(n, m),
-        BigInt((Math.sign(n) * Math.pow(Math.abs(n), 1 / m)) | 0)
-      );
+      t.equal(t_root(n, m), BigIntMath.root(n, m));
     }),
     {
       examples: [

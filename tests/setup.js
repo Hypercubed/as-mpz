@@ -21,6 +21,103 @@ export function toHex(a) {
   return '0x' + a;
 }
 
+export const BigIntMath = {
+  toHex(a) {
+    const s = a.toString(16);
+
+    if (s.startsWith('-')) {
+      return '-0x' + s.slice(1);
+    }
+    return '0x' + s;
+  },
+  abs(x) {
+    return x < 0n ? -x : x;
+  },
+  toPrecision(n, precision) {
+    const s = n.toString();
+    const e = s.length;
+    if (e > precision) {
+      const m = 10n ** BigInt(e - precision);
+      return ((n + m / 2n) / m) * m;
+    }
+    return n;
+  },
+  sign(x) {
+    return x < 0n ? -1n : 1n;
+  },
+  mod(n, m) {
+    return ((n % m) + m) % m;
+  },
+  sqrt(n) {
+    return BigInt(Math.pow(Number(n), 1 / 2) | 0);
+  },
+  root(n, m) {
+    return BigInt(
+      (Math.sign(Number(n)) * Math.pow(Math.abs(Number(n)), 1 / m)) | 0
+    );
+  },
+  log(k, n) {
+    return BigInt(n.toString(k).length - 1);
+  },
+  gcd(a, b) {
+    if (a < 0n) a = -a;
+    if (b < 0n) b = -b;
+
+    if (!b) return a;
+    return BigIntMath.gcd(b, a % b);
+  },
+  lcm(a, b) {
+    if (a === 0n || b === 0n) return 0n;
+    if (a < 0n) a = -a;
+    if (b < 0n) b = -b;
+
+    return (a * b) / BigIntMath.gcd(a, b);
+  },
+  fact(n) {
+    if (n < 2n) return 1n;
+    var fact = 1n;
+    for (let i = 2n; i <= n; i++) {
+      fact *= i;
+    }
+    return fact;
+  },
+  cmp(a, b) {
+    return a === b ? 0 : a < b ? -1 : 1;
+  },
+  toExponential(n, fractionDigits = 0) {
+    if (BigIntMath.abs(n) < Number.MAX_SAFE_INTEGER && fractionDigits <= 100) {
+      return Number(n).toExponential(fractionDigits);
+    }
+
+    if (fractionDigits <= 20) {
+      return n
+        .toLocaleString('en-US', {
+          notation: 'scientific',
+          minimumFractionDigits: fractionDigits,
+          maximumFractionDigits: fractionDigits
+        })
+        .replace(/E/, 'e+');
+    }
+
+    // Handle zero and negative values
+    const sign = n < 0n ? '-' : '';
+    n = BigIntMath.toPrecision(BigIntMath.abs(n), fractionDigits + 1);
+
+    // Determine the exponent based on the number of digits
+    const bigintStr = n.toString();
+    const exponent = bigintStr.length - 1;
+
+    // Extract the first digit(s) for the significand
+    const significand = bigintStr.slice(0, 1);
+    const fractionalDigits = bigintStr
+      .slice(1, fractionDigits + 1)
+      .padEnd(fractionDigits, '0');
+
+    // Construct the exponential notation string
+    return `${sign}${significand}.${fractionalDigits}e+${exponent}`;
+  }
+};
+
 export const from = n => mpz.from(String(n));
 export const to = n => BigInt(mpz.toString(n));
 export const t_add = (n, m) => to(mpz.add(from(n), from(m)));
@@ -36,6 +133,7 @@ export const t_log10 = n => to(mpz.log10(from(n)));
 export const t_root = (n, m) => to(mpz.iroot(from(n), m));
 export const t_rem = (n, m) => to(mpz.rem(from(n), from(m)));
 export const t_mod = (n, m) => to(mpz.mod(from(n), from(m)));
+export const t_neg = n => to(mpz.negate(from(n)));
 
 export const t_mul_pow2 = (n, m) => to(mpz.mul_pow2(from(n), m));
 export const t_div_pow2 = (n, m) => to(mpz.div_pow2(from(n), m));

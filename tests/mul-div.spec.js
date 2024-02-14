@@ -123,7 +123,6 @@ t.test('mul-div invariants', t => {
 
       // commutative
       t.equal(t_mul(a, b), t_mul(b, a));
-
     })
   );
 
@@ -131,7 +130,7 @@ t.test('mul-div invariants', t => {
   // a*(b+c) = a*b + a*c
 
   fc.assert(
-    fc.property(fc.bigIntN(N), (n) => {
+    fc.property(fc.bigIntN(N), n => {
       // identity
       t.equal(t_mul(n, 1n), n);
       t.equal(t_div(n, 1n), n);

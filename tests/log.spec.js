@@ -1,19 +1,15 @@
 import t from 'tap';
-import { t_log2, t_log10 } from './setup.js';
+import { t_log2, t_log10, BigIntMath } from './setup.js';
 import fc from 'fast-check';
 
 fc.configureGlobal({ numRuns: 300 });
 
 const M = 2n ** 4096n;
 
-function log(k, n) {
-  return BigInt(n.toString(k).length - 1);
-}
-
 t.test('log2', t => {
   fc.assert(
     fc.property(fc.bigInt({ min: 1n, max: M }), n => {
-      t.equal(t_log2(n), log(2, n));
+      t.equal(t_log2(n), BigIntMath.log(2, n));
     })
   );
 
@@ -30,7 +26,7 @@ t.test('log2', t => {
 t.test('log10', t => {
   fc.assert(
     fc.property(fc.bigInt({ min: 1n, max: M }), n => {
-      t.equal(t_log10(n), log(10, n));
+      t.equal(t_log10(n), BigIntMath.log(10, n));
     })
   );
 
