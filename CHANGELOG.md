@@ -3,6 +3,7 @@ CHANGELOG
 
 ## HEAD (Unreleased)
 * *Feature*: Implement `#toExponential`.
+* *Feature*: Implement `#powMod`.
 
 ---
 

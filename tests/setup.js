@@ -127,6 +127,7 @@ export const t_dec = n => to(mpz.dec(from(n)));
 export const t_mul = (n, m) => to(mpz.mul(from(n), from(m)));
 export const t_div = (n, m) => to(mpz.div(from(n), from(m)));
 export const t_pow = (n, m) => to(mpz.pow(from(n), from(m)));
+export const t_powMod = (n, m, o) => to(mpz.powMod(from(n), from(m), from(o)));
 export const t_sqrt = n => to(mpz.isqrt(from(n)));
 export const t_log2 = n => to(mpz.log2(from(n)));
 export const t_log10 = n => to(mpz.log10(from(n)));

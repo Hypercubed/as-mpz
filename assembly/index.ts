@@ -854,6 +854,50 @@ export class MpZ {
     return z;
   }
 
+  powMod<T, X>(rhs: T, m: X): MpZ {
+    const x = this;
+    const y = MpZ.from(rhs);
+    const n = MpZ.from(m);
+
+    if (y.isNeg) return MpZ.ZERO;
+
+    if (y.eqz()) return MpZ.ONE.mod(m);
+    if (x.eqz()) return MpZ.ZERO;
+    if (y.eq(MpZ.ONE)) return x.mod(m);
+    if (x.eq(MpZ.ONE)) return MpZ.ONE.mod(m);
+
+    let z = x.abs()._upowMod(y, n);
+    if (z.eqz()) return MpZ.ZERO;
+
+    const sp = x.isNeg && y.isOdd();
+    if (sp === n.isNeg) return z;
+    return z.negate().add(n);
+  }
+
+  protected _upowMod(rhs: MpZ, m: MpZ): MpZ {
+    assert(ASC_NO_ASSERT || !this.isNeg, '_upowMod: lhs must be positive');
+
+    let z = MpZ.ONE;
+    let x: MpZ = this.mod(m);
+
+    const p = rhs.size;
+    for (let i: i32 = 0; i < p; ++i) {
+      let ly = unchecked(rhs._data[i]);
+
+      for (let j: u32 = 0; j < LIMB_BITS; ++j) {
+        if (ly & 1) {
+          z = z._umul(x).mod(m);
+        }
+
+        ly >>= 1;
+        if (ly === 0 && i === p - 1) break;
+        x = x._usqr().mod(m);
+      }
+    }
+
+    return z;
+  }
+
   /**
    * #### `#sqrt(): MpZ`
    *

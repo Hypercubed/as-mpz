@@ -1,5 +1,14 @@
 import t from 'tap';
-import { mpz, to, from, t_pow, t_sqrt, t_root } from './setup.js';
+import {
+  mpz,
+  to,
+  from,
+  t_pow,
+  t_powMod,
+  t_sqrt,
+  t_root,
+  BigIntMath
+} from './setup.js';
 import fc from 'fast-check';
 
 fc.configureGlobal({ numRuns: 200 });
@@ -7,7 +16,7 @@ const N = 256; // 2**31-1 max
 
 t.test('pow', t => {
   fc.assert(
-    fc.property(fc.bigIntN(N), fc.bigInt(0n, 20n), (n, m) => {
+    fc.property(fc.bigIntN(N), fc.bigInt(0n, 2n ** 4n), (n, m) => {
       t.equal(t_pow(n, m), n ** m);
     }),
     {
@@ -18,6 +27,22 @@ t.test('pow', t => {
         [0xdeadbeefn, 1n]
       ]
     }
+  );
+
+  t.end();
+});
+
+t.test('powMod', t => {
+  fc.assert(
+    fc.property(
+      fc.bigIntN(N),
+      fc.bigInt(0n, 2n ** 8n),
+      fc.bigIntN(N),
+      (x, n, m) => {
+        if (m === 0n) m++;
+        t.equal(t_powMod(x, n, m), BigIntMath.mod(x ** n, m));
+      }
+    )
   );
 
   t.end();

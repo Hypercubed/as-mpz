@@ -98,15 +98,19 @@ export function mod(a: MpZ, b: MpZ): MpZ {
 }
 
 export function rem(a: MpZ, b: MpZ): MpZ {
-  return a % b;
+  return a.rem(b);
 }
 
 export function pow(a: MpZ, b: MpZ): MpZ {
-  return a ** b;
+  return a.pow(b);
+}
+
+export function powMod(a: MpZ, b: MpZ, c: MpZ): MpZ {
+  return a.powMod(b, c);
 }
 
 export function sub(a: MpZ, b: MpZ): MpZ {
-  return a - b;
+  return a.sub(b);
 }
 
 export function dec(a: MpZ): MpZ {
