@@ -74,3 +74,56 @@ describe('pow', () => {
     expect(p.toString()).toBe('99899999001');
   });
 });
+
+describe('powMod', () => {
+  it('return correct results', () => {
+    assertSame(MpZ.from(0).powMod(1, 1), 0);
+    assertSame(MpZ.from(1).powMod(1, 1), 0);
+
+    assertSame(MpZ.from(0).powMod(1, 2), 0);
+    assertSame(MpZ.from(1).powMod(1, 2), 1);
+
+    assertSame(MpZ.from(0xdeadbeef).powMod(2, 3), 1);
+    assertSame(MpZ.from(0xdeadbeef).powMod(2, 10), 1);
+    assertSame(MpZ.from(0xdeadbeef).powMod(2, 100), 81);
+
+    assertSame(MpZ.from(0xdeadbeef).powMod(3, 2), 1);
+    assertSame(MpZ.from(0xdeadbeef).powMod(3, 10), 9);
+    assertSame(MpZ.from(0xdeadbeef).powMod(3, 100), 79);
+
+    assertSame(MpZ.from(0xdeadbeef).powMod(4, 2), 1);
+    assertSame(MpZ.from(0xdeadbeef).powMod(4, 10), 1);
+    assertSame(MpZ.from(0xdeadbeef).powMod(4, 100), 61);
+
+    assertSame(MpZ.from(0xdeadbeef).powMod(5, 2), 1);
+    assertSame(MpZ.from(0xdeadbeef).powMod(5, 10), 9);
+    assertSame(MpZ.from(0xdeadbeef).powMod(5, 100), 99);
+  });
+
+  it('returns correct results for negative numbers', () => {
+    assertSame(MpZ.from(-1).powMod(1, 1), 0);
+    assertSame(MpZ.from(-1).powMod(1, 2), 1);
+    assertSame(MpZ.from(-0xdeadbeef).powMod(2, 100), 81);
+    assertSame(MpZ.from(-0xdeadbeef).powMod(3, 100), 21);
+    assertSame(MpZ.from(-0xdeadbeef).powMod(4, 100), 61);
+    assertSame(MpZ.from(-0xdeadbeef).powMod(5, 100), 1);
+  });
+
+  it('throws on mod by zero', () => {
+    expect(() => {
+      MpZ.from(1).powMod(2, 0);
+    }).toThrow();
+  });
+
+  it('throws on mod < 0', () => {
+    expect(() => {
+      MpZ.from(1).powMod(2, -2);
+    }).toThrow();
+  });
+
+  it('throws on rhs < 0', () => {
+    expect(() => {
+      MpZ.from(1).powMod(-2, 2);
+    }).toThrow();
+  });
+});

@@ -37,21 +37,35 @@ describe('rem', () => {
       '542101086242752217003726400434970855712890625'
     );
   });
+
+  it('throws on rem by zero', () => {
+    expect(() => {
+      MpZ.from(1).rem(0);
+    }).toThrow();
+  });
 });
 
 describe('mod', () => {
-  assertSame(MpZ.from(0).mod(1), 0);
-  assertSame(MpZ.from(100000 + 7).mod(100000), 7);
+  it('return correct results', () => {
+    assertSame(MpZ.from(0).mod(1), 0);
+    assertSame(MpZ.from(100000 + 7).mod(100000), 7);
 
-  assertSame(MpZ.from(100000).mod(7), 5);
-  assertSame(MpZ.from(-100000).mod(7), 2);
-  assertSame(MpZ.from(-100000).mod(-7), -5);
-  assertSame(MpZ.from(100000).mod(-7), -2);
+    assertSame(MpZ.from(100000).mod(7), 5);
+    assertSame(MpZ.from(-100000).mod(7), 2);
+    assertSame(MpZ.from(-100000).mod(-7), -5);
+    assertSame(MpZ.from(100000).mod(-7), -2);
 
-  assertSame(MpZ.from(10000).mod(7), 4);
-  assertSame(MpZ.from(-10000).mod(7), 3);
-  assertSame(MpZ.from(-10000).mod(-7), -4);
-  assertSame(MpZ.from(10000).mod(-7), -3);
+    assertSame(MpZ.from(10000).mod(7), 4);
+    assertSame(MpZ.from(-10000).mod(7), 3);
+    assertSame(MpZ.from(-10000).mod(-7), -4);
+    assertSame(MpZ.from(10000).mod(-7), -3);
+  });
+
+  it('throws on mod by zero', () => {
+    expect(() => {
+      MpZ.from(1).mod(0);
+    }).toThrow();
+  });
 });
 
 describe('operators', () => {

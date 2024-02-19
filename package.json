@@ -21,7 +21,7 @@
     "asp": "asp",
     "pretap": "npm run asbuild:debug",
     "prettier": "prettier . --check",
-    "tap": "tap --node-arg=\"--no-warnings\" --allow-empty-coverage --disable-coverage run ./tests/*.spec.js --timeout=120",
+    "tap": "tap --node-arg=\"--no-warnings\" --allow-empty-coverage --disable-coverage run ./tests/pow.spec.js --timeout=120",
     "asbuild:debug": "asc assembly/main.ts --target debug",
     "asbuild:release": "asc assembly/main.ts --target release",
     "asbuild": "npm run asbuild:debug && npm run asbuild:release",

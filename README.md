@@ -153,6 +153,12 @@ Throws RangeError if `rhs` is zero.
 
 Returns the value of `this` MpZ raised to the power of `rhs` (`this ** rhs`).
 
+#### `# powMod(rhs: i32 | u32 | i64 | u64 | MpZ, m: i32 | u32 | i64 | u64 | MpZ): MpZ`
+
+Returns the value of `this` MpZ raised to the power of `rhs` mod `m` (`this ** rhs mod m`).
+Throws RangeError if `m` is <= 0.
+Throws RangeError if `rhs` is negative.
+
 #### `#sqrt(): MpZ`
 
 Returns the greatest integer less than or equal to the square root of `this`.

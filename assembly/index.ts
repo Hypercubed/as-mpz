@@ -854,31 +854,43 @@ export class MpZ {
     return z;
   }
 
+  /**
+   * #### `# powMod(rhs: i32 | u32 | i64 | u64 | MpZ, m: i32 | u32 | i64 | u64 | MpZ): MpZ`
+   *
+   * @returns the value of `this` MpZ raised to the power of `rhs` mod `m` (`this ** rhs mod m`).
+   * @throws RangeError if `m` is <= 0.
+   * @throws RangeError if `rhs` is negative.
+   */
+  // TODO: Support negative exponents (modular inverse)
   powMod<T, X>(rhs: T, m: X): MpZ {
     const x = this;
     const y = MpZ.from(rhs);
     const n = MpZ.from(m);
 
-    if (y.isNeg) return MpZ.ZERO;
+    if (n.isNeg || n.eqz())
+      throw new RangeError('powMod: Modulus must be greater than 0');
+    if (y.isNeg) throw new RangeError('powMod: rhs must be greater than 0');
 
-    if (y.eqz()) return MpZ.ONE.mod(m);
+    if (y.eqz()) return MpZ.ONE;
     if (x.eqz()) return MpZ.ZERO;
     if (y.eq(MpZ.ONE)) return x.mod(m);
-    if (x.eq(MpZ.ONE)) return MpZ.ONE.mod(m);
+    if (x.eq(MpZ.ONE)) return MpZ.ONE;
 
     let z = x.abs()._upowMod(y, n);
     if (z.eqz()) return MpZ.ZERO;
 
-    const sp = x.isNeg && y.isOdd();
-    if (sp === n.isNeg) return z;
-    return z.negate().add(n);
+    if (x.isNeg && y.isOdd()) return z.negate().add(n);
+    return z;
   }
 
+  // unsigned pow mod
+  // exponentiation by squaring (modified)
+  // `this` must be positive
   protected _upowMod(rhs: MpZ, m: MpZ): MpZ {
     assert(ASC_NO_ASSERT || !this.isNeg, '_upowMod: lhs must be positive');
 
     let z = MpZ.ONE;
-    let x: MpZ = this.mod(m);
+    let x: MpZ = this.rem(m);
 
     const p = rhs.size;
     for (let i: i32 = 0; i < p; ++i) {
@@ -886,12 +898,12 @@ export class MpZ {
 
       for (let j: u32 = 0; j < LIMB_BITS; ++j) {
         if (ly & 1) {
-          z = z._umul(x).mod(m);
+          z = z._umul(x).rem(m);
         }
 
         ly >>= 1;
         if (ly === 0 && i === p - 1) break;
-        x = x._usqr().mod(m);
+        x = x._usqr().rem(m);
       }
     }
 

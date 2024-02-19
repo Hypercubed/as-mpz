@@ -1,6 +1,6 @@
 # Todo list for [as-bigin](https://github.com/Hypercubed/as-bigint)
 
-- `#ctz`?
+- `#ctz`/`#bitLength`
 - fused arithmetic?
 - Optimized `#inc`/`#dec`
 - `max`/`min`

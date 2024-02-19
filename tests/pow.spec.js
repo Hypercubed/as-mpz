@@ -37,7 +37,7 @@ t.test('powMod', t => {
     fc.property(
       fc.bigIntN(N),
       fc.bigInt(0n, 2n ** 8n),
-      fc.bigIntN(N),
+      fc.bigInt(0n, 2n ** 256n),
       (x, n, m) => {
         if (m === 0n) m++;
         t.equal(t_powMod(x, n, m), BigIntMath.mod(x ** n, m));
