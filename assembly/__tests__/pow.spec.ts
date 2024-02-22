@@ -3,13 +3,11 @@ import { assertSame } from './assertions';
 
 describe('pow', () => {
   it('return correct results', () => {
-    assertSame(MpZ.from(0).pow(MpZ.ONE), 0);
     assertSame(MpZ.from(1).pow(MpZ.ONE), 1);
     assertSame(MpZ.from(0xdeadbeef).pow(MpZ.ONE), 0xdeadbeef);
 
     assertSame(MpZ.from(1).pow('0xdeadbeefdeadbeef'), 1);
 
-    assertSame(MpZ.from(0).pow(MpZ.TWO), 0);
     assertSame(MpZ.from(1).pow(MpZ.TWO), 1);
     assertSame(MpZ.from(0xdeadbeef).pow(MpZ.TWO), '13957162197951816481');
     assertSame(MpZ.from(0xdeadbeef).pow(3), '52142960857923402497294780879');
@@ -20,8 +18,31 @@ describe('pow', () => {
     );
   });
 
-  it('n < 0', () => {
-    assertSame(MpZ.from(0).pow(-1), 0);
+  it('n === 0', () => {
+    assertSame(MpZ.from(0).pow(0), 1);
+    assertSame(MpZ.from(1).pow(0), 1);
+    assertSame(MpZ.from(0xdeadbeef).pow(0), 1);
+  });
+
+  it('throws if n < 0', () => {
+    expect(() => {
+      MpZ.from(0).pow(-1);
+    }).toThrow();
+
+    expect(() => {
+      MpZ.from(1).pow(-1);
+    }).toThrow();
+
+    expect(() => {
+      MpZ.from(-0xdeadbeef).pow(-0xdeadbeef);
+    }).toThrow();
+  });
+
+  it('a === 0', () => {
+    assertSame(MpZ.from(0).pow(0), 1);
+    assertSame(MpZ.from(0).pow(1), 0);
+    assertSame(MpZ.from(0).pow(2), 0);
+    assertSame(MpZ.from(0).pow(0xdeadbeef), 0);
   });
 
   it('a < 0', () => {
@@ -98,6 +119,12 @@ describe('powMod', () => {
     assertSame(MpZ.from(0xdeadbeef).powMod(5, 2), 1);
     assertSame(MpZ.from(0xdeadbeef).powMod(5, 10), 9);
     assertSame(MpZ.from(0xdeadbeef).powMod(5, 100), 99);
+  });
+
+  it('n === 0', () => {
+    assertSame(MpZ.from(0).powMod(0, 10), 1);
+    assertSame(MpZ.from(1).powMod(0, 10), 1);
+    assertSame(MpZ.from(0xdeadbeef).powMod(0, 10), 1);
   });
 
   it('returns correct results for negative numbers', () => {

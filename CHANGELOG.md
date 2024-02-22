@@ -4,6 +4,7 @@ CHANGELOG
 ## HEAD (Unreleased)
 * *Feature*: Implement `#toExponential`.
 * *Feature*: Implement `#powMod`.
+* *Breaking*: `#pow` now throws when the exponent is negative.
 
 ---
 

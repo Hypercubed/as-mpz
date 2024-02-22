@@ -794,15 +794,16 @@ export class MpZ {
    * #### `#pow(rhs: i32 | u32 | i64 | u64 | MpZ): MpZ`
    *
    * @returns the value of `this` MpZ raised to the power of `rhs` (`this ** rhs`).
+   * @throws RangeError if `rhs` is negative and `this` is zero.
    */
   pow<T>(rhs: T): MpZ {
     const y = MpZ.from(rhs);
-    if (y.isNeg) return MpZ.ZERO;
+    if (y.isNeg) throw new RangeError('rhs must be greater than 0');
 
+    if (this.eq(MpZ.ONE)) return MpZ.ONE;
     if (y.eqz()) return MpZ.ONE;
     if (this.eqz()) return MpZ.ZERO;
     if (y.eq(MpZ.ONE)) return this;
-    if (this.eq(MpZ.ONE)) return MpZ.ONE;
 
     const sz = this.isNeg && y.isOdd();
     const z =
@@ -868,8 +869,8 @@ export class MpZ {
     const n = MpZ.from(m);
 
     if (n.isNeg || n.eqz())
-      throw new RangeError('powMod: Modulus must be greater than 0');
-    if (y.isNeg) throw new RangeError('powMod: rhs must be greater than 0');
+      throw new RangeError('Modulus must be greater than 0');
+    if (y.isNeg) throw new RangeError('rhs must be greater than 0');
 
     if (y.eqz()) return MpZ.ONE;
     if (x.eqz()) return MpZ.ZERO;

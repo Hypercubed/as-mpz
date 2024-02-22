@@ -152,6 +152,7 @@ Throws RangeError if `rhs` is zero.
 #### `#pow(rhs: i32 | u32 | i64 | u64 | MpZ): MpZ`
 
 Returns the value of `this` MpZ raised to the power of `rhs` (`this ** rhs`).
+Throws RangeError if `rhs` is negative and `this` is zero.
 
 #### `# powMod(rhs: i32 | u32 | i64 | u64 | MpZ, m: i32 | u32 | i64 | u64 | MpZ): MpZ`
 
