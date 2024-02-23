@@ -9,8 +9,6 @@ const mpzB = MpZ.from(b);
 const bigIntA = BigInt.from(a);
 const bigIntB = BigInt.from(b);
 
-assert(`${mpzA.add(mpzB)}` === `${bigIntA.add(bigIntB)}`);
-
 suite('add large', () => {
   bench('MpZ#__uadd (large)', () => {
     // @ts-ignore
@@ -27,25 +25,27 @@ suite('add large', () => {
 });
 
 const c = 0xbeef;
+const d = 0xdead;
 const mpzC = blackbox(MpZ.from(c));
+const mpzD = blackbox(MpZ.from(d));
 const bigIntC = blackbox(BigInt.from(c));
+const bigIntD = blackbox(BigInt.from(d));
 
 suite('add small', () => {
-  // bench('MpZ#_uaddToU32 (small)', () => {
-  //   // @ts-ignore
-  //   blackbox(mpzA._uaddToU32(c));
-  // });
+  bench('native', () => {
+    blackbox(c + d);
+  });
 
-  bench('MpZ#__uadd (small)', () => {
+  bench('MpZ#_uaddToU32 (small)', () => {
     // @ts-ignore
-    blackbox(mpzA.__uadd(mpzC));
+    blackbox(mpzC._uaddU32(d));
   });
 
   bench('MpZ#add (small)', () => {
-    blackbox(mpzA.add(mpzC));
+    blackbox(mpzC.add(mpzD));
   });
 
   bench('BigInt#add (small)', () => {
-    blackbox(bigIntA.add(bigIntC));
+    blackbox(bigIntC.add(bigIntD));
   });
 });

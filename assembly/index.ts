@@ -794,7 +794,7 @@ export class MpZ {
    * #### `#pow(rhs: i32 | u32 | i64 | u64 | MpZ): MpZ`
    *
    * @returns the value of `this` MpZ raised to the power of `rhs` (`this ** rhs`).
-   * @throws RangeError if `rhs` is negative and `this` is zero.
+   * @throws RangeError if `rhs` is negative.
    */
   pow<T>(rhs: T): MpZ {
     const y = MpZ.from(rhs);
@@ -805,16 +805,37 @@ export class MpZ {
     if (this.eqz()) return MpZ.ZERO;
     if (y.eq(MpZ.ONE)) return this;
 
-    const sz = this.isNeg && y.isOdd();
-    const z =
-      y.size === 1 ? this._upowU32(unchecked(y._data[0])) : this._upow(y);
-    return sz ? z.negate() : z;
+    const z = this._upow(y);
+    return this.isNeg && y.isOdd() ? z.negate() : z;
   }
 
   // unsigned pow
   // exponentiation by squaring (modified)
   // ignores sign of base and exponent
   protected _upow(rhs: MpZ): MpZ {
+    let x: MpZ = this;
+
+    const powersOfTwo = x._ctz();
+
+    if (powersOfTwo > 0) {
+      x = x._udiv_pow2(powersOfTwo);
+    }
+
+    let z: MpZ;
+    if (rhs.size === 1) {
+      z = x._upowU32(unchecked(rhs._data[0]));
+    } else {
+      z = x._upowLarge(rhs);
+    }
+
+    if (powersOfTwo > 0) {
+      z = z._leftShift(rhs.mul(powersOfTwo));
+    }
+
+    return z;
+  }
+
+  protected _upowLarge(rhs: MpZ): MpZ {
     let z = MpZ.ONE;
     let x: MpZ = this;
 
