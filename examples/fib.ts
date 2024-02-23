@@ -80,6 +80,6 @@ function run(f0: MpZ, f1: MpZ, P: i32, Q: i32): void {
 
 function trim<T>(m: T, n: u32 = 30): string {
   const s = m.toString();
-  if (s.length <= 2 * n) return s + ' '.repeat(2 * n + 3 - s.length);
-  return s.slice(0, n) + '...' + s.slice(-n);
+  if (s.length <= 2 * n) return s;
+  return s.slice(0, n) + '...' + s.slice(-n) + ` (${s.length} digits)`;
 }
